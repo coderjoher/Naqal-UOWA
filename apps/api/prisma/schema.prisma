@@ -58,35 +58,45 @@ model University {
   payments           Payment[]
   subscriptions      Subscription[]
   receiptCounter     ReceiptCounter?
+  availability       DriverAvailability[]
+  rideRequests       RideRequest[]
+  runs               Run[]
+  runStops           RunStop[]
+  wavePlans          WavePlan[]
+  notifications      Notification[]
 
   @@map("universities")
 }
 
 model User {
-  id           String      @id @default(uuid()) @db.Uuid
+  id             String     @id @default(uuid()) @db.Uuid
   /// Null only for role = super_admin (platform level).
-  universityId String?     @map("university_id") @db.Uuid
-  role         Role
-  name         String
-  email        String?     @unique
-  phone        String?
-  gender       Gender?
-  passwordHash String?     @map("password_hash")
-  status       UserStatus  @default(active)
+  universityId   String?    @map("university_id") @db.Uuid
+  role           Role
+  name           String
+  email          String?    @unique
+  phone          String?
+  gender         Gender?
+  passwordHash   String?    @map("password_hash")
+  status         UserStatus @default(active)
   /// Students: university student number. Unique per university.
-  studentId    String?     @map("student_id")
-  nameAr       String?     @map("name_ar")
+  studentId      String?    @map("student_id")
+  nameAr         String?    @map("name_ar")
   /// Drivers sign in with this phone (OTP). Globally unique: a driver belongs to one university in v1.
-  loginPhone   String?     @unique @map("login_phone")
-  defaultPointId String?   @map("default_point_id") @db.Uuid
-  createdAt    DateTime    @default(now()) @map("created_at")
-  updatedAt    DateTime    @updatedAt @map("updated_at")
+  loginPhone     String?    @unique @map("login_phone")
+  defaultPointId String?    @map("default_point_id") @db.Uuid
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
 
-  university    University?     @relation(fields: [universityId], references: [id])
-  defaultPoint  GatheringPoint? @relation(fields: [defaultPointId], references: [id])
+  university    University?          @relation(fields: [universityId], references: [id])
+  defaultPoint  GatheringPoint?      @relation(fields: [defaultPointId], references: [id])
   driver        DriverProfile?
   subscriptions Subscription[]
-  payments      Payment[]       @relation("PaymentStudent")
+  payments      Payment[]            @relation("PaymentStudent")
+  availability  DriverAvailability[] @relation("DriverAvailability")
+  rideRequests  RideRequest[]        @relation("RideRequests")
+  runs          Run[]                @relation("DriverRuns")
+  notifications Notification[]       @relation("Notifications")
 
   @@unique([universityId, studentId])
   @@index([universityId, role])
@@ -149,9 +159,11 @@ model GatheringPoint {
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
-  university University   @relation(fields: [universityId], references: [id])
-  tier       DistanceTier @relation(fields: [tierId], references: [id])
+  university University    @relation(fields: [universityId], references: [id])
+  tier       DistanceTier  @relation(fields: [tierId], references: [id])
   students   User[]
+  requests   RideRequest[]
+  stops      RunStop[]
 
   @@index([universityId, active])
   @@map("gathering_points")
@@ -175,7 +187,11 @@ model Wave {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  university University @relation(fields: [universityId], references: [id])
+  university   University           @relation(fields: [universityId], references: [id])
+  availability DriverAvailability[]
+  requests     RideRequest[]
+  runs         Run[]
+  plans        WavePlan[]
 
   @@index([universityId, type])
   @@map("waves")
@@ -394,4 +410,147 @@ model ReceiptCounter {
   university University @relation(fields: [universityId], references: [id])
 
   @@map("receipt_counters")
+}
+
+// ── P4: ride requests and dispatch ────────────────────────────────────────────
+
+/// DR-02: a driver offers to run a wave on a date.
+model DriverAvailability {
+  universityId String   @map("university_id") @db.Uuid
+  driverId     String   @map("driver_id") @db.Uuid
+  date         DateTime @db.Date
+  waveId       String   @map("wave_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  university University @relation(fields: [universityId], references: [id])
+  driver     User       @relation("DriverAvailability", fields: [driverId], references: [id])
+  wave       Wave       @relation(fields: [waveId], references: [id])
+
+  @@id([driverId, date, waveId])
+  @@index([universityId, date, waveId])
+  @@map("driver_availability")
+}
+
+enum RideStatus {
+  open
+  assigned
+  waitlisted
+  cancelled
+  done
+}
+
+/// ST-04: a request for one wave on one date. At most one live request per student, wave and date.
+model RideRequest {
+  id              String     @id @default(uuid()) @db.Uuid
+  universityId    String     @map("university_id") @db.Uuid
+  studentId       String     @map("student_id") @db.Uuid
+  waveId          String     @map("wave_id") @db.Uuid
+  date            DateTime   @db.Date
+  pointId         String     @map("point_id") @db.Uuid
+  tierId          String     @map("tier_id") @db.Uuid
+  gender          Gender
+  /// SM-03: had an active subscription for the date when requesting.
+  subscriber      Boolean
+  /// Cash to the driver for this ride (PA-02/PA-03): ride price, tier difference, or 0.
+  fare            Int
+  status          RideStatus @default(open)
+  runId           String?    @map("run_id") @db.Uuid
+  waitlistedUntil DateTime?  @map("waitlisted_until")
+  /// student | expired | office
+  cancelReason    String?    @map("cancel_reason")
+  boardedAt       DateTime?  @map("boarded_at")
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+
+  university University     @relation(fields: [universityId], references: [id])
+  student    User           @relation("RideRequests", fields: [studentId], references: [id])
+  wave       Wave           @relation(fields: [waveId], references: [id])
+  point      GatheringPoint @relation(fields: [pointId], references: [id])
+  run        Run?           @relation(fields: [runId], references: [id])
+
+  @@index([universityId, date, waveId, status])
+  @@index([studentId, date])
+  @@map("ride_requests")
+}
+
+enum RunStatus {
+  planned
+  started
+  done
+  cancelled
+}
+
+/// DS-02: one bus doing one wave on one date.
+model Run {
+  id           String    @id @default(uuid()) @db.Uuid
+  universityId String    @map("university_id") @db.Uuid
+  driverId     String    @map("driver_id") @db.Uuid
+  waveId       String    @map("wave_id") @db.Uuid
+  date         DateTime  @db.Date
+  gender       Gender
+  /// DS-06: tier of the farthest stop (Q3 default rule), kept so settlement can be recomputed.
+  tierId       String    @map("tier_id") @db.Uuid
+  capacity     Int
+  status       RunStatus @default(planned)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  university University    @relation(fields: [universityId], references: [id])
+  driver     User          @relation("DriverRuns", fields: [driverId], references: [id])
+  wave       Wave          @relation(fields: [waveId], references: [id])
+  stops      RunStop[]
+  requests   RideRequest[]
+
+  @@unique([driverId, waveId, date])
+  @@index([universityId, date, waveId])
+  @@map("runs")
+}
+
+model RunStop {
+  id           String    @id @default(uuid()) @db.Uuid
+  universityId String    @map("university_id") @db.Uuid
+  runId        String    @map("run_id") @db.Uuid
+  seq          Int
+  pointId      String    @map("point_id") @db.Uuid
+  /// Planned pickup (morning) or drop-off (return).
+  eta          DateTime
+  servedAt     DateTime? @map("served_at")
+
+  university University     @relation(fields: [universityId], references: [id])
+  run        Run            @relation(fields: [runId], references: [id], onDelete: Cascade)
+  point      GatheringPoint @relation(fields: [pointId], references: [id])
+
+  @@unique([runId, seq])
+  @@map("run_stops")
+}
+
+/// Marks a wave on a date as planned; later requests go through insertion (DS-03).
+model WavePlan {
+  universityId String   @map("university_id") @db.Uuid
+  waveId       String   @map("wave_id") @db.Uuid
+  date         DateTime @db.Date
+  plannedAt    DateTime @default(now()) @map("planned_at")
+
+  university University @relation(fields: [universityId], references: [id])
+  wave       Wave       @relation(fields: [waveId], references: [id])
+
+  @@id([waveId, date])
+  @@map("wave_plans")
+}
+
+/// Outbox of messages for a user (in-app now; push delivery in P5).
+model Notification {
+  id           String    @id @default(uuid()) @db.Uuid
+  universityId String    @map("university_id") @db.Uuid
+  userId       String    @map("user_id") @db.Uuid
+  kind         String
+  data         Json      @default("{}")
+  readAt       DateTime? @map("read_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  university University @relation(fields: [universityId], references: [id])
+  user       User       @relation("Notifications", fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@map("notifications")
 }

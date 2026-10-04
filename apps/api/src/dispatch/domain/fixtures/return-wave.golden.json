@@ -1,0 +1,54 @@
+{
+  "runs": 4,
+  "plan": [
+    {
+      "gender": "female",
+      "tier": "T1",
+      "seats": "11/14",
+      "stops": [
+        "north×6@14:18",
+        "west×5@14:42"
+      ],
+      "tiers": [
+        "T1"
+      ]
+    },
+    {
+      "gender": "male",
+      "tier": "T0",
+      "seats": "4/14",
+      "stops": [
+        "east×4@14:13"
+      ],
+      "tiers": [
+        "T0"
+      ]
+    },
+    {
+      "gender": "male",
+      "tier": "T2",
+      "seats": "13/14",
+      "stops": [
+        "north×8@14:18",
+        "north2×5@14:25"
+      ],
+      "tiers": [
+        "T1",
+        "T2"
+      ]
+    },
+    {
+      "gender": "male",
+      "tier": "T2",
+      "seats": "13/14",
+      "stops": [
+        "west×6@14:25",
+        "west2×7@14:33"
+      ],
+      "tiers": [
+        "T1",
+        "T2"
+      ]
+    }
+  ]
+}

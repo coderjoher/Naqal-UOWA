@@ -42,6 +42,59 @@ class FakeBackend {
       };
   final requests = <http.Request>[];
 
+  /// What GET /rides/me returns; tests change it to simulate dispatch (server side).
+  List<Map<String, Object?>> rides = [];
+
+  /// Baghdad civil dates, so "today" labels and goldens do not depend on when tests run.
+  static String day([int plus = 0]) {
+    final d = DateTime.now().toUtc().add(Duration(hours: 3, days: plus));
+    return '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+  }
+
+  static String get today => day();
+
+  final slots = [
+    {'waveId': 'w8', 'date': day(), 'type': 'morning', 'minuteOfDay': 480, 'time': '08:00', 'today': true},
+    {'waveId': 'w14', 'date': day(), 'type': 'return', 'minuteOfDay': 840, 'time': '14:00', 'today': true},
+    {'waveId': 'w8', 'date': day(1), 'type': 'morning', 'minuteOfDay': 480, 'time': '08:00', 'today': false},
+  ];
+
+  static Map<String, Object?> ride({
+    String id = 'r1',
+    String status = 'open',
+    String? date,
+    String time = '08:00',
+    String type = 'morning',
+    int fare = 0,
+    DateTime? waitlistedUntil,
+    String? cancelReason,
+    Map<String, Object?>? assignment,
+  }) =>
+      {
+        'id': id,
+        'status': status,
+        'date': date ?? today,
+        'wave': {'id': 'w8', 'type': type, 'minuteOfDay': 480, 'time': time},
+        'point': {'id': 'p1', 'name': 'Al-Abbas Square', 'nameAr': 'ساحة العباس'},
+        'subscriber': fare == 0,
+        'fare': fare,
+        'waitlistedUntil': waitlistedUntil?.toUtc().toIso8601String(),
+        'cancelReason': cancelReason,
+        'assignment': assignment,
+      };
+
+  static Map<String, Object?> assignment({DateTime? pickupAt}) => {
+        'runId': 'run1',
+        'driverName': 'حيدر عباس',
+        'driverPhone': '+9647801234567',
+        'plate': '12345 كربلاء',
+        'vehicleType': 'كوستر',
+        'vehiclePhotoUrl': null,
+        'pickupAt': (pickupAt ?? DateTime(2026, 10, 5, 7, 32)).toUtc().toIso8601String(),
+        'stopNumber': 2,
+        'stops': 3,
+      };
+
   final points = [
     {'id': 'p1', 'name': 'Al-Abbas Square', 'nameAr': 'ساحة العباس', 'tierId': 't-b', 'tier': {'id': 't-b', 'name': 'B'}, 'distanceKm': 4.8, 'active': true},
     {'id': 'p2', 'name': 'Bab Baghdad', 'nameAr': 'باب بغداد', 'tierId': 't-a', 'tier': {'id': 't-a', 'name': 'A'}, 'distanceKm': 2.7, 'active': true},
@@ -84,6 +137,20 @@ class FakeBackend {
         return _json(points);
       case 'GET /subscriptions/me':
         return _json(subscription);
+      case 'GET /rides/options':
+        return _json({'slots': slots, 'defaultPointId': (profile['defaultPoint'] as Map?)?['id'], 'gender': profile['gender']});
+      case 'GET /rides/me':
+        return _json(rides);
+      case 'POST /rides':
+        final slot = slots.firstWhere((x) => x['waveId'] == body['waveId'] && x['date'] == body['date']);
+        final r = ride(id: 'r${rides.length + 1}', date: slot['date'] as String, time: slot['time'] as String, type: slot['type'] as String);
+        rides = [r, ...rides];
+        return _json(r, 201);
+    }
+    final cancel = RegExp(r'^/rides/([^/]+)/cancel$').firstMatch(req.url.path);
+    if (req.method == 'POST' && cancel != null) {
+      rides = [for (final r in rides) r['id'] == cancel.group(1) ? {...r, 'status': 'cancelled', 'cancelReason': 'student', 'assignment': null} : r];
+      return _json(rides.firstWhere((r) => r['id'] == cancel.group(1)));
     }
     return _json({'message': 'not found'}, 404);
   });

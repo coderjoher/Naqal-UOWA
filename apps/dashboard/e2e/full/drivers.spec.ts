@@ -10,7 +10,7 @@ async function applyAsDriver(request: APIRequestContext, phone: string, name: st
   const { accessToken } = await (await request.post(`${API}/auth/driver/verify`, { data: { phone, code: devCode, university: 'warith' } })).json();
   const headers = { Authorization: `Bearer ${accessToken}` };
   expect((await request.patch(`${API}/drivers/me`, { headers, data: { name, vehicleType: 'coaster', plate: '45 ك 12345', seats: 20, modelYear: 2019 } })).ok()).toBe(true);
-  for (const key of ['national_id', 'driving_licence', 'vehicle_registration']) {
+  for (const key of ['national_id', 'driving_licence', 'vehicle_registration', 'vehicle_photo']) {
     const r = await request.put(`${API}/drivers/me/documents/${key}`, { headers, multipart: { file: { name: `${key}.png`, mimeType: 'image/png', buffer: PNG } } });
     expect(r.ok()).toBe(true);
   }

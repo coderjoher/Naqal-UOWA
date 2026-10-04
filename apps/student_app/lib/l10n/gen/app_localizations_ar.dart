@@ -30,7 +30,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noRideToday => 'لا توجد رحلة اليوم';
 
   @override
-  String get noRideTodayBody => 'طلب الرحلات اليومية سيتوفر قريباً.';
+  String get noRideTodayBody => 'اطلب مقعداً في حافلة اليوم أو الغد.';
 
   @override
   String get tabHome => 'الرئيسية';
@@ -257,4 +257,112 @@ class AppLocalizationsAr extends AppLocalizations {
   String subTier(String tier) {
     return 'الفئة $tier';
   }
+
+  @override
+  String get rideRequest => 'اطلب رحلة';
+
+  @override
+  String get rideRequestTitle => 'طلب رحلة';
+
+  @override
+  String get rideRequestBody => 'اختر الموعد ونقطة التجمّع، ونحجز لك مقعداً.';
+
+  @override
+  String get rideWhen => 'الموعد';
+
+  @override
+  String get rideWhere => 'نقطة التجمّع';
+
+  @override
+  String get rideToday => 'اليوم';
+
+  @override
+  String get rideTomorrow => 'غداً';
+
+  @override
+  String get rideMorning => 'ذهاب';
+
+  @override
+  String get rideReturn => 'عودة';
+
+  @override
+  String rideSlot(String day, String type, String time) {
+    return '$day · $type $time';
+  }
+
+  @override
+  String get rideNoSlots => 'لا توجد مواعيد متاحة اليوم أو غداً.';
+
+  @override
+  String get rideSend => 'أرسل الطلب';
+
+  @override
+  String get rideSent => 'وصل طلبك';
+
+  @override
+  String get rideConfirmed => 'مؤكد';
+
+  @override
+  String get rideCampus => 'الجامعة';
+
+  @override
+  String rideStopOf(String n, String total) {
+    return 'المحطة $n من $total';
+  }
+
+  @override
+  String ridePayDriver(String amount) {
+    return 'ادفع $amount نقداً للسائق';
+  }
+
+  @override
+  String get rideCovered => 'مشمول باشتراكك';
+
+  @override
+  String get rideCancel => 'إلغاء الطلب';
+
+  @override
+  String get rideCancelTitle => 'إلغاء الطلب؟';
+
+  @override
+  String get rideCancelBody => 'سيُعطى مقعدك لطالب آخر.';
+
+  @override
+  String get rideCancelYes => 'نعم، ألغِ';
+
+  @override
+  String get rideKeep => 'لا، أبقِه';
+
+  @override
+  String get rideCancelled => 'أُلغي الطلب';
+
+  @override
+  String get ridePendingTitle => 'وصل طلبك';
+
+  @override
+  String get ridePendingBody =>
+      'نوزّع الحافلات قبل الموعد بساعة ونخبرك بحافلتك.';
+
+  @override
+  String get rideWaitTitle => 'أنت على قائمة الانتظار';
+
+  @override
+  String get rideWaitBody =>
+      'كل المقاعد محجوزة الآن. سنحجز لك مقعداً فور تحرّر واحد.';
+
+  @override
+  String get rideWaitLeft => 'الوقت المتبقي';
+
+  @override
+  String rideExpired(String time) {
+    return 'لم نجد مقعداً لرحلة $time. يمكنك طلب موعد آخر.';
+  }
+
+  @override
+  String rideWave(String day, String type, String time) {
+    return '$day · $type $time';
+  }
+
+  @override
+  String get rideFemaleOnly => 'للطالبات فقط';
 }

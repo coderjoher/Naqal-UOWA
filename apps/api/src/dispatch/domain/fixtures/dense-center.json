@@ -1,0 +1,12 @@
+{
+  "name": "Dense city centre, one gender, one tier, uneven buses",
+  "kind": "morning",
+  "waveHour": 10,
+  "points": {
+    "campus": [32.5847, 44.0617],
+    "p1": [32.612, 44.03], "p2": [32.615, 44.025], "p3": [32.618, 44.033], "p4": [32.61, 44.022], "p5": [32.62, 44.028]
+  },
+  "tiers": { "p1": 1, "p2": 1, "p3": 1, "p4": 1, "p5": 1 },
+  "requests": [["p1", "female", 12], ["p2", "female", 9], ["p3", "female", 14], ["p4", "female", 7], ["p5", "female", 10]],
+  "drivers": [26, 18, 14, 14, 11]
+}

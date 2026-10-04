@@ -7,10 +7,11 @@ import 'package:naql_ui/naql_ui.dart';
 import '../data/auth.dart';
 import '../data/subscription.dart';
 import '../l10n/gen/app_localizations.dart';
+import 'ride_section.dart';
 import 'subscription_card.dart';
 
 /// Home leads with the day's answer: is there a ride? (design principle 1).
-/// Subscription card (P3); P4 adds the request flow and trip card.
+/// The ride comes first (P4), then the subscription (P3) and the gathering point.
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -36,8 +37,10 @@ class HomeScreen extends ConsumerWidget {
             ]),
           ),
           const SizedBox(height: NaqlSpace.s6),
+          const NaqlEntrance(index: 1, child: RideSection()),
+          const SizedBox(height: NaqlSpace.s4),
           NaqlEntrance(
-            index: 1,
+            index: 2,
             child: sub.when(
               data: (info) => SubscriptionCard(info: info, lang: lang),
               loading: () => const NaqlSkeleton(height: 120, radius: NaqlRadius.lg),
@@ -47,7 +50,7 @@ class HomeScreen extends ConsumerWidget {
           const SizedBox(height: NaqlSpace.s4),
           if (point != null)
             NaqlEntrance(
-              index: 2,
+              index: 3,
               child: NaqlCard(
                 onTap: () => context.go('/profile/point'),
                 child: Row(children: [
@@ -68,14 +71,6 @@ class HomeScreen extends ConsumerWidget {
                 ]),
               ),
             ),
-          const SizedBox(height: NaqlSpace.s4),
-          NaqlEntrance(
-            index: 3,
-            child: NaqlCard(
-              padding: const EdgeInsets.symmetric(horizontal: NaqlSpace.s5, vertical: NaqlSpace.s8),
-              child: NaqlEmptyState(icon: LucideIcons.busFront, title: t.noRideToday, message: t.noRideTodayBody),
-            ),
-          ),
         ],
       ),
     );

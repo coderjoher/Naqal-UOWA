@@ -137,7 +137,7 @@ abstract class AppLocalizations {
   /// No description provided for @noRideTodayBody.
   ///
   /// In ar, this message translates to:
-  /// **'طلب الرحلات اليومية سيتوفر قريباً.'**
+  /// **'اطلب مقعداً في حافلة اليوم أو الغد.'**
   String get noRideTodayBody;
 
   /// No description provided for @tabHome.
@@ -553,6 +553,198 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الفئة {tier}'**
   String subTier(String tier);
+
+  /// No description provided for @rideRequest.
+  ///
+  /// In ar, this message translates to:
+  /// **'اطلب رحلة'**
+  String get rideRequest;
+
+  /// No description provided for @rideRequestTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلب رحلة'**
+  String get rideRequestTitle;
+
+  /// No description provided for @rideRequestBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر الموعد ونقطة التجمّع، ونحجز لك مقعداً.'**
+  String get rideRequestBody;
+
+  /// No description provided for @rideWhen.
+  ///
+  /// In ar, this message translates to:
+  /// **'الموعد'**
+  String get rideWhen;
+
+  /// No description provided for @rideWhere.
+  ///
+  /// In ar, this message translates to:
+  /// **'نقطة التجمّع'**
+  String get rideWhere;
+
+  /// No description provided for @rideToday.
+  ///
+  /// In ar, this message translates to:
+  /// **'اليوم'**
+  String get rideToday;
+
+  /// No description provided for @rideTomorrow.
+  ///
+  /// In ar, this message translates to:
+  /// **'غداً'**
+  String get rideTomorrow;
+
+  /// No description provided for @rideMorning.
+  ///
+  /// In ar, this message translates to:
+  /// **'ذهاب'**
+  String get rideMorning;
+
+  /// No description provided for @rideReturn.
+  ///
+  /// In ar, this message translates to:
+  /// **'عودة'**
+  String get rideReturn;
+
+  /// No description provided for @rideSlot.
+  ///
+  /// In ar, this message translates to:
+  /// **'{day} · {type} {time}'**
+  String rideSlot(String day, String type, String time);
+
+  /// No description provided for @rideNoSlots.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد مواعيد متاحة اليوم أو غداً.'**
+  String get rideNoSlots;
+
+  /// No description provided for @rideSend.
+  ///
+  /// In ar, this message translates to:
+  /// **'أرسل الطلب'**
+  String get rideSend;
+
+  /// No description provided for @rideSent.
+  ///
+  /// In ar, this message translates to:
+  /// **'وصل طلبك'**
+  String get rideSent;
+
+  /// No description provided for @rideConfirmed.
+  ///
+  /// In ar, this message translates to:
+  /// **'مؤكد'**
+  String get rideConfirmed;
+
+  /// No description provided for @rideCampus.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجامعة'**
+  String get rideCampus;
+
+  /// No description provided for @rideStopOf.
+  ///
+  /// In ar, this message translates to:
+  /// **'المحطة {n} من {total}'**
+  String rideStopOf(String n, String total);
+
+  /// No description provided for @ridePayDriver.
+  ///
+  /// In ar, this message translates to:
+  /// **'ادفع {amount} نقداً للسائق'**
+  String ridePayDriver(String amount);
+
+  /// No description provided for @rideCovered.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشمول باشتراكك'**
+  String get rideCovered;
+
+  /// No description provided for @rideCancel.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء الطلب'**
+  String get rideCancel;
+
+  /// No description provided for @rideCancelTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء الطلب؟'**
+  String get rideCancelTitle;
+
+  /// No description provided for @rideCancelBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'سيُعطى مقعدك لطالب آخر.'**
+  String get rideCancelBody;
+
+  /// No description provided for @rideCancelYes.
+  ///
+  /// In ar, this message translates to:
+  /// **'نعم، ألغِ'**
+  String get rideCancelYes;
+
+  /// No description provided for @rideKeep.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا، أبقِه'**
+  String get rideKeep;
+
+  /// No description provided for @rideCancelled.
+  ///
+  /// In ar, this message translates to:
+  /// **'أُلغي الطلب'**
+  String get rideCancelled;
+
+  /// No description provided for @ridePendingTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'وصل طلبك'**
+  String get ridePendingTitle;
+
+  /// No description provided for @ridePendingBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'نوزّع الحافلات قبل الموعد بساعة ونخبرك بحافلتك.'**
+  String get ridePendingBody;
+
+  /// No description provided for @rideWaitTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنت على قائمة الانتظار'**
+  String get rideWaitTitle;
+
+  /// No description provided for @rideWaitBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل المقاعد محجوزة الآن. سنحجز لك مقعداً فور تحرّر واحد.'**
+  String get rideWaitBody;
+
+  /// No description provided for @rideWaitLeft.
+  ///
+  /// In ar, this message translates to:
+  /// **'الوقت المتبقي'**
+  String get rideWaitLeft;
+
+  /// No description provided for @rideExpired.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم نجد مقعداً لرحلة {time}. يمكنك طلب موعد آخر.'**
+  String rideExpired(String time);
+
+  /// No description provided for @rideWave.
+  ///
+  /// In ar, this message translates to:
+  /// **'{day} · {type} {time}'**
+  String rideWave(String day, String type, String time);
+
+  /// No description provided for @rideFemaleOnly.
+  ///
+  /// In ar, this message translates to:
+  /// **'للطالبات فقط'**
+  String get rideFemaleOnly;
 }
 
 class _AppLocalizationsDelegate

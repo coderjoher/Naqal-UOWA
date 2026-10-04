@@ -13,6 +13,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
+  clock: ^1.1.1
   flutter_riverpod: ^3.4.3
   go_router: ^18.0.2
   naql_ui:

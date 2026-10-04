@@ -55,6 +55,6 @@ instantly. Every money record is immutable.
 
 ## Exit gate
 
-- [ ] All P3 tests green in CI (PR #4)
+- [x] All P3 tests green in CI (PR #4)
 - [ ] Q4 (calendar month vs 30 days) decided by the office and policy matches
 - [ ] Office staff run a dry-run of 20 payments on staging without help

@@ -1,6 +1,6 @@
 # P4 — Ride requests and dispatch
 
-Status: planned
+Status: in-progress
 Depends on: P3
 
 ## Goal
@@ -27,15 +27,38 @@ drivers see their runs, while the hard constraints always hold.
 
 ## Deliverables
 
-- `dispatch` module as **pure TypeScript domain code** (no Nest/Prisma imports) so it is tested
-  in isolation: `planWave()`, `insertRequest()`, `recheckWaitlist()`.
-- BullMQ jobs: `wave.plan` (T − 60 min, configurable), `waitlist.recheck` (on cancel/new run),
-  `waitlist.expire` (delayed job per request).
-- Request state machine: `open → assigned | waitlisted → cancelled | done`.
-- Run mixing tiers: **open question Q3** — default rule: run counts toward its farthest-stop tier
-  (DS-06), recorded on the run so settlement can be recomputed if the rule changes.
-- Student app: Request sheet (wave chips, point picker), Assignment card, Waitlist countdown.
-- Driver app: Availability calendar, Today list, Run detail with stop list.
+- `apps/api/src/dispatch/domain/` — **pure TypeScript** (no Nest/Prisma imports): `planWave()`,
+  `insertRequest()` (cheapest insertion, subscriber bumping), `cancelRequest()`,
+  `recheckWaitlist()`. Times are seconds after Baghdad midnight; travel times come from the P1
+  OSRM matrix (straight line × 1.3 at 30 km/h when a pair is missing).
+- Rules: morning runs are timed backwards to arrive 10 min before the wave; a ride lasts at most
+  45 min; a bus never goes back to a stop it has passed; return runs take riders only before
+  leaving campus; served stops are frozen; boarded riders are never moved or bumped.
+- `DispatchEngine` loads one wave/date, runs the domain and writes runs, stops and requests in one
+  transaction under a PostgreSQL advisory lock per wave and date.
+- BullMQ queue `dispatch`: `wave.tick` every minute queues `wave.plan` at T − 60 min;
+  `waitlist.recheck` after every new request (once planned) and every cancellation;
+  `waitlist.expire` as a delayed job per waitlisted request. The request path only writes the
+  request (T4-07: < 100 ms).
+- Request states `open → assigned | waitlisted → cancelled | done`; one live request per student,
+  wave and date (partial unique index). Fare per ride: 0 for subscribers in their tier, the tier
+  difference when boarding farther, the ride price for pay-per-ride (PA-02, PA-03).
+- Q3 default: a run counts toward its farthest-stop tier (DS-06), stored on the run.
+- Outbox table `notifications` (`ride.assigned`, `ride.waitlisted`, `ride.bumped`,
+  `ride.expired`); push delivery comes in P5.
+- API: `GET /rides/options`, `POST /rides`, `GET /rides/me`, `POST /rides/:id/cancel`,
+  `GET|PUT /drivers/me/availability`, `GET /drivers/me/runs?date=`, `GET /dispatch?date=`,
+  `POST /dispatch/plan`.
+- Vehicle photo (`vehicle_photo`) is now a default required driver document; students get a
+  short-lived, logged link to it (ST-05, NF-13).
+- Student app: request sheet (wave chips for today/tomorrow, point picker), assignment card
+  (pickup time, bus, driver, plate, photo, stop n of m, cash to pay), waitlist countdown, pending
+  card, cancel with confirmation. Polls every 5 s while waiting.
+- Driver app: Today (runs with departure, stops, seats, cash), Run detail (timeline of stops,
+  riders per stop, 56 dp rows), Schedule tab (next 7 days, one toggle per wave, locked once planned).
+- Dashboard: Dispatch page (today/tomorrow, counts per wave, dispatch now / re-check, buses with
+  ordered stops and load, waitlist). Full-stack Playwright test drives it through the worker.
+- Nightly workflow runs T4-01 with 100 000 cases and a fresh seed.
 
 ## Tests
 

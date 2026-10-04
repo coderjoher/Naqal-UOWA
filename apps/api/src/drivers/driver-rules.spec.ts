@@ -17,9 +17,9 @@ describe('driver review state machine', () => {
   it('[T2-06] lists every missing requirement until the application is complete', () => {
     const empty = { name: null, phone: '+9647701234567', vehicleType: null, plate: null, seats: null, modelYear: null, documentKeys: [] };
     expect(missingRequirements(empty, DEFAULT_REQUIREMENTS, 2026)).toEqual([
-      'name', 'vehicle_type', 'plate', 'seats', 'model_year', 'doc_national_id', 'doc_driving_licence', 'doc_vehicle_registration',
+      'name', 'vehicle_type', 'plate', 'seats', 'model_year', 'doc_national_id', 'doc_driving_licence', 'doc_vehicle_registration', 'doc_vehicle_photo',
     ]);
-    const full = { ...empty, name: 'علي', vehicleType: 'coaster', plate: '12345 كربلاء', seats: 20, modelYear: 2018, documentKeys: ['national_id', 'driving_licence', 'vehicle_registration'] };
+    const full = { ...empty, name: 'علي', vehicleType: 'coaster', plate: '12345 كربلاء', seats: 20, modelYear: 2018, documentKeys: ['national_id', 'driving_licence', 'vehicle_registration', 'vehicle_photo'] };
     expect(missingRequirements(full, DEFAULT_REQUIREMENTS, 2026)).toEqual([]);
     expect(missingRequirements({ ...full, modelYear: 2005 }, DEFAULT_REQUIREMENTS, 2026)).toEqual(['model_year']);
     expect(missingRequirements({ ...full, seats: 8 }, DEFAULT_REQUIREMENTS, 2026)).toEqual(['seats']);

@@ -23,6 +23,8 @@ class TripCard extends StatelessWidget {
     this.plate,
     this.femaleOnly = false,
     this.femaleOnlyLabel,
+    this.photo,
+    this.footer,
     this.onTap,
   });
 
@@ -38,6 +40,12 @@ class TripCard extends StatelessWidget {
   final String? plate;
   final bool femaleOnly;
   final String? femaleOnlyLabel;
+
+  /// Vehicle photo shown next to the driver (ST-05). Falls back to a bus icon if it fails.
+  final ImageProvider? photo;
+
+  /// Extra content under the driver row (fare, actions).
+  final Widget? footer;
   final VoidCallback? onTap;
 
   @override
@@ -70,6 +78,10 @@ class TripCard extends StatelessWidget {
           const Padding(padding: EdgeInsets.symmetric(vertical: NaqlSpace.s4), child: Divider(height: 1, color: NaqlColors.border)),
           Row(
             children: [
+              if (photo != null) ...[
+                _Photo(image: photo!),
+                const SizedBox(width: NaqlSpace.s3),
+              ],
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   if (driverName != null) Text(driverName!, style: NaqlText.label),
@@ -84,7 +96,30 @@ class TripCard extends StatelessWidget {
               StatusPill(label: status, tone: statusTone),
             ],
           ),
+          if (footer != null) ...[const SizedBox(height: NaqlSpace.s4), footer!],
         ],
+      ),
+    );
+  }
+}
+
+class _Photo extends StatelessWidget {
+  const _Photo({required this.image});
+  final ImageProvider image;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(NaqlRadius.sm),
+      child: Container(
+        width: 56,
+        height: 44,
+        color: NaqlColors.primarySoft,
+        child: Image(
+          image: image,
+          fit: BoxFit.cover,
+          errorBuilder: (_, _, _) => const Icon(LucideIcons.busFront, color: NaqlColors.primary, size: 22),
+        ),
       ),
     );
   }

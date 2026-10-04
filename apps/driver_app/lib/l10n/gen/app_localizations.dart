@@ -119,7 +119,7 @@ abstract class AppLocalizations {
   /// No description provided for @noRunsTodayBody.
   ///
   /// In ar, this message translates to:
-  /// **'ستظهر هنا رحلاتك ونقاط التوقف بعد تفعيل التوزيع.'**
+  /// **'عيّن أيام عملك من تبويب «جدولي»، وتظهر رحلاتك هنا بعد توزيع الحافلات.'**
   String get noRunsTodayBody;
 
   /// No description provided for @tabToday.
@@ -511,6 +511,156 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تسجيل الخروج'**
   String get signOut;
+
+  /// No description provided for @tabSchedule.
+  ///
+  /// In ar, this message translates to:
+  /// **'جدولي'**
+  String get tabSchedule;
+
+  /// No description provided for @scheduleTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'متى ستعمل؟'**
+  String get scheduleTitle;
+
+  /// No description provided for @scheduleBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر المواعيد التي ستعمل فيها خلال الأسبوع. يُقفل الموعد بعد توزيع الحافلات.'**
+  String get scheduleBody;
+
+  /// No description provided for @dayToday.
+  ///
+  /// In ar, this message translates to:
+  /// **'اليوم'**
+  String get dayToday;
+
+  /// No description provided for @dayTomorrow.
+  ///
+  /// In ar, this message translates to:
+  /// **'غداً'**
+  String get dayTomorrow;
+
+  /// No description provided for @waveMorning.
+  ///
+  /// In ar, this message translates to:
+  /// **'ذهاب'**
+  String get waveMorning;
+
+  /// No description provided for @waveReturn.
+  ///
+  /// In ar, this message translates to:
+  /// **'عودة'**
+  String get waveReturn;
+
+  /// No description provided for @waveLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'{type} {time}'**
+  String waveLabel(String type, String time);
+
+  /// No description provided for @noWavesDay.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد رحلات في هذا اليوم'**
+  String get noWavesDay;
+
+  /// No description provided for @lockedWave.
+  ///
+  /// In ar, this message translates to:
+  /// **'مُقفل — تم التوزيع'**
+  String get lockedWave;
+
+  /// No description provided for @availabilityFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر حفظ جدولك'**
+  String get availabilityFailed;
+
+  /// No description provided for @runSeats.
+  ///
+  /// In ar, this message translates to:
+  /// **'{booked} من {capacity} مقعد'**
+  String runSeats(int booked, int capacity);
+
+  /// No description provided for @runStops.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} محطات'**
+  String runStops(int count);
+
+  /// No description provided for @departAt.
+  ///
+  /// In ar, this message translates to:
+  /// **'الانطلاق'**
+  String get departAt;
+
+  /// No description provided for @cashToCollect.
+  ///
+  /// In ar, this message translates to:
+  /// **'نقد للتحصيل'**
+  String get cashToCollect;
+
+  /// No description provided for @femaleOnly.
+  ///
+  /// In ar, this message translates to:
+  /// **'للطالبات فقط'**
+  String get femaleOnly;
+
+  /// No description provided for @riders.
+  ///
+  /// In ar, this message translates to:
+  /// **'الركاب: {count}'**
+  String riders(int count);
+
+  /// No description provided for @campus.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجامعة'**
+  String get campus;
+
+  /// No description provided for @arriveBy.
+  ///
+  /// In ar, this message translates to:
+  /// **'الوصول قبل {time}'**
+  String arriveBy(String time);
+
+  /// No description provided for @leaveCampus.
+  ///
+  /// In ar, this message translates to:
+  /// **'الانطلاق من الجامعة'**
+  String get leaveCampus;
+
+  /// No description provided for @subscriber.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشترك'**
+  String get subscriber;
+
+  /// No description provided for @payCash.
+  ///
+  /// In ar, this message translates to:
+  /// **'{amount} نقداً'**
+  String payCash(String amount);
+
+  /// No description provided for @setSchedule.
+  ///
+  /// In ar, this message translates to:
+  /// **'عيّن جدولك'**
+  String get setSchedule;
+
+  /// No description provided for @stopsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'المحطات'**
+  String get stopsTitle;
+
+  /// No description provided for @seatsLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'المقاعد'**
+  String get seatsLabel;
 }
 
 class _AppLocalizationsDelegate

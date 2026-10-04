@@ -1,0 +1,23 @@
+{
+  "name": "Karbala, 8:00 morning wave, two genders, three tiers",
+  "kind": "morning",
+  "waveHour": 8,
+  "points": {
+    "campus": [32.5847, 44.0617],
+    "bab_baghdad": [32.6, 44.05],
+    "abbas_sq": [32.616, 44.0249],
+    "hay_hussein": [32.62, 44.0],
+    "hay_askari": [32.63, 44.03],
+    "al_hurr": [32.66, 43.93],
+    "hindiya_rd": [32.55, 44.1]
+  },
+  "tiers": { "bab_baghdad": 0, "hindiya_rd": 0, "abbas_sq": 1, "hay_askari": 1, "hay_hussein": 1, "al_hurr": 2 },
+  "requests": [
+    ["bab_baghdad", "male", 6], ["bab_baghdad", "female", 5],
+    ["hindiya_rd", "male", 4], ["hindiya_rd", "female", 3],
+    ["abbas_sq", "male", 9], ["abbas_sq", "female", 11],
+    ["hay_askari", "male", 5], ["hay_hussein", "female", 6],
+    ["al_hurr", "male", 7], ["al_hurr", "female", 4]
+  ],
+  "drivers": [14, 14, 14, 14, 14, 14, 14, 14, 14, 14]
+}

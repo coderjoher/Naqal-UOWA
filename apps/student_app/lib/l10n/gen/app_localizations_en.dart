@@ -30,7 +30,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noRideToday => 'No ride today';
 
   @override
-  String get noRideTodayBody => 'Daily ride requests are coming soon.';
+  String get noRideTodayBody =>
+      'Ask for a seat on today\'s or tomorrow\'s bus.';
 
   @override
   String get tabHome => 'Home';
@@ -259,4 +260,113 @@ class AppLocalizationsEn extends AppLocalizations {
   String subTier(String tier) {
     return 'Tier $tier';
   }
+
+  @override
+  String get rideRequest => 'Request a ride';
+
+  @override
+  String get rideRequestTitle => 'Request a ride';
+
+  @override
+  String get rideRequestBody =>
+      'Pick a time and a gathering point and we will find you a seat.';
+
+  @override
+  String get rideWhen => 'When';
+
+  @override
+  String get rideWhere => 'Gathering point';
+
+  @override
+  String get rideToday => 'Today';
+
+  @override
+  String get rideTomorrow => 'Tomorrow';
+
+  @override
+  String get rideMorning => 'To campus';
+
+  @override
+  String get rideReturn => 'Home';
+
+  @override
+  String rideSlot(String day, String type, String time) {
+    return '$day · $type $time';
+  }
+
+  @override
+  String get rideNoSlots => 'No times are open today or tomorrow.';
+
+  @override
+  String get rideSend => 'Send request';
+
+  @override
+  String get rideSent => 'Request sent';
+
+  @override
+  String get rideConfirmed => 'Confirmed';
+
+  @override
+  String get rideCampus => 'Campus';
+
+  @override
+  String rideStopOf(String n, String total) {
+    return 'Stop $n of $total';
+  }
+
+  @override
+  String ridePayDriver(String amount) {
+    return 'Pay $amount cash to the driver';
+  }
+
+  @override
+  String get rideCovered => 'Covered by your subscription';
+
+  @override
+  String get rideCancel => 'Cancel request';
+
+  @override
+  String get rideCancelTitle => 'Cancel this request?';
+
+  @override
+  String get rideCancelBody => 'Your seat will go to another student.';
+
+  @override
+  String get rideCancelYes => 'Yes, cancel';
+
+  @override
+  String get rideKeep => 'No, keep it';
+
+  @override
+  String get rideCancelled => 'Request cancelled';
+
+  @override
+  String get ridePendingTitle => 'Request received';
+
+  @override
+  String get ridePendingBody =>
+      'Buses are assigned an hour before departure. We will tell you your bus.';
+
+  @override
+  String get rideWaitTitle => 'You are on the waitlist';
+
+  @override
+  String get rideWaitBody =>
+      'All seats are taken right now. We will seat you as soon as one frees up.';
+
+  @override
+  String get rideWaitLeft => 'Time left';
+
+  @override
+  String rideExpired(String time) {
+    return 'No seat was found for the $time ride. You can request another time.';
+  }
+
+  @override
+  String rideWave(String day, String type, String time) {
+    return '$day · $type $time';
+  }
+
+  @override
+  String get rideFemaleOnly => 'Female only';
 }

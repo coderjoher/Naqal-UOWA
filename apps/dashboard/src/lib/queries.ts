@@ -175,3 +175,39 @@ export async function downloadReceipt(paymentId: string, receiptNo: number) {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }
+
+export interface DispatchStop {
+  seq: number;
+  eta: string;
+  served: boolean;
+  point: { id: string; name: string; nameAr: string | null };
+  count: number;
+  cashToCollect: number;
+  passengers: { requestId: string; name: string; studentId: string | null; fare: number; subscriber: boolean }[];
+}
+export interface DispatchRun {
+  id: string;
+  status: string;
+  gender: 'male' | 'female';
+  femaleOnly: boolean;
+  capacity: number;
+  booked: number;
+  departAt: string | null;
+  driverName: string;
+  plate: string | null;
+  tierName: string | null;
+  stops: DispatchStop[];
+}
+export interface DispatchWave {
+  waveId: string;
+  type: 'morning' | 'return';
+  time: string;
+  planned: boolean;
+  counts: { open: number; assigned: number; waitlisted: number; cancelled: number };
+  runs: DispatchRun[];
+  waitlist: { id: string; status: 'open' | 'waitlisted'; name: string; studentId: string | null; gender: 'male' | 'female'; point: string; subscriber: boolean; until: string | null }[];
+}
+
+/** Operations board; refreshes every 5 s so planning and re-checks show up without reloading. */
+export const useDispatch = (date: string) => useQuery({ queryKey: ['dispatch', date], queryFn: () => api<DispatchWave[]>(`/dispatch?date=${date}`), refetchInterval: 5000 });
+export const usePlanWave = () => useSave((body: { waveId: string; date: string }) => api<{ queued: boolean }>('/dispatch/plan', json(body)), [['dispatch']]);
