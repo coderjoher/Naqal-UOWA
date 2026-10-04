@@ -80,6 +80,6 @@ drivers see their runs, while the hard constraints always hold.
 ## Exit gate
 
 - [x] All P4 tests green in CI (PR #5)
-- [ ] Property test T4-01 runs with a fixed seed in CI and 100 000 cases nightly
+- [x] Property test T4-01 runs with a fixed seed in CI and 100 000 cases nightly (first nightly run green)
 - [x] Simulation of one real morning (seed data: 500 requests, 30 buses) assigns ≥ 95 % with zero constraint violations (`simulation.spec.ts`: 500/500)
 - [ ] Q3 answered or default rule accepted in writing by the office
