@@ -14,7 +14,11 @@ import { StudentAuthController } from './identity/student-auth.controller';
 import { StudentAuthService } from './identity/student-auth.service';
 import { FilesController } from './storage/files.controller';
 import { StorageService } from './storage/storage.service';
+import { OfficeCashProvider, PAYMENT_PROVIDERS } from './payments/payment-provider';
+import { PaymentsService } from './payments/payments.service';
 import { StudentsController } from './students/students.controller';
+import { SubscriptionsController } from './subscriptions/subscriptions.controller';
+import { SubscriptionsService } from './subscriptions/subscriptions.service';
 import { StudentsService } from './students/students.service';
 import { PointsController } from './gathering-points/points.controller';
 import { PointsService } from './gathering-points/points.service';
@@ -71,6 +75,7 @@ class CacheModule {}
     StudentsController,
     DriversController,
     FilesController,
+    SubscriptionsController,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
@@ -85,6 +90,9 @@ class CacheModule {}
     OtpService,
     StorageService,
     { provide: SMS_SENDER, useClass: ConsoleSmsSender },
+    { provide: PAYMENT_PROVIDERS, useValue: [new OfficeCashProvider()] },
+    PaymentsService,
+    SubscriptionsService,
   ],
 })
 export class AppModule implements NestModule {

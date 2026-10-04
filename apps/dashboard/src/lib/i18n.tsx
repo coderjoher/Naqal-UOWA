@@ -223,6 +223,39 @@ const ar = {
   "students.emptyTitle": "لا يوجد طلبة بعد",
   "students.emptyBody": "ابدأ باستيراد قائمة الطلبة من شعبة التسجيل.",
   "students.badFile": "تعذّر قراءة الملف. تأكد من الأعمدة.",
+  "nav.subscriptions": "الاشتراكات",
+  "subs.title": "الاشتراكات",
+  "subs.desc": "سجّل الدفع النقدي ليُفعّل اشتراك الطالب فوراً، واطبع الإيصال.",
+  "subs.record": "تسجيل دفعة",
+  "subs.studentNumber": "الرقم الجامعي",
+  "subs.find": "بحث",
+  "subs.month": "الشهر",
+  "subs.price": "المبلغ",
+  "subs.point": "نقطة التجمّع",
+  "subs.tier": "الفئة",
+  "subs.confirm": "تسجيل الدفع النقدي",
+  "subs.recorded": "تم تسجيل الدفعة وتفعيل الاشتراك",
+  "subs.receiptNo": "رقم الإيصال",
+  "subs.download": "تنزيل الإيصال (PDF)",
+  "subs.next": "طالب آخر",
+  "subs.noPoint": "لم يختر الطالب نقطة تجمّع في التطبيق بعد.",
+  "subs.already": "لدى الطالب اشتراك فعّال لهذا الشهر.",
+  "subs.list": "دفعات الشهر",
+  "subs.count": "اشتراكات فعّالة",
+  "subs.total": "المبلغ المستلم",
+  "subs.student": "الطالب",
+  "subs.amount": "المبلغ",
+  "subs.date": "التاريخ",
+  "subs.status": "الحالة",
+  "subs.active": "فعّال",
+  "subs.cancelled": "ملغى",
+  "subs.reverse": "إلغاء الدفعة",
+  "subs.reverseTitle": "إلغاء الدفعة",
+  "subs.reverseHint": "لا تُحذف الدفعات. يُسجّل قيد إلغاء بنفس المبلغ بالسالب ويُلغى الاشتراك.",
+  "subs.reason": "سبب الإلغاء",
+  "subs.reversed": "تم إلغاء الدفعة",
+  "subs.notFound": "لم يُعثر على الطالب. يجب أن يسجّل الدخول في التطبيق مرة واحدة أولاً.",
+  "subs.empty": "لا توجد دفعات لهذا الشهر",
 };
 
 const en: Record<keyof typeof ar, string> = {
@@ -448,6 +481,39 @@ const en: Record<keyof typeof ar, string> = {
   "students.emptyTitle": "No students yet",
   "students.emptyBody": "Start by importing the roster from the registrar.",
   "students.badFile": "Could not read the file. Check the columns.",
+  "nav.subscriptions": "Subscriptions",
+  "subs.title": "Subscriptions",
+  "subs.desc": "Record the cash payment to activate the student’s subscription immediately, then print the receipt.",
+  "subs.record": "Record a payment",
+  "subs.studentNumber": "Student number",
+  "subs.find": "Find",
+  "subs.month": "Month",
+  "subs.price": "Amount",
+  "subs.point": "Gathering point",
+  "subs.tier": "Tier",
+  "subs.confirm": "Record cash payment",
+  "subs.recorded": "Payment recorded, subscription active",
+  "subs.receiptNo": "Receipt no.",
+  "subs.download": "Download receipt (PDF)",
+  "subs.next": "Next student",
+  "subs.noPoint": "The student has not chosen a gathering point in the app yet.",
+  "subs.already": "The student already has an active subscription for this month.",
+  "subs.list": "This month’s payments",
+  "subs.count": "Active subscriptions",
+  "subs.total": "Collected",
+  "subs.student": "Student",
+  "subs.amount": "Amount",
+  "subs.date": "Date",
+  "subs.status": "Status",
+  "subs.active": "Active",
+  "subs.cancelled": "Cancelled",
+  "subs.reverse": "Reverse payment",
+  "subs.reverseTitle": "Reverse payment",
+  "subs.reverseHint": "Payments are never deleted. A reversal with the negative amount is recorded and the subscription is cancelled.",
+  "subs.reason": "Reason for reversal",
+  "subs.reversed": "Payment reversed",
+  "subs.notFound": "Student not found. They must sign in to the app once first.",
+  "subs.empty": "No payments this month",
 };
 
 export type Lang = 'ar' | 'en';
@@ -494,8 +560,8 @@ export function useI18n() {
   return v;
 }
 
-/** Format IQD amounts with grouping in the active locale. */
+/** IQD amounts with Western digits and grouping (as on Iraqi receipts), unit in the active language. */
 export function useMoney() {
-  const { lang, t } = useI18n();
-  return (n: number) => `${n.toLocaleString(lang === 'ar' ? 'ar-IQ' : 'en-US')} ${t('tiers.iqd')}`;
+  const { t } = useI18n();
+  return (n: number) => `${n.toLocaleString('en-US')} ${t('tiers.iqd')}`;
 }

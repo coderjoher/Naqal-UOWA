@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api, ApiError, type Role } from './api';
+import { api, API_URL, ApiError, loadSession, type Role } from './api';
 
 export interface University {
   id: string;
@@ -135,3 +135,43 @@ export const documentLink = (driverId: string, key: string) => api<{ url: string
 export const useStudents = () => useQuery({ queryKey: ['students'], queryFn: () => api<RosterStudent[]>('/students') });
 export const useImportRoster = () => useSave((rows: { studentId: string; name: string; nameAr?: string; gender: 'male' | 'female' }[]) => api<{ created: number; updated: number }>('/students/roster', json({ rows })), [['students']]);
 export const useIssueCode = () => useSave((studentId: string) => api<{ studentId: string; code: string; expiresAt: string }>(`/students/${encodeURIComponent(studentId)}/activation-code`, json({})), [['students']]);
+
+export interface SubscriptionPreview {
+  student: { id: string; studentId: string | null; name: string; nameAr: string | null; gender: 'male' | 'female' | null; status: string };
+  point: { id: string; name: string; nameAr: string | null; active: boolean } | null;
+  tier: { id: string; name: string } | null;
+  month: string;
+  price: number | null;
+  alreadySubscribed: boolean;
+}
+export interface SubscriptionRow {
+  id: string;
+  month: string;
+  price: number;
+  status: 'active' | 'cancelled';
+  createdAt: string;
+  paymentId: string;
+  student: { id: string; name: string; nameAr: string | null; studentId: string | null };
+  payment: { receiptNo: number; amount: number; createdAt: string; reversedBy: { id: string } | null };
+}
+
+export const subscriptionPreview = (studentId: string, month: string) => api<SubscriptionPreview>(`/subscriptions/preview?studentId=${encodeURIComponent(studentId)}&month=${month}`);
+export const useSubscriptions = (month: string) => useQuery({ queryKey: ['subscriptions', month], queryFn: () => api<SubscriptionRow[]>(`/subscriptions?month=${month}`) });
+export const useRecordSubscription = () =>
+  useSave((body: { studentId: string; month: string }) => api<{ subscription: { id: string }; payment: { id: string; receiptNo: number; amount: number } }>('/subscriptions', json(body)), [['subscriptions']]);
+export const useReversePayment = () => useSave(({ id, reason }: { id: string; reason: string }) => api(`/payments/${id}/reverse`, json({ reason })), [['subscriptions']]);
+
+/** Fetches the receipt with the session token and saves it as a file. */
+export async function downloadReceipt(paymentId: string, receiptNo: number) {
+  const session = loadSession();
+  const res = await fetch(`${API_URL}/payments/${paymentId}/receipt.pdf`, { headers: session ? { authorization: `Bearer ${session.accessToken}` } : {} });
+  if (!res.ok) throw new ApiError(res.status, res.statusText);
+  const url = URL.createObjectURL(await res.blob());
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `receipt-${receiptNo}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10_000);
+}

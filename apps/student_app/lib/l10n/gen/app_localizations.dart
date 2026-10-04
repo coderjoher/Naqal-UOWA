@@ -481,6 +481,78 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'غير محدّدة'**
   String get notSet;
+
+  /// No description provided for @subActive.
+  ///
+  /// In ar, this message translates to:
+  /// **'اشتراك فعّال'**
+  String get subActive;
+
+  /// No description provided for @subExpiring.
+  ///
+  /// In ar, this message translates to:
+  /// **'ينتهي خلال {days} أيام'**
+  String subExpiring(int days);
+
+  /// No description provided for @subExpired.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاشتراك منتهي'**
+  String get subExpired;
+
+  /// No description provided for @subNone.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يوجد اشتراك'**
+  String get subNone;
+
+  /// No description provided for @subUntil.
+  ///
+  /// In ar, this message translates to:
+  /// **'حتى {date}'**
+  String subUntil(String date);
+
+  /// No description provided for @subMonthly.
+  ///
+  /// In ar, this message translates to:
+  /// **'اشتراك شهري'**
+  String get subMonthly;
+
+  /// No description provided for @subTierPrice.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفئة {tier} · {price}'**
+  String subTierPrice(String tier, String price);
+
+  /// No description provided for @subPayAtOffice.
+  ///
+  /// In ar, this message translates to:
+  /// **'ادفع نقداً في مكتب النقل وسيُفعّل اشتراكك فوراً.'**
+  String get subPayAtOffice;
+
+  /// No description provided for @subRenew.
+  ///
+  /// In ar, this message translates to:
+  /// **'جدّد اشتراكك في مكتب النقل قبل انتهائه.'**
+  String get subRenew;
+
+  /// No description provided for @subNext.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشهر القادم مدفوع: {month}'**
+  String subNext(String month);
+
+  /// No description provided for @subUnlimited.
+  ///
+  /// In ar, this message translates to:
+  /// **'رحلات غير محدودة وأولوية في المقاعد'**
+  String get subUnlimited;
+
+  /// No description provided for @subTier.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفئة {tier}'**
+  String subTier(String tier);
 }
 
 class _AppLocalizationsDelegate

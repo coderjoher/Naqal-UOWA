@@ -23,3 +23,6 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
     await this.db.$disconnect();
   }
 }
+
+/** The client handed to `db.$transaction(async (tx) => …)` callbacks (tenant-scoped like `db`). */
+export type Tx = Omit<TenantPrisma, '$extends' | '$transaction' | '$connect' | '$disconnect' | '$on'>;

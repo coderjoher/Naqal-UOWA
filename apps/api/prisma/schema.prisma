@@ -39,6 +39,8 @@ model University {
   integrationConfig Json     @default("{}") @map("integration_config")
   /// Service area as [[lat, lng], ...] polygon. Gathering points must lie inside it.
   coverage          Json     @default("[]")
+  /// Where and when students pay (shown in the student app), e.g. "Building B, room 12, 9–1".
+  officeNote        String?  @map("office_note")
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
@@ -53,6 +55,9 @@ model University {
   drivers            DriverProfile[]
   driverDocuments    DriverDocument[]
   documentAccesses   DocumentAccess[]
+  payments           Payment[]
+  subscriptions      Subscription[]
+  receiptCounter     ReceiptCounter?
 
   @@map("universities")
 }
@@ -77,9 +82,11 @@ model User {
   createdAt    DateTime    @default(now()) @map("created_at")
   updatedAt    DateTime    @updatedAt @map("updated_at")
 
-  university   University?     @relation(fields: [universityId], references: [id])
-  defaultPoint GatheringPoint? @relation(fields: [defaultPointId], references: [id])
-  driver       DriverProfile?
+  university    University?     @relation(fields: [universityId], references: [id])
+  defaultPoint  GatheringPoint? @relation(fields: [defaultPointId], references: [id])
+  driver        DriverProfile?
+  subscriptions Subscription[]
+  payments      Payment[]       @relation("PaymentStudent")
 
   @@unique([universityId, studentId])
   @@index([universityId, role])
@@ -304,4 +311,87 @@ model OtpCode {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("otp_codes")
+}
+
+enum PaymentType {
+  subscription
+  cash_fare
+  tier_difference
+}
+
+/// How the money was collected. Electronic methods plug in later without schema changes (PA-04).
+enum PaymentMethod {
+  cash_office
+  cash_driver
+  zaincash
+  qi
+}
+
+/// Immutable money record (NF-14): UPDATE and DELETE are rejected by a database trigger.
+/// Corrections are new rows with `reversesPaymentId` and a negative amount.
+model Payment {
+  id                String        @id @default(uuid()) @db.Uuid
+  universityId      String        @map("university_id") @db.Uuid
+  type              PaymentType
+  method            PaymentMethod
+  /// IQD, whole dinars. Negative for reversals.
+  amount            Int
+  /// Sequential, gap-free per university.
+  receiptNo         Int           @map("receipt_no")
+  studentId         String?       @map("student_id") @db.Uuid
+  collectedById     String        @map("collected_by_id") @db.Uuid
+  externalRef       String?       @map("external_ref")
+  reversesPaymentId String?       @unique @map("reverses_payment_id") @db.Uuid
+  note              String?
+  createdAt         DateTime      @default(now()) @map("created_at")
+
+  university   University    @relation(fields: [universityId], references: [id])
+  student      User?         @relation("PaymentStudent", fields: [studentId], references: [id])
+  reverses     Payment?      @relation("Reversal", fields: [reversesPaymentId], references: [id])
+  reversedBy   Payment?      @relation("Reversal")
+  subscription Subscription?
+
+  @@unique([universityId, receiptNo])
+  @@index([universityId, createdAt])
+  @@map("payments")
+}
+
+enum SubscriptionStatus {
+  active
+  cancelled
+}
+
+/// Monthly subscription (ST-03, TO-06). Period follows SubscriptionPeriodPolicy (Q4: calendar month).
+model Subscription {
+  id           String             @id @default(uuid()) @db.Uuid
+  universityId String             @map("university_id") @db.Uuid
+  studentId    String             @map("student_id") @db.Uuid
+  tierId       String             @map("tier_id") @db.Uuid
+  pointId      String             @map("point_id") @db.Uuid
+  /// First month covered, "YYYY-MM".
+  month        String
+  periodStart  DateTime           @map("period_start") @db.Date
+  periodEnd    DateTime           @map("period_end") @db.Date
+  price        Int
+  status       SubscriptionStatus @default(active)
+  paymentId    String             @unique @map("payment_id") @db.Uuid
+  createdAt    DateTime           @default(now()) @map("created_at")
+
+  university University @relation(fields: [universityId], references: [id])
+  student    User       @relation(fields: [studentId], references: [id])
+  payment    Payment    @relation(fields: [paymentId], references: [id])
+
+  @@index([universityId, month])
+  @@index([studentId, periodEnd])
+  @@map("subscriptions")
+}
+
+/// Last receipt number issued per university (incremented atomically with each payment).
+model ReceiptCounter {
+  universityId String @id @map("university_id") @db.Uuid
+  last         Int    @default(0)
+
+  university University @relation(fields: [universityId], references: [id])
+
+  @@map("receipt_counters")
 }

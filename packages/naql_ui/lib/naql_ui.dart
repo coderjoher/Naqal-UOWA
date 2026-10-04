@@ -16,5 +16,6 @@ export 'src/components/pressable.dart';
 export 'src/components/status_pill.dart';
 export 'src/components/top_bar.dart';
 export 'src/components/trip_card.dart';
+export 'src/foundation/format.dart';
 export 'src/foundation/theme.dart';
 export 'src/foundation/tokens.g.dart';

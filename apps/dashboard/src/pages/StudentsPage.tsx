@@ -148,7 +148,7 @@ export function StudentsPage() {
             </motion.p>
             <p className="max-w-sm text-text-muted">{t('students.codeHint')}</p>
             <p className="text-caption text-text-muted">
-              {t('students.codeExpires')}: {new Date(code.expiresAt).toLocaleDateString(lang === 'ar' ? 'ar-IQ' : 'en-GB')}
+              {t('students.codeExpires')}: {new Date(code.expiresAt).toLocaleDateString(lang === 'ar' ? 'ar-IQ-u-nu-latn' : 'en-GB')}
             </p>
           </div>
         ) : null}

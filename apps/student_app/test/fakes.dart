@@ -11,12 +11,35 @@ import 'package:student_app/app.dart';
 
 /// In-memory stand-in for the Naql API with one university, two points and one roster student.
 class FakeBackend {
-  FakeBackend({this.signedIn = false, this.withPoint = false}) {
+  FakeBackend({this.signedIn = false, this.withPoint = false, Map<String, Object?>? subscription}) : subscription = subscription ?? noSubscription {
     if (withPoint) profile['defaultPoint'] = {...points.first, 'tierId': 't-b'};
   }
 
   final bool signedIn;
   final bool withPoint;
+
+  /// What GET /subscriptions/me returns; tests may replace it to simulate the office recording a payment.
+  Map<String, Object?> subscription;
+
+  static const Map<String, Object?> noSubscription = {
+    'status': 'none',
+    'daysLeft': 0,
+    'current': null,
+    'upcoming': null,
+    'price': 60000,
+    'tierName': 'B',
+    'payAt': {'officeNote': 'مكتب النقل — البناية ب، الطابق الأرضي'},
+  };
+
+  static Map<String, Object?> active({int daysLeft = 20, String status = 'active'}) => {
+        'status': status,
+        'daysLeft': daysLeft,
+        'current': {'month': '2026-10', 'start': '2026-10-01T00:00:00.000Z', 'end': '2026-10-31T00:00:00.000Z', 'price': 60000},
+        'upcoming': null,
+        'price': 60000,
+        'tierName': 'B',
+        'payAt': {'officeNote': 'مكتب النقل — البناية ب، الطابق الأرضي'},
+      };
   final requests = <http.Request>[];
 
   final points = [
@@ -59,6 +82,8 @@ class FakeBackend {
         return _json(profile);
       case 'GET /gathering-points':
         return _json(points);
+      case 'GET /subscriptions/me':
+        return _json(subscription);
     }
     return _json({'message': 'not found'}, 404);
   });

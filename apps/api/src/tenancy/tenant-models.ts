@@ -11,4 +11,6 @@ export const TENANT_MODELS: ReadonlySet<string> = new Set([
   'DriverProfile',
   'DriverDocument',
   'DocumentAccess',
+  'Payment',
+  'Subscription',
 ]);

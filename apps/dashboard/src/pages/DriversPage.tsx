@@ -180,7 +180,7 @@ export function DriversPage() {
   const [open, setOpen] = useState<string | null>(null);
   const counts = useMemo(() => Object.fromEntries(TABS.map((s) => [s, q.data?.filter((d) => d.status === s).length ?? 0])), [q.data]);
   const rows = q.data?.filter((d) => d.status === tab) ?? [];
-  const date = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString(lang === 'ar' ? 'ar-IQ' : 'en-GB', { day: 'numeric', month: 'short' }) : '—');
+  const date = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString(lang === 'ar' ? 'ar-IQ-u-nu-latn' : 'en-GB', { day: 'numeric', month: 'short' }) : '—');
 
   return (
     <Stagger>

@@ -84,5 +84,55 @@
   "language": "اللغة",
   "signOut": "تسجيل الخروج",
   "defaultPoint": "نقطة التجمّع",
-  "notSet": "غير محدّدة"
+  "notSet": "غير محدّدة",
+  "subActive": "اشتراك فعّال",
+  "subExpiring": "ينتهي خلال {days} أيام",
+  "@subExpiring": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "subExpired": "الاشتراك منتهي",
+  "subNone": "لا يوجد اشتراك",
+  "subUntil": "حتى {date}",
+  "@subUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "subMonthly": "اشتراك شهري",
+  "subTierPrice": "الفئة {tier} · {price}",
+  "@subTierPrice": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "subPayAtOffice": "ادفع نقداً في مكتب النقل وسيُفعّل اشتراكك فوراً.",
+  "subRenew": "جدّد اشتراكك في مكتب النقل قبل انتهائه.",
+  "subNext": "الشهر القادم مدفوع: {month}",
+  "@subNext": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "subUnlimited": "رحلات غير محدودة وأولوية في المقاعد",
+  "subTier": "الفئة {tier}",
+  "@subTier": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      }
+    }
+  }
 }
