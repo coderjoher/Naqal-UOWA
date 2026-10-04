@@ -1,0 +1,83 @@
+// Every tenant-owned model carries `universityId` (NF-05) and must be listed in
+// src/tenancy/tenant-models.ts so the Prisma extension scopes it automatically.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  student
+  driver
+  office
+  super_admin
+}
+
+enum Gender {
+  male
+  female
+}
+
+enum UserStatus {
+  active
+  suspended
+}
+
+model University {
+  id                String   @id @default(uuid()) @db.Uuid
+  name              String
+  nameAr            String?  @map("name_ar")
+  slug              String   @unique
+  campusLat         Float    @map("campus_lat")
+  campusLng         Float    @map("campus_lng")
+  commissionPct     Decimal  @default(0) @map("commission_pct") @db.Decimal(5, 2)
+  waitlistMinutes   Int      @default(30) @map("waitlist_minutes")
+  integrationConfig Json     @default("{}") @map("integration_config")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  users       User[]
+  auditEvents AuditEvent[]
+
+  @@map("universities")
+}
+
+model User {
+  id           String      @id @default(uuid()) @db.Uuid
+  /// Null only for role = super_admin (platform level).
+  universityId String?     @map("university_id") @db.Uuid
+  role         Role
+  name         String
+  email        String?     @unique
+  phone        String?
+  gender       Gender?
+  passwordHash String?     @map("password_hash")
+  status       UserStatus  @default(active)
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+
+  university University? @relation(fields: [universityId], references: [id])
+
+  @@index([universityId, role])
+  @@map("users")
+}
+
+model AuditEvent {
+  id           String   @id @default(uuid()) @db.Uuid
+  universityId String?  @map("university_id") @db.Uuid
+  actorId      String   @map("actor_id") @db.Uuid
+  action       String
+  entity       String
+  entityId     String?  @map("entity_id")
+  payload      Json?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  university University? @relation(fields: [universityId], references: [id])
+
+  @@index([universityId, createdAt])
+  @@map("audit_events")
+}

@@ -1,0 +1,15 @@
+{
+  "@@locale": "en",
+  "appTitle": "Naql Jamiat Warith",
+  "hello": "Welcome",
+  "notifications": "Notifications",
+  "noSubscription": "No subscription",
+  "noRideToday": "No ride today",
+  "noRideTodayBody": "Daily ride requests are coming soon.",
+  "tabHome": "Home",
+  "tabTrips": "My trips",
+  "tabAlerts": "Alerts",
+  "tabProfile": "Account",
+  "comingSoon": "Coming soon",
+  "comingSoonBody": "This page is under construction."
+}

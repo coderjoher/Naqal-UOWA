@@ -30,15 +30,19 @@ and pill controls**. We drop their gradients, glass blur and decorative photos.
 | `surface-muted` | `#F5F7FB` | Inner rows, disabled fields |
 | `border` | `#E2E8F0` | 1 px dividers and input outlines |
 | `text` | `#0F172A` | Primary text |
-| `text-muted` | `#64748B` | Labels, secondary text (contrast ≥ 4.5:1 on white) |
+| `text-muted` | `#56627A` | Labels, secondary text (≥ 5.4:1 on `bg`, 6.1:1 on white) |
 | `primary` | `#2563EB` | The single primary action, active tab, bus marker |
-| `primary-soft` | `#E8EFFD` | Selected chip background, icon circles |
+| `primary-soft` | `#EEF3FE` | Selected nav item, icon circles (primary text on it ≥ 4.6:1) |
 | `on-primary` | `#FFFFFF` | Text on primary |
 | `ink` | `#1E1B4B` | Strong dark buttons on the dashboard (navy from reference 2) |
-| `success` | `#0E9F6E` | Assigned, active subscription, verified run |
-| `warning` | `#D97706` | Waitlisted, expiring soon |
-| `danger` | `#DC2626` | Cancelled, rejected, errors |
+| `success` | `#047857` | Assigned, active subscription, verified run |
+| `warning` | `#B45309` | Waitlisted, expiring soon |
+| `danger` | `#B91C1C` | Cancelled, rejected, errors |
 | `female-only` | `#7C3AED` | Female-only bus badge (solid violet, not a stereotype pink) |
+
+Each status colour also has a `*-soft` background; text in the status colour on its soft
+background meets WCAG AA (≥ 4.5:1). This is checked by the Flutter accessibility test in
+`packages/naql_ui/test/components_test.dart`.
 
 Dark theme is defined later (P8) by swapping the same token names.
 

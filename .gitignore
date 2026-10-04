@@ -1,0 +1,16 @@
+node_modules/
+dist/
+build/
+coverage/
+.env
+*.log
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+pubspec_overrides.yaml
+**/failures/
+test-results/
+playwright-report/
+.idea/
+.DS_Store
+!packages/design-tokens/build/

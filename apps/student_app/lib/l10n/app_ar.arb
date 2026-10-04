@@ -1,0 +1,15 @@
+{
+  "@@locale": "ar",
+  "appTitle": "نقل جامعة وارث",
+  "hello": "أهلاً بك",
+  "notifications": "الإشعارات",
+  "noSubscription": "لا يوجد اشتراك",
+  "noRideToday": "لا توجد رحلة اليوم",
+  "noRideTodayBody": "طلب الرحلات اليومية سيتوفر قريباً.",
+  "tabHome": "الرئيسية",
+  "tabTrips": "رحلاتي",
+  "tabAlerts": "التنبيهات",
+  "tabProfile": "حسابي",
+  "comingSoon": "قريباً",
+  "comingSoonBody": "هذه الصفحة قيد التطوير."
+}

@@ -1,0 +1,11 @@
+{
+  "name": "naql-jamiat-warith",
+  "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "check:phases": "node scripts/check-phases.mjs",
+    "tokens": "pnpm --filter @naql/design-tokens generate",
+    "test": "pnpm -r test"
+  }
+}

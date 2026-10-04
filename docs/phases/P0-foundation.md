@@ -1,6 +1,6 @@
 # P0 — Foundation
 
-Status: planned
+Status: in-progress
 Depends on: —
 
 ## Goal
@@ -21,16 +21,22 @@ from the first line of code, so every later phase only adds features.
 
 ## Deliverables
 
-- `apps/api` — NestJS 11, Prisma + PostgreSQL 16, Redis, BullMQ, `@nestjs/config`, Pino logging,
-  OpenAPI generated from DTOs. `TenantGuard` + Prisma client extension that injects
-  `university_id` into every query. `AuditInterceptor` writes an audit event for every mutating
-  admin request (consumed later by SA-05).
-- `apps/dashboard` — React 19 + Vite + TypeScript, TanStack Router/Query, Tailwind wired to the
-  token CSS variables, Radix primitives. RTL by default. Login screen + empty shell for both roles.
-- `apps/student_app`, `apps/driver_app` — Flutter 3, Riverpod, go_router, both depending on
-  `packages/naql_ui` and `packages/naql_core` (API client generated from OpenAPI, auth storage).
-- `packages/design-tokens/tokens.json` + generator script.
-- `docker-compose.yml` (postgres, redis, osrm with Karbala extract, api, dashboard).
+- `apps/api` — NestJS 11, Prisma 6 + PostgreSQL 16, Redis (ioredis), `@nestjs/config`, OpenAPI
+  at `/docs`. Global `JwtAuthGuard` + `RolesGuard`; a Prisma client extension
+  (`src/tenancy/tenant-scope.ts`) injects `university_id` into every query on tenant models and
+  throws without a tenant context. `AuditInterceptor` writes an audit event for every mutating
+  admin request (consumed later by SA-05). `/health` checks db, redis and osrm.
+- `apps/dashboard` — React 19 + Vite + TypeScript, React Router, TanStack Query, Tailwind v4 reading
+  the generated token theme (Tailwind's default palette is removed), Radix Slot. Arabic RTL by
+  default with an English toggle. Login + shell with role-based menus.
+- `apps/student_app`, `apps/driver_app` — Flutter 3.47, Riverpod, go_router, gen-l10n (ar/en), both
+  built only from `packages/naql_ui`; `packages/naql_core` holds the API client and session.
+- `packages/design-tokens/tokens.json` + generator (`--check` mode for CI).
+- `docker-compose.yml` (PostGIS, Redis, OSRM with the Iraq extract, API, dashboard behind nginx).
+- `.github/workflows/ci.yml` — tokens, api, dashboard, flutter and compose jobs.
+
+Deferred to the phase that first needs them: BullMQ (P1 matrix rebuild), structured logging and
+tracing (P8), OpenAPI-generated Dart client (P2).
 
 ## Tests
 
@@ -50,6 +56,6 @@ from the first line of code, so every later phase only adds features.
 ## Exit gate
 
 - [ ] All P0 tests green in CI on `main`
-- [ ] API unit coverage ≥ 80 % lines on `auth` and `tenancy` modules
+- [x] API unit coverage ≥ 80 % lines on `auth` and `tenancy` modules (enforced by `jest.unit.config.js`)
 - [ ] `docker compose up` works on a clean machine following the README
 - [ ] Design tokens reviewed against `docs/design-system.md`
