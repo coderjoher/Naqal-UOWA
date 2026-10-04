@@ -16,6 +16,8 @@ dependencies:
   shared_preferences: ^2.5.5
   naql_core:
     path: ../naql_core
+  naql_ui:
+    path: ../naql_ui
 
 dev_dependencies:
   flutter_test:

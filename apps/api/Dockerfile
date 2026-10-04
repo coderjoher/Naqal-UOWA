@@ -16,5 +16,6 @@ ENV NODE_ENV=production
 COPY --from=build /repo /repo
 WORKDIR /repo/apps/api
 EXPOSE 3000
-# Migrations run on start so a fresh `docker compose up` is usable immediately.
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main.js"]
+# Migrations run on start so a fresh `docker compose up` is usable immediately; with
+# DEMO_SEED=true the demo data is loaded once (the seed skips itself when data exists).
+CMD ["sh", "-c", "npx prisma migrate deploy && if [ \"$DEMO_SEED\" = true ]; then npx ts-node prisma/seed-demo.ts; fi && node dist/main.js"]

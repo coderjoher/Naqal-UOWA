@@ -2,11 +2,9 @@
 **/dist
 **/.dart_tool
 **/build
-apps/student_app
-apps/driver_app
-packages/naql_ui
-packages/naql_core
-packages/naql_app
+**/android
+**/ios
+**/test/failures
 **/.env
 **/test-results
 **/playwright-report

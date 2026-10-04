@@ -18,6 +18,7 @@ class WelcomeScreen extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.all(NaqlSpace.s5),
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            const Align(alignment: AlignmentDirectional.centerStart, child: ServerSettingsButton()),
             const Spacer(),
             NaqlEntrance(
               child: Center(

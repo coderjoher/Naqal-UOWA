@@ -10,3 +10,7 @@ Uri apiBaseUrl() {
   if (defaultTargetPlatform == TargetPlatform.android) return Uri.parse('http://10.0.2.2:3000/');
   return Uri.parse('http://localhost:3000/');
 }
+
+/// Demo / test builds (`--dart-define=DEMO=true`): the server address can be changed in the app,
+/// so one APK works against any computer running `docker compose`.
+const demoBuild = bool.fromEnvironment('DEMO');

@@ -13,6 +13,7 @@
     "test:int": "jest --config jest.int.config.js --runInBand",
     "test:cov": "jest --config jest.unit.config.js --coverage",
     "db:migrate": "prisma migrate deploy",
+    "db:demo": "ts-node prisma/seed-demo.ts",
     "db:seed": "ts-node prisma/seed.ts",
     "prisma:generate": "prisma generate",
     "db:new-migration": "sh -c 'D=prisma/migrations/$(date -u +%Y%m%d%H%M%S)_$0 && mkdir -p $D && prisma migrate diff --from-migrations prisma/migrations --to-schema-datamodel prisma/schema.prisma --shadow-database-url \"$SHADOW_DATABASE_URL\" --script > $D/migration.sql && echo $D'"
