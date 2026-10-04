@@ -55,6 +55,17 @@ jobs:
   dashboard:
     name: Dashboard (React)
     runs-on: ubuntu-latest
+    # The `full` Playwright project drives the real API against these services.
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_USER: naql, POSTGRES_PASSWORD: naql, POSTGRES_DB: naql_e2e }
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U naql" --health-interval 3s --health-retries 20
+      redis:
+        image: redis:7
+        ports: ['6379:6379']
+        options: --health-cmd "redis-cli ping" --health-interval 3s --health-retries 20
     defaults:
       run: { working-directory: apps/dashboard }
     steps:
@@ -62,11 +73,16 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: pnpm }
-      - run: pnpm install --frozen-lockfile --filter @naql/dashboard
+      - run: pnpm install --frozen-lockfile --filter @naql/dashboard --filter @naql/api
       - run: pnpm lint
       - run: pnpm test
+      - name: Build API for end-to-end tests
+        working-directory: apps/api
+        run: pnpm exec prisma generate && pnpm build
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test:e2e
+      - name: Browser tests (mocked + full stack)
+        run: pnpm test:e2e
+        env: { E2E_FULL: '1' }
       - run: pnpm build
       - uses: actions/upload-artifact@v4
         if: failure()
@@ -123,6 +139,15 @@ jobs:
           done
           docker compose -p naql-uowa logs api osrm
           exit 1
+      - name: Real OSRM builds a 50-point Karbala matrix in under 30 s (P1 exit gate)
+        run: |
+          coords=$(python3 -c "import random; random.seed(7); print(';'.join(f'{44.0+random.uniform(-0.12,0.12):.5f},{32.6+random.uniform(-0.1,0.1):.5f}' for _ in range(51)))")
+          start=$(date +%s.%N)
+          body=$(curl -fsS "http://localhost:5000/table/v1/driving/${coords}?annotations=duration,distance")
+          secs=$(echo "$(date +%s.%N) - $start" | bc)
+          echo "matrix in ${secs}s"
+          echo "$body" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['code']=='Ok' and len(d['durations'])==51, d.get('code')"
+          python3 -c "import sys; sys.exit(0 if float('$secs') < 30 else 1)"
       - name: Dashboard is served and proxies the API
         run: |
           curl -fsS http://localhost:8080/ | grep -q '<div id="root">'

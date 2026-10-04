@@ -15,7 +15,7 @@ const TONES: Record<Tone, string> = {
 /** Status = colour + dot + word. The label is required so colour is never the only signal. */
 export function Badge({ tone = 'neutral', children }: { tone?: Tone; children: ReactNode }) {
   return (
-    <span data-tone={tone} className={clsx('inline-flex h-7 items-center gap-2 rounded-pill px-3 text-caption font-medium', TONES[tone])}>
+    <span data-tone={tone} className={clsx('inline-flex h-7 items-center gap-2 whitespace-nowrap rounded-pill px-3 text-caption font-medium', TONES[tone])}>
       <span className="size-2 rounded-pill bg-current" aria-hidden />
       {children}
     </span>

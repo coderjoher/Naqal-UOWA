@@ -1,5 +1,8 @@
 # Design system — "Clear first"
 
+**Chosen direction: A — Calm Blue** (picked by the owner on 4 Oct 2026 from the four options on the
+design-directions page). Tokens below are that direction.
+
 Reference: the two mood-board shots (TripWay-style booking app and the Metropolitan University bus
 app). We keep their **light, airy layout, white rounded cards, one strong blue, big readable times
 and pill controls**. We drop their gradients, glass blur and decorative photos.
@@ -107,3 +110,20 @@ All UI lives in `packages/naql_ui`. Apps never use raw Material widgets for visi
 - Radix UI primitives (dialog, dropdown, tabs, toast) styled with our tokens, so they look
   custom and stay accessible. TanStack Table for tables, MapLibre GL with the same map style
   as the apps.
+
+## Motion — lively, never in the way
+
+The apps should feel alive, but motion must never delay a task.
+
+- **Page changes:** content slides 16 px and fades in (280 ms, ease-out), mirrored in RTL. The old
+  page leaves in 160 ms. Dashboard: `AnimatePresence` in the shell; Flutter: `NaqlPageTransitionsBuilder`.
+- **Buttons:** lift 1 px on hover, shrink to 97 % on press (spring), spinner when loading. Icon
+  buttons scale 1.06 / 0.92. Flutter: `NaqlPressable` scale + haptic tick.
+- **Lists and cards:** children appear one after another (40 ms stagger, 6 px rise).
+- **Navigation:** the active sidebar item is a pill that slides between items (shared layout).
+- **Feedback:** every save shows a toast that springs up from the bottom; numbers on the overview
+  count up; progress bars fill.
+- **Map pins** pop in; the selected pin grows.
+- Loading uses flat pulsing skeletons, never spinners on whole pages.
+- Everything respects `prefers-reduced-motion` (dashboard: `MotionConfig reducedMotion="user"`;
+  Flutter: `MediaQuery.disableAnimations`).

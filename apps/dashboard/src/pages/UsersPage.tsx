@@ -1,25 +1,17 @@
-import { useQuery } from '@tanstack/react-query';
-import { api, type Role } from '../lib/api';
+import { Users } from 'lucide-react';
 import { useI18n } from '../lib/i18n';
-import { Badge, Card, Table } from '../ui';
-
-interface User {
-  id: string;
-  name: string;
-  email: string | null;
-  role: Role;
-  status: 'active' | 'suspended';
-}
+import { useUsers } from '../lib/queries';
+import { Badge, Card, EmptyState, PageHeader, SkeletonRows, Stagger, Table } from '../ui';
 
 export function UsersPage() {
   const { t } = useI18n();
-  const q = useQuery({ queryKey: ['users'], queryFn: () => api<User[]>('/users') });
+  const q = useUsers();
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="text-title">{t('users.title')}</h1>
-      <Card>
+    <Stagger>
+      <PageHeader title={t('users.title')} description={t('users.desc')} />
+      <Card animated>
         {q.isPending ? (
-          <p className="text-text-muted">{t('common.loading')}</p>
+          <SkeletonRows />
         ) : q.isError ? (
           <p className="text-danger" role="alert">
             {t('common.error')}
@@ -29,9 +21,20 @@ export function UsersPage() {
             caption={t('users.title')}
             rows={q.data}
             rowKey={(u) => u.id}
-            empty={t('common.empty')}
+            empty={<EmptyState icon={Users} title={t('common.empty')} />}
             columns={[
-              { key: 'name', header: t('users.name'), cell: (u) => u.name },
+              {
+                key: 'name',
+                header: t('users.name'),
+                cell: (u) => (
+                  <span className="flex items-center gap-3">
+                    <span className="grid size-9 place-items-center rounded-pill bg-primary-soft text-label text-primary" aria-hidden>
+                      {u.name.slice(0, 1)}
+                    </span>
+                    {u.name}
+                  </span>
+                ),
+              },
               { key: 'email', header: t('users.email'), cell: (u) => <span dir="ltr">{u.email ?? '—'}</span> },
               { key: 'role', header: t('users.role'), cell: (u) => t(`role.${u.role}`) },
               {
@@ -43,6 +46,6 @@ export function UsersPage() {
           />
         )}
       </Card>
-    </div>
+    </Stagger>
   );
 }

@@ -25,3 +25,47 @@
     }
   }
 }
+
+/* Map pins (DOM markers, styled from tokens) */
+.naql-pin {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 3px solid var(--color-surface);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font: 600 12px/1 var(--font-sans);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: transform 160ms ease;
+  animation: naql-pop 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.naql-pin:hover,
+.naql-pin.is-selected {
+  transform: scale(1.18);
+}
+.naql-pin.is-selected {
+  outline: 3px solid var(--color-primary-soft);
+}
+.naql-pin--campus {
+  width: 38px;
+  height: 38px;
+  background: var(--color-ink);
+}
+.naql-pin--draft {
+  background: var(--color-warning);
+}
+.naql-pin--inactive {
+  background: var(--color-text-muted);
+}
+@keyframes naql-pop {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+}
+.maplibregl-map {
+  font-family: var(--font-sans);
+}

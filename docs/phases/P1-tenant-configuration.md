@@ -1,6 +1,6 @@
 # P1 — Universities and transport configuration
 
-Status: planned
+Status: in-progress
 Depends on: P0
 
 ## Goal
@@ -24,12 +24,22 @@ everything dispatch needs: driver requirements, tiers, gathering points and wave
 
 ## Deliverables
 
-- API modules `universities`, `tiers`, `gathering-points`, `waves`, `driver-requirements`, `routing`.
-- `routing` job: on point create/update/delete, enqueue `travel-matrix.rebuild` (BullMQ) that calls
-  OSRM `/table` and stores a `travel_times` matrix (point ↔ point, point ↔ campus).
-- Dashboard pages: Universities (super admin), Settings → Tiers, Points (MapLibre map with
-  click-to-place + tier colour), Waves (weekday grid), Driver requirements (dynamic form builder).
-- Tier is derived from the point's OSRM distance to campus and can be overridden by the office.
+- API modules `universities` (create with first office account, edit commission / waitlist /
+  campus / service area), `tiers` (whole-set replace with contiguity validation), `gathering-points`,
+  `waves`, `driver-requirements` (+ `registration-form` consumed by the driver app in P2), `routing`.
+- `routing`: on any point change, one debounced BullMQ job `travel-matrix.rebuild` per university
+  calls OSRM `/table` and stores the `travel_times` matrix (point ↔ point, point ↔ campus).
+- Tier is derived from the point's OSRM road distance to campus (straight line × 1.3 if OSRM is
+  down) and can be overridden by the office; changing tiers re-resolves automatic points.
+- Service area is a `[lat, lng]` polygon on the university (JSON + point-in-polygon in the API);
+  PostGIS is not needed yet and stays available in the compose image for later phases.
+- Config reads (tiers, points, waves, requirements) are cached in Redis per university and
+  invalidated on every write; a Redis outage falls back to the database.
+- Dashboard: Universities (super admin, slide-over forms), Overview with setup checklist,
+  Tiers editor, Points map (MapLibre, muted CARTO basemap, click to place), Waves, Driver
+  requirements. Animated page transitions, buttons, lists and toasts.
+- Tests use a deterministic fake OSRM (`apps/api/test/fake-osrm.ts`); the real Iraq extract is
+  exercised in the CI `compose` job.
 
 ## Tests
 
@@ -40,7 +50,7 @@ everything dispatch needs: driver requirements, tiers, gathering points and wave
 | T1-03 | e2e | TO-01 | Office defines required documents / vehicle type / max vehicle age; driver registration schema reflects them |
 | T1-04 | unit | TO-04, PA-01 | Tier ranges must not overlap or leave gaps; each point resolves to exactly one tier |
 | T1-05 | integration | TO-03, SM-01 | Creating a point stores geography, auto-assigns tier from distance, rejects points outside the coverage polygon |
-| T1-06 | integration | DS-01 | Point change enqueues one rebuild job; job fills matrix for all point pairs + campus using an OSRM test container |
+| T1-06 | integration | DS-01 | Point change enqueues one rebuild job; job fills matrix for all point pairs + campus (fake OSRM in tests; real extract in the compose job) |
 | T1-07 | unit | TO-05 | Waves: morning/return types, weekday mask, no duplicate time per type/day |
 | T1-08 | integration | NF-04 | Reads hit Redis after first load; any write invalidates the matching key |
 | T1-09 | playwright | TO-03, TO-04, TO-05 | Office user configures 3 tiers, 5 points on the map and 2 waves end to end in Arabic RTL |
@@ -48,5 +58,5 @@ everything dispatch needs: driver requirements, tiers, gathering points and wave
 ## Exit gate
 
 - [ ] All P1 tests green in CI
-- [ ] Real Karbala OSRM extract builds a matrix for 50 points in < 30 s
+- [ ] Real Karbala OSRM extract builds a matrix for 50 points in < 30 s (checked by the CI `compose` job)
 - [ ] Transport office reviews the Points / Tiers / Waves screens and signs off

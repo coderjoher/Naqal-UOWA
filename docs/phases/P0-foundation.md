@@ -1,6 +1,6 @@
 # P0 — Foundation
 
-Status: in-progress
+Status: done
 Depends on: —
 
 ## Goal
@@ -55,7 +55,7 @@ tracing (P8), OpenAPI-generated Dart client (P2).
 
 ## Exit gate
 
-- [ ] All P0 tests green in CI on `main`
+- [x] All P0 tests green in CI on `main` (CI run #3 on the merge commit)
 - [x] API unit coverage ≥ 80 % lines on `auth` and `tenancy` modules (enforced by `jest.unit.config.js`)
-- [ ] `docker compose up` works on a clean machine following the README
-- [ ] Design tokens reviewed against `docs/design-system.md`
+- [x] `docker compose up` works on a clean machine following the README (verified by the CI `compose` job on a fresh runner)
+- [x] Design tokens reviewed against `docs/design-system.md` (direction A, Calm Blue, chosen by the owner)

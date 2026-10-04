@@ -37,11 +37,18 @@ model University {
   commissionPct     Decimal  @default(0) @map("commission_pct") @db.Decimal(5, 2)
   waitlistMinutes   Int      @default(30) @map("waitlist_minutes")
   integrationConfig Json     @default("{}") @map("integration_config")
+  /// Service area as [[lat, lng], ...] polygon. Gathering points must lie inside it.
+  coverage          Json     @default("[]")
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
-  users       User[]
-  auditEvents AuditEvent[]
+  users              User[]
+  auditEvents        AuditEvent[]
+  tiers              DistanceTier[]
+  gatheringPoints    GatheringPoint[]
+  waves              Wave[]
+  driverRequirements DriverRequirementSet?
+  travelTimes        TravelTime[]
 
   @@map("universities")
 }
@@ -80,4 +87,107 @@ model AuditEvent {
 
   @@index([universityId, createdAt])
   @@map("audit_events")
+}
+
+/// Price band by road distance to campus (PA-01). Tiers of one university are contiguous:
+/// the first starts at 0 km, each next one starts where the previous ends, the last is open.
+model DistanceTier {
+  id                String   @id @default(uuid()) @db.Uuid
+  universityId      String   @map("university_id") @db.Uuid
+  name              String
+  minKm             Float    @map("min_km")
+  /// Null = no upper bound (last tier).
+  maxKm             Float?   @map("max_km")
+  /// Monthly subscription price in IQD.
+  subscriptionPrice Int      @map("subscription_price")
+  /// Pay-per-ride price in IQD.
+  ridePrice         Int      @map("ride_price")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  university University       @relation(fields: [universityId], references: [id])
+  points     GatheringPoint[]
+
+  @@index([universityId, minKm])
+  @@map("distance_tiers")
+}
+
+/// Fixed pickup point (SM-01). Tier is derived from road distance unless overridden.
+model GatheringPoint {
+  id             String   @id @default(uuid()) @db.Uuid
+  universityId   String   @map("university_id") @db.Uuid
+  name           String
+  nameAr         String?  @map("name_ar")
+  lat            Float
+  lng            Float
+  tierId         String   @map("tier_id") @db.Uuid
+  tierOverridden Boolean  @default(false) @map("tier_overridden")
+  /// Road distance / duration to campus from OSRM (null until computed).
+  distanceKm     Float?   @map("distance_km")
+  durationMin    Float?   @map("duration_min")
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  university University   @relation(fields: [universityId], references: [id])
+  tier       DistanceTier @relation(fields: [tierId], references: [id])
+
+  @@index([universityId, active])
+  @@map("gathering_points")
+}
+
+enum WaveType {
+  morning
+  return
+}
+
+/// Morning arrival or return departure time, active on a set of weekdays (TO-05).
+model Wave {
+  id           String   @id @default(uuid()) @db.Uuid
+  universityId String   @map("university_id") @db.Uuid
+  type         WaveType
+  /// Minutes after midnight (Asia/Baghdad). Morning: arrive-by time; return: departure time.
+  minuteOfDay  Int      @map("minute_of_day")
+  /// Bit mask, bit 0 = Sunday … bit 6 = Saturday.
+  weekdays     Int
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  university University @relation(fields: [universityId], references: [id])
+
+  @@index([universityId, type])
+  @@map("waves")
+}
+
+/// What the transport office requires from drivers and vehicles (TO-01).
+model DriverRequirementSet {
+  id                 String   @id @default(uuid()) @db.Uuid
+  universityId       String   @unique @map("university_id") @db.Uuid
+  /// [{ key, label, labelAr, required }]
+  documents          Json     @default("[]")
+  /// Allowed vehicle types, e.g. ["coaster", "minibus"].
+  vehicleTypes       Json     @default("[]") @map("vehicle_types")
+  minSeats           Int      @default(10) @map("min_seats")
+  maxVehicleAgeYears Int      @default(15) @map("max_vehicle_age_years")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  university University @relation(fields: [universityId], references: [id])
+
+  @@map("driver_requirement_sets")
+}
+
+/// Precomputed OSRM travel matrix (DS-01). Keys are gathering point ids or "campus".
+model TravelTime {
+  universityId String   @map("university_id") @db.Uuid
+  fromKey      String   @map("from_key")
+  toKey        String   @map("to_key")
+  durationS    Int      @map("duration_s")
+  distanceM    Int      @map("distance_m")
+  computedAt   DateTime @default(now()) @map("computed_at")
+
+  university University @relation(fields: [universityId], references: [id])
+
+  @@id([universityId, fromKey, toKey])
+  @@map("travel_times")
 }
