@@ -1,0 +1,135 @@
+name: CI
+
+# Every suite must pass for a PR to merge (FD-02). Nothing here may use continue-on-error
+# or swallow exit codes — scripts/tests/ci-contract.test.mjs enforces that.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tokens:
+    name: Design tokens
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node packages/design-tokens/generate.mjs --check
+      - run: node --test packages/design-tokens/test/*.test.mjs scripts/tests/*.test.mjs
+
+  api:
+    name: API (NestJS)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_USER: naql, POSTGRES_PASSWORD: naql, POSTGRES_DB: naql_test }
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U naql" --health-interval 3s --health-retries 20
+      redis:
+        image: redis:7
+        ports: ['6379:6379']
+        options: --health-cmd "redis-cli ping" --health-interval 3s --health-retries 20
+    defaults:
+      run: { working-directory: apps/api }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile --filter @naql/api
+      - run: pnpm exec prisma generate
+      - run: pnpm lint
+      - name: Unit tests (+ coverage gate on auth & tenancy)
+        run: pnpm test:cov
+      - name: Integration + e2e tests (real PostgreSQL & Redis)
+        run: pnpm test:int
+      - run: pnpm build
+
+  dashboard:
+    name: Dashboard (React)
+    runs-on: ubuntu-latest
+    defaults:
+      run: { working-directory: apps/dashboard }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile --filter @naql/dashboard
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      - run: pnpm build
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with: { name: playwright-results, path: apps/dashboard/test-results }
+
+  flutter:
+    name: Flutter (naql_ui, naql_core, student_app, driver_app)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: { flutter-version: 3.47.6, channel: stable, cache: true }
+      - run: flutter pub get
+      - run: flutter analyze packages/naql_ui packages/naql_core apps/student_app apps/driver_app
+      - name: naql_ui (goldens + widget tests)
+        run: flutter test
+        working-directory: packages/naql_ui
+      - name: naql_core
+        run: flutter test
+        working-directory: packages/naql_core
+      - name: student_app
+        run: flutter test
+        working-directory: apps/student_app
+      - name: driver_app
+        run: flutter test
+        working-directory: apps/driver_app
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with: { name: golden-failures, path: packages/naql_ui/test/failures }
+
+  compose:
+    name: Docker Compose stack (T0-06)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache OSRM data
+        uses: actions/cache@v4
+        with:
+          path: /tmp/osrm-volume
+          key: osrm-iraq-${{ hashFiles('infra/osrm/prepare.sh') }}
+      - name: Restore OSRM volume
+        run: |
+          docker volume create naql-uowa_osrm
+          if [ -d /tmp/osrm-volume ]; then
+            docker run --rm -v naql-uowa_osrm:/data -v /tmp/osrm-volume:/backup alpine sh -c 'cp -a /backup/. /data/'
+          fi
+      - name: Start stack
+        run: docker compose -p naql-uowa up -d --build --wait --wait-timeout 1200
+      - name: Health is OK within 60 s
+        run: |
+          for i in $(seq 1 30); do
+            body=$(curl -fsS http://localhost:3000/health) && echo "$body" && echo "$body" | grep -q '"status":"ok"' && exit 0
+            sleep 2
+          done
+          docker compose -p naql-uowa logs api osrm
+          exit 1
+      - name: Dashboard is served and proxies the API
+        run: |
+          curl -fsS http://localhost:8080/ | grep -q '<div id="root">'
+          curl -fsS http://localhost:8080/api/health | grep -q '"db":"ok"'
+      - name: Save OSRM volume
+        if: success()
+        run: |
+          mkdir -p /tmp/osrm-volume
+          # Files are created by root inside the container; make them readable so actions/cache can archive them.
+          docker run --rm -v naql-uowa_osrm:/data -v /tmp/osrm-volume:/backup alpine sh -c 'cp -a /data/. /backup/ && chmod -R a+rX /backup'

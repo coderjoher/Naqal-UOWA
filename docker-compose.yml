@@ -1,0 +1,77 @@
+# Local stack: PostgreSQL (PostGIS), Redis, OSRM, API, dashboard.
+#   docker compose up -d --build --wait
+#   open http://localhost:8080   (dashboard)   http://localhost:3000/docs   (API docs)
+# First start downloads the Iraq map extract and prepares OSRM (a few minutes, cached in a volume).
+
+services:
+  postgres:
+    image: postgis/postgis:16-3.5
+    environment:
+      POSTGRES_USER: naql
+      POSTGRES_PASSWORD: naql
+      POSTGRES_DB: naql
+    ports: ['5432:5432']
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U naql']
+      interval: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    ports: ['6379:6379']
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 3s
+      retries: 20
+
+  osrm-download:
+    image: curlimages/curl:8.11.1
+    user: root
+    command: ['sh', '-c', '[ -f /data/iraq-latest.osm.pbf ] || curl -fsSL -o /data/iraq-latest.osm.pbf https://download.geofabrik.de/asia/iraq-latest.osm.pbf']
+    volumes: [osrm:/data]
+
+  osrm-prepare:
+    image: ghcr.io/project-osrm/osrm-backend:v5.27.1
+    entrypoint: ['/bin/sh', '/prepare.sh']
+    volumes:
+      - osrm:/data
+      - ./infra/osrm/prepare.sh:/prepare.sh:ro
+    depends_on:
+      osrm-download: { condition: service_completed_successfully }
+
+  osrm:
+    image: ghcr.io/project-osrm/osrm-backend:v5.27.1
+    command: osrm-routed --algorithm mld --max-table-size 1000 /data/iraq-latest.osrm
+    ports: ['5000:5000']
+    volumes: [osrm:/data]
+    depends_on:
+      osrm-prepare: { condition: service_completed_successfully }
+
+  api:
+    build: { context: ., dockerfile: apps/api/Dockerfile }
+    environment:
+      DATABASE_URL: postgresql://naql:naql@postgres:5432/naql
+      REDIS_URL: redis://redis:6379
+      OSRM_URL: http://osrm:5000
+      JWT_SECRET: ${JWT_SECRET:-dev-only-secret-change-me-0123456789}
+      PORT: 3000
+    ports: ['3000:3000']
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      osrm: { condition: service_started }
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://localhost:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      retries: 24
+
+  dashboard:
+    build: { context: ., dockerfile: apps/dashboard/Dockerfile }
+    ports: ['8080:80']
+    depends_on:
+      api: { condition: service_started }
+
+volumes:
+  pgdata:
+  osrm:

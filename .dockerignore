@@ -1,0 +1,13 @@
+**/node_modules
+**/dist
+**/.dart_tool
+**/build
+apps/student_app
+apps/driver_app
+packages/naql_ui
+packages/naql_core
+**/.env
+**/test-results
+**/playwright-report
+.git
+!packages/design-tokens/build

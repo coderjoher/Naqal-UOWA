@@ -1,0 +1,60 @@
+/* GENERATED from packages/design-tokens/tokens.json — do not edit by hand. */
+@theme {
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-bg: #EEF2F8;
+  --color-surface: #FFFFFF;
+  --color-surface-muted: #F5F7FB;
+  --color-border: #E2E8F0;
+  --color-text: #0F172A;
+  --color-text-muted: #56627A;
+  --color-primary: #2563EB;
+  --color-primary-pressed: #1D4ED8;
+  --color-primary-soft: #EEF3FE;
+  --color-on-primary: #FFFFFF;
+  --color-ink: #1E1B4B;
+  --color-success: #047857;
+  --color-success-soft: #E3F6EF;
+  --color-warning: #B45309;
+  --color-warning-soft: #FDF1E1;
+  --color-danger: #B91C1C;
+  --color-danger-soft: #FDE8E8;
+  --color-female-only: #7C3AED;
+  --color-female-only-soft: #F1EAFE;
+  --radius-*: initial;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+  --spacing: 4px;
+  --font-sans: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  --text-*: initial;
+  --text-display: 32px;
+  --text-display--line-height: 40px;
+  --text-display--font-weight: 600;
+  --text-title: 22px;
+  --text-title--line-height: 28px;
+  --text-title--font-weight: 600;
+  --text-headline: 18px;
+  --text-headline--line-height: 24px;
+  --text-headline--font-weight: 600;
+  --text-body: 16px;
+  --text-body--line-height: 24px;
+  --text-body--font-weight: 400;
+  --text-label: 14px;
+  --text-label--line-height: 20px;
+  --text-label--font-weight: 500;
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-caption--font-weight: 400;
+  --shadow-*: initial;
+  --shadow-card: 0px 4px 16px rgba(15, 23, 42, 0.06);
+}
+
+:root {
+  --motion-fast: 200ms;
+  --motion-sheet: 280ms;
+  --touch-min: 48px;
+  --touch-driver: 56px;
+}

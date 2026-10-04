@@ -1,0 +1,10 @@
+# Dart pub workspace: one dependency resolution for all Flutter packages and apps.
+name: naql_workspace
+publish_to: none
+environment:
+  sdk: ^3.13.0
+workspace:
+  - packages/naql_ui
+  - packages/naql_core
+  - apps/student_app
+  - apps/driver_app

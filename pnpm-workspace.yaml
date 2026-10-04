@@ -1,0 +1,10 @@
+packages:
+  - apps/api
+  - apps/dashboard
+  - packages/design-tokens
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - prisma
+  - esbuild
+  - '@nestjs/core'

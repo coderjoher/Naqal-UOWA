@@ -1,0 +1,27 @@
+@import 'tailwindcss';
+@import '../../../packages/design-tokens/build/tokens.theme.css';
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-bg text-text font-sans text-body antialiased;
+  }
+  /* Times and numbers keep their width so they do not jump while updating. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+}

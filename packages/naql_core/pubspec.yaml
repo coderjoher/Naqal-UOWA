@@ -1,0 +1,15 @@
+name: naql_core
+description: Shared non-UI code for the Naql apps — API client, session, models.
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  http: ^1.6.0
+
+dev_dependencies:
+  test: any
+  lints: ^6.0.0

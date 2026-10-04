@@ -1,0 +1,30 @@
+name: naql_ui
+description: Naql design system for Flutter — custom components built on design tokens, not stock Material.
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  lucide_icons_flutter: ^3.1.21
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  fonts:
+    - family: IBM Plex Sans Arabic
+      fonts:
+        - asset: fonts/IBMPlexSansArabic-Regular.ttf
+          weight: 400
+        - asset: fonts/IBMPlexSansArabic-Medium.ttf
+          weight: 500
+        - asset: fonts/IBMPlexSansArabic-SemiBold.ttf
+          weight: 600

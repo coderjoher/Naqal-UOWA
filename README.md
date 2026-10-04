@@ -32,6 +32,40 @@ docs/
   design-system.md  visual language
 ```
 
+## Getting started
+
+Requirements: Node 22 + pnpm 10, Flutter 3.47, Docker (or local PostgreSQL 16 and Redis 7).
+
+```bash
+pnpm install
+flutter pub get                       # resolves the Dart workspace (naql_ui, naql_core, both apps)
+
+# Everything in containers (first start prepares the OSRM map, a few minutes):
+docker compose up -d --build --wait   # dashboard http://localhost:8080 · API docs http://localhost:3000/docs
+
+# Or run the API and dashboard locally against your own PostgreSQL + Redis:
+cd apps/api && cp .env.example .env && pnpm db:migrate && pnpm db:seed && pnpm start:dev
+cd apps/dashboard && pnpm dev         # http://localhost:5173 (proxies /api to :3000)
+cd apps/student_app && flutter run
+```
+
+Seeded dev accounts (password `password123`): `admin@naql.app` (super admin),
+`office@uowa.edu.iq`, `student@uowa.edu.iq`, `driver@uowa.edu.iq`.
+
+### Tests
+
+| Where | Command | What |
+|-------|---------|------|
+| `apps/api` | `pnpm test:unit` / `pnpm test:cov` | Unit tests, coverage gate on auth + tenancy |
+| `apps/api` | `pnpm test:int` | Integration + e2e on real PostgreSQL/Redis (`.env.test`) |
+| `apps/dashboard` | `pnpm test` / `pnpm test:e2e` | Vitest components, Playwright browser tests |
+| `packages/naql_ui` | `flutter test` | Golden (LTR + RTL) and widget tests |
+| `apps/*_app`, `packages/naql_core` | `flutter test` | App smoke tests, API client tests |
+| repo root | `pnpm check:phases` | Requirements ↔ phases ↔ tests traceability |
+
+Design tokens live in `packages/design-tokens/tokens.json`; after editing run `pnpm tokens` and,
+if colours changed, `flutter test --update-goldens` in `packages/naql_ui`.
+
 ## Phases
 
 | Phase | Name | Main requirements | Tests |

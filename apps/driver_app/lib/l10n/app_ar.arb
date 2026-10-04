@@ -1,0 +1,12 @@
+{
+  "@@locale": "ar",
+  "appTitle": "نقل جامعة وارث — السائق",
+  "todayRuns": "رحلات اليوم",
+  "noRunsToday": "لا توجد رحلات اليوم",
+  "noRunsTodayBody": "ستظهر هنا رحلاتك ونقاط التوقف بعد تفعيل التوزيع.",
+  "tabToday": "اليوم",
+  "tabEarnings": "الأرباح",
+  "tabProfile": "حسابي",
+  "comingSoon": "قريباً",
+  "comingSoonBody": "هذه الصفحة قيد التطوير."
+}

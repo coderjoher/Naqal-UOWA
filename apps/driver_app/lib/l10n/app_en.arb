@@ -1,0 +1,12 @@
+{
+  "@@locale": "en",
+  "appTitle": "Naql Jamiat Warith — Driver",
+  "todayRuns": "Today's runs",
+  "noRunsToday": "No runs today",
+  "noRunsTodayBody": "Your runs and stops will appear here once dispatch is live.",
+  "tabToday": "Today",
+  "tabEarnings": "Earnings",
+  "tabProfile": "Account",
+  "comingSoon": "Coming soon",
+  "comingSoonBody": "This page is under construction."
+}

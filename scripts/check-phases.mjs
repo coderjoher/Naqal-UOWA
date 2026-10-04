@@ -9,8 +9,9 @@
 //  5. Every requirement in docs/requirements.md is scoped to exactly one phase.
 //  6. Every exit gate has at least one checklist item.
 //  7. A phase with "Status: done" must have every exit-gate item checked, and every test ID
-//     must appear in a test file under apps/ or packages/ (e.g. it('[T4-01] ...')), so the test
-//     really exists in code and runs in CI.
+//     must appear in a test file under apps/, packages/ or scripts/ (e.g. it('[T4-01] ...')), so
+//     the test really exists in code and runs in CI. The summary shows how many test IDs of
+//     each phase already exist in code.
 
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, relative } from 'node:path';
@@ -18,7 +19,8 @@ import { join, relative } from 'node:path';
 const root = new URL('..', import.meta.url).pathname;
 const REQ_FILE = join(root, 'docs/requirements.md');
 const PHASE_DIR = join(root, 'docs/phases');
-const CODE_DIRS = ['apps', 'packages'].map((d) => join(root, d));
+const CODE_DIRS = ['apps', 'packages', 'scripts'].map((d) => join(root, d));
+const SELF = new URL(import.meta.url).pathname;
 const LAYERS = new Set([
   'unit', 'integration', 'e2e', 'contract', 'widget', 'golden', 'flutter-int',
   'dashboard', 'playwright', 'load', 'security', 'ci',
@@ -57,7 +59,7 @@ function listCodeFiles(dir, acc = []) {
     if (['node_modules', 'build', 'dist', '.dart_tool', '.git'].includes(name)) continue;
     const p = join(dir, name);
     if (statSync(p).isDirectory()) listCodeFiles(p, acc);
-    else if (/\.(ts|tsx|js|mjs|dart)$/.test(name)) acc.push(p);
+    else if (/\.(ts|tsx|js|mjs|dart)$/.test(name) && p !== SELF) acc.push(p);
   }
   return acc;
 }
@@ -125,14 +127,23 @@ for (const file of phaseFiles) {
   const gate = (s['exit gate'] ?? []).filter((l) => /^-\s+\[[ x]\]/.test(l));
   if (gate.length === 0) fail(rel, 'exit gate has no checklist items');
 
+  const inCode = status === 'planned' ? [] : tests.filter((id) => code().includes(`[${id}]`));
   if (status === 'done') {
     const open = gate.filter((l) => /^-\s+\[ \]/.test(l));
     if (open.length) fail(rel, `status is done but ${open.length} exit-gate item(s) unchecked`);
     for (const id of tests) {
-      if (!code().includes(`[${id}]`)) fail(rel, `status is done but test [${id}] not found in apps/ or packages/`);
+      if (!inCode.includes(id)) fail(rel, `status is done but test [${id}] not found in apps/, packages/ or scripts/`);
     }
   }
-  summary.push({ phase: file.replace(/\.md$/, ''), status, requirements: scope.size, tests: tests.length });
+  const checked = gate.filter((l) => /^-\s+\[x\]/.test(l)).length;
+  summary.push({
+    phase: file.replace(/\.md$/, ''),
+    status,
+    requirements: scope.size,
+    tests: tests.length,
+    'tests in code': status === 'planned' ? '—' : `${inCode.length}/${tests.length}`,
+    'exit gate': `${checked}/${gate.length}`,
+  });
 }
 
 for (const id of catalogue.keys()) {
