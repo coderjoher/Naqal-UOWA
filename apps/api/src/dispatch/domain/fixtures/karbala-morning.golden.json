@@ -1,0 +1,77 @@
+{
+  "runs": 6,
+  "plan": [
+    {
+      "gender": "female",
+      "tier": "T0",
+      "seats": "8/14",
+      "stops": [
+        "hindiya_rd×3@07:25",
+        "bab_baghdad×5@07:44"
+      ],
+      "tiers": [
+        "T0"
+      ]
+    },
+    {
+      "gender": "female",
+      "tier": "T1",
+      "seats": "14/14",
+      "stops": [
+        "hay_hussein×6@07:30",
+        "abbas_sq×8@07:37"
+      ],
+      "tiers": [
+        "T1"
+      ]
+    },
+    {
+      "gender": "female",
+      "tier": "T2",
+      "seats": "7/14",
+      "stops": [
+        "al_hurr×4@07:11",
+        "abbas_sq×3@07:37"
+      ],
+      "tiers": [
+        "T1",
+        "T2"
+      ]
+    },
+    {
+      "gender": "male",
+      "tier": "T0",
+      "seats": "10/14",
+      "stops": [
+        "hindiya_rd×4@07:25",
+        "bab_baghdad×6@07:44"
+      ],
+      "tiers": [
+        "T0"
+      ]
+    },
+    {
+      "gender": "male",
+      "tier": "T1",
+      "seats": "14/14",
+      "stops": [
+        "hay_askari×5@07:32",
+        "abbas_sq×9@07:37"
+      ],
+      "tiers": [
+        "T1"
+      ]
+    },
+    {
+      "gender": "male",
+      "tier": "T2",
+      "seats": "7/14",
+      "stops": [
+        "al_hurr×7@07:13"
+      ],
+      "tiers": [
+        "T2"
+      ]
+    }
+  ]
+}

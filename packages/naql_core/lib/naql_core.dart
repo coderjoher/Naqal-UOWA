@@ -3,4 +3,5 @@ library;
 
 export 'src/api_client.dart';
 export 'src/models.dart';
+export 'src/rides.dart';
 export 'src/session.dart';

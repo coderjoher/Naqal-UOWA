@@ -59,15 +59,6 @@ export class DriversController {
     return this.drivers.submit(u.id, u.universityId!);
   }
 
-  /** Today's runs (filled in P4). Only approved drivers may see or operate runs. */
-  @ApiBearerAuth()
-  @Roles('driver')
-  @Get('drivers/me/runs')
-  async runs(@CurrentUser() u: AuthUser) {
-    await this.drivers.assertApproved(u.id);
-    return [];
-  }
-
   @ApiBearerAuth()
   @Roles('office')
   @Get('drivers')

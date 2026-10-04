@@ -1,0 +1,12 @@
+{
+  "name": "14:00 return wave fanning out",
+  "kind": "return",
+  "waveHour": 14,
+  "points": {
+    "campus": [32.5847, 44.0617],
+    "north": [32.65, 44.03], "north2": [32.67, 44.02], "west": [32.6, 43.95], "west2": [32.61, 43.92], "east": [32.57, 44.12]
+  },
+  "tiers": { "north": 1, "north2": 2, "west": 1, "west2": 2, "east": 0 },
+  "requests": [["north", "male", 8], ["north2", "male", 5], ["west", "male", 6], ["west2", "male", 7], ["east", "male", 4], ["north", "female", 6], ["west", "female", 5]],
+  "drivers": [14, 14, 14, 14, 14, 14]
+}

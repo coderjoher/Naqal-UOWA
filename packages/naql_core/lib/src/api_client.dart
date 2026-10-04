@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
 import 'models.dart';
+import 'rides.dart';
 import 'session.dart';
 
 class ApiException implements Exception {
@@ -34,6 +35,10 @@ class ApiClient {
   Future<dynamic> get(String path) => _send('GET', path);
   Future<dynamic> post(String path, [Object? body]) => _send('POST', path, body);
   Future<dynamic> patch(String path, Object body) => _send('PATCH', path, body);
+  Future<dynamic> put(String path, Object body) => _send('PUT', path, body);
+
+  /// Absolute URL for a path returned by the API (e.g. a signed `/files/…` link).
+  Uri resolve(String path) => _url(path);
 
   Uri _url(String path) => baseUrl.resolve(path.startsWith('/') ? path.substring(1) : path);
 
@@ -90,6 +95,26 @@ class ApiClient {
       );
 
   Future<SubscriptionInfo> subscription() async => SubscriptionInfo.fromJson(await get('/subscriptions/me') as Map<String, dynamic>);
+
+  // ---------------- Rides (P4) ----------------
+
+  Future<RideOptions> rideOptions() async => RideOptions.fromJson(await get('/rides/options') as Map<String, dynamic>);
+
+  Future<RideInfo> requestRide({required String waveId, required String date, String? pointId}) async =>
+      RideInfo.fromJson(await post('/rides', {'waveId': waveId, 'date': date, 'pointId': ?pointId}) as Map<String, dynamic>);
+
+  Future<List<RideInfo>> myRides() async => [for (final r in await get('/rides/me') as List) RideInfo.fromJson(r as Map<String, dynamic>)];
+
+  Future<RideInfo> cancelRide(String id) async => RideInfo.fromJson(await post('/rides/$id/cancel') as Map<String, dynamic>);
+
+  Future<List<AvailabilityDay>> availability() async =>
+      [for (final d in await get('/drivers/me/availability') as List) AvailabilityDay.fromJson(d as Map<String, dynamic>)];
+
+  Future<AvailabilityDay> setAvailability(String date, List<String> waveIds) async =>
+      AvailabilityDay.fromJson(await put('/drivers/me/availability', {'date': date, 'waveIds': waveIds}) as Map<String, dynamic>);
+
+  Future<List<DriverRun>> driverRuns({String? date}) async =>
+      [for (final r in await get(date == null ? '/drivers/me/runs' : '/drivers/me/runs?date=$date') as List) DriverRun.fromJson(r as Map<String, dynamic>)];
 
   Future<List<GatheringPoint>> gatheringPoints() async =>
       (await get('/gathering-points') as List).map((p) => GatheringPoint.fromJson(p as Map<String, dynamic>)).where((p) => p.active).toList();

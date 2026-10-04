@@ -20,7 +20,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get noRunsTodayBody =>
-      'ستظهر هنا رحلاتك ونقاط التوقف بعد تفعيل التوزيع.';
+      'عيّن أيام عملك من تبويب «جدولي»، وتظهر رحلاتك هنا بعد توزيع الحافلات.';
 
   @override
   String get tabToday => 'اليوم';
@@ -227,4 +227,92 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get signOut => 'تسجيل الخروج';
+
+  @override
+  String get tabSchedule => 'جدولي';
+
+  @override
+  String get scheduleTitle => 'متى ستعمل؟';
+
+  @override
+  String get scheduleBody =>
+      'اختر المواعيد التي ستعمل فيها خلال الأسبوع. يُقفل الموعد بعد توزيع الحافلات.';
+
+  @override
+  String get dayToday => 'اليوم';
+
+  @override
+  String get dayTomorrow => 'غداً';
+
+  @override
+  String get waveMorning => 'ذهاب';
+
+  @override
+  String get waveReturn => 'عودة';
+
+  @override
+  String waveLabel(String type, String time) {
+    return '$type $time';
+  }
+
+  @override
+  String get noWavesDay => 'لا توجد رحلات في هذا اليوم';
+
+  @override
+  String get lockedWave => 'مُقفل — تم التوزيع';
+
+  @override
+  String get availabilityFailed => 'تعذّر حفظ جدولك';
+
+  @override
+  String runSeats(int booked, int capacity) {
+    return '$booked من $capacity مقعد';
+  }
+
+  @override
+  String runStops(int count) {
+    return '$count محطات';
+  }
+
+  @override
+  String get departAt => 'الانطلاق';
+
+  @override
+  String get cashToCollect => 'نقد للتحصيل';
+
+  @override
+  String get femaleOnly => 'للطالبات فقط';
+
+  @override
+  String riders(int count) {
+    return 'الركاب: $count';
+  }
+
+  @override
+  String get campus => 'الجامعة';
+
+  @override
+  String arriveBy(String time) {
+    return 'الوصول قبل $time';
+  }
+
+  @override
+  String get leaveCampus => 'الانطلاق من الجامعة';
+
+  @override
+  String get subscriber => 'مشترك';
+
+  @override
+  String payCash(String amount) {
+    return '$amount نقداً';
+  }
+
+  @override
+  String get setSchedule => 'عيّن جدولك';
+
+  @override
+  String get stopsTitle => 'المحطات';
+
+  @override
+  String get seatsLabel => 'المقاعد';
 }

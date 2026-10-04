@@ -20,7 +20,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noRunsTodayBody =>
-      'Your runs and stops will appear here once dispatch is live.';
+      'Set the days you drive in Schedule; your runs appear here once buses are assigned.';
 
   @override
   String get tabToday => 'Today';
@@ -229,4 +229,92 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signOut => 'Sign out';
+
+  @override
+  String get tabSchedule => 'Schedule';
+
+  @override
+  String get scheduleTitle => 'When will you drive?';
+
+  @override
+  String get scheduleBody =>
+      'Pick the waves you will drive this week. A wave locks once buses are assigned.';
+
+  @override
+  String get dayToday => 'Today';
+
+  @override
+  String get dayTomorrow => 'Tomorrow';
+
+  @override
+  String get waveMorning => 'To campus';
+
+  @override
+  String get waveReturn => 'Home';
+
+  @override
+  String waveLabel(String type, String time) {
+    return '$type $time';
+  }
+
+  @override
+  String get noWavesDay => 'No waves on this day';
+
+  @override
+  String get lockedWave => 'Locked — buses assigned';
+
+  @override
+  String get availabilityFailed => 'Could not save your schedule';
+
+  @override
+  String runSeats(int booked, int capacity) {
+    return '$booked of $capacity seats';
+  }
+
+  @override
+  String runStops(int count) {
+    return '$count stops';
+  }
+
+  @override
+  String get departAt => 'Leave at';
+
+  @override
+  String get cashToCollect => 'Cash to collect';
+
+  @override
+  String get femaleOnly => 'Female only';
+
+  @override
+  String riders(int count) {
+    return 'Riders: $count';
+  }
+
+  @override
+  String get campus => 'Campus';
+
+  @override
+  String arriveBy(String time) {
+    return 'Arrive by $time';
+  }
+
+  @override
+  String get leaveCampus => 'Leave campus';
+
+  @override
+  String get subscriber => 'Subscriber';
+
+  @override
+  String payCash(String amount) {
+    return '$amount cash';
+  }
+
+  @override
+  String get setSchedule => 'Set your schedule';
+
+  @override
+  String get stopsTitle => 'Stops';
+
+  @override
+  String get seatsLabel => 'Seats';
 }

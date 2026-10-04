@@ -3,7 +3,7 @@
   "appTitle": "نقل جامعة وارث — السائق",
   "todayRuns": "رحلات اليوم",
   "noRunsToday": "لا توجد رحلات اليوم",
-  "noRunsTodayBody": "ستظهر هنا رحلاتك ونقاط التوقف بعد تفعيل التوزيع.",
+  "noRunsTodayBody": "عيّن أيام عملك من تبويب «جدولي»، وتظهر رحلاتك هنا بعد توزيع الحافلات.",
   "tabToday": "اليوم",
   "tabEarnings": "الأرباح",
   "tabProfile": "حسابي",
@@ -92,5 +92,78 @@
   "reason": "السبب",
   "editApplication": "تعديل الطلب",
   "refresh": "تحديث الحالة",
-  "signOut": "تسجيل الخروج"
+  "signOut": "تسجيل الخروج",
+  "tabSchedule": "جدولي",
+  "scheduleTitle": "متى ستعمل؟",
+  "scheduleBody": "اختر المواعيد التي ستعمل فيها خلال الأسبوع. يُقفل الموعد بعد توزيع الحافلات.",
+  "dayToday": "اليوم",
+  "dayTomorrow": "غداً",
+  "waveMorning": "ذهاب",
+  "waveReturn": "عودة",
+  "waveLabel": "{type} {time}",
+  "@waveLabel": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "noWavesDay": "لا توجد رحلات في هذا اليوم",
+  "lockedWave": "مُقفل — تم التوزيع",
+  "availabilityFailed": "تعذّر حفظ جدولك",
+  "runSeats": "{booked} من {capacity} مقعد",
+  "@runSeats": {
+    "placeholders": {
+      "booked": {
+        "type": "int"
+      },
+      "capacity": {
+        "type": "int"
+      }
+    }
+  },
+  "runStops": "{count} محطات",
+  "@runStops": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "departAt": "الانطلاق",
+  "cashToCollect": "نقد للتحصيل",
+  "femaleOnly": "للطالبات فقط",
+  "riders": "الركاب: {count}",
+  "@riders": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "campus": "الجامعة",
+  "arriveBy": "الوصول قبل {time}",
+  "@arriveBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "leaveCampus": "الانطلاق من الجامعة",
+  "subscriber": "مشترك",
+  "payCash": "{amount} نقداً",
+  "@payCash": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "setSchedule": "عيّن جدولك",
+  "stopsTitle": "المحطات",
+  "seatsLabel": "المقاعد"
 }

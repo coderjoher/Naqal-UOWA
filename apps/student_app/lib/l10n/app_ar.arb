@@ -13,7 +13,7 @@
   "notifications": "الإشعارات",
   "noSubscription": "لا يوجد اشتراك",
   "noRideToday": "لا توجد رحلة اليوم",
-  "noRideTodayBody": "طلب الرحلات اليومية سيتوفر قريباً.",
+  "noRideTodayBody": "اطلب مقعداً في حافلة اليوم أو الغد.",
   "tabHome": "الرئيسية",
   "tabTrips": "رحلاتي",
   "tabAlerts": "التنبيهات",
@@ -134,5 +134,87 @@
         "type": "String"
       }
     }
-  }
+  },
+  "rideRequest": "اطلب رحلة",
+  "rideRequestTitle": "طلب رحلة",
+  "rideRequestBody": "اختر الموعد ونقطة التجمّع، ونحجز لك مقعداً.",
+  "rideWhen": "الموعد",
+  "rideWhere": "نقطة التجمّع",
+  "rideToday": "اليوم",
+  "rideTomorrow": "غداً",
+  "rideMorning": "ذهاب",
+  "rideReturn": "عودة",
+  "rideSlot": "{day} · {type} {time}",
+  "@rideSlot": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "rideNoSlots": "لا توجد مواعيد متاحة اليوم أو غداً.",
+  "rideSend": "أرسل الطلب",
+  "rideSent": "وصل طلبك",
+  "rideConfirmed": "مؤكد",
+  "rideCampus": "الجامعة",
+  "rideStopOf": "المحطة {n} من {total}",
+  "@rideStopOf": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "ridePayDriver": "ادفع {amount} نقداً للسائق",
+  "@ridePayDriver": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "rideCovered": "مشمول باشتراكك",
+  "rideCancel": "إلغاء الطلب",
+  "rideCancelTitle": "إلغاء الطلب؟",
+  "rideCancelBody": "سيُعطى مقعدك لطالب آخر.",
+  "rideCancelYes": "نعم، ألغِ",
+  "rideKeep": "لا، أبقِه",
+  "rideCancelled": "أُلغي الطلب",
+  "ridePendingTitle": "وصل طلبك",
+  "ridePendingBody": "نوزّع الحافلات قبل الموعد بساعة ونخبرك بحافلتك.",
+  "rideWaitTitle": "أنت على قائمة الانتظار",
+  "rideWaitBody": "كل المقاعد محجوزة الآن. سنحجز لك مقعداً فور تحرّر واحد.",
+  "rideWaitLeft": "الوقت المتبقي",
+  "rideExpired": "لم نجد مقعداً لرحلة {time}. يمكنك طلب موعد آخر.",
+  "@rideExpired": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "rideWave": "{day} · {type} {time}",
+  "@rideWave": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "rideFemaleOnly": "للطالبات فقط"
 }

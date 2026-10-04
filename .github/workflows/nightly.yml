@@ -1,0 +1,24 @@
+name: Nightly
+
+# Long-running checks that would slow every PR down.
+on:
+  schedule:
+    - cron: '17 1 * * *' # 04:17 Baghdad
+  workflow_dispatch:
+
+jobs:
+  dispatch-property:
+    name: Dispatch property test, 100 000 cases (T4-01)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run: { working-directory: apps/api }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile --filter @naql/api
+      - run: pnpm exec prisma generate
+      - name: 100 000 random scenarios with a fresh seed each night
+        run: DISPATCH_PROPERTY_RUNS=100000 DISPATCH_PROPERTY_SEED=$(date +%s) pnpm exec jest --config jest.unit.config.js src/dispatch/domain/properties.spec.ts --testTimeout=3000000

@@ -23,3 +23,23 @@ String formatIqd(int amount, String lang) {
   }
   return '${amount < 0 ? '-' : ''}$b ${lang == 'ar' ? 'د.ع' : 'IQD'}';
 }
+
+/// "07:35" — 24-hour clock with Western digits, as on Iraqi bus timetables.
+String formatClock(DateTime d) => '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
+
+/// "04:59" from a duration (minutes:seconds), or "1:04:59" past an hour.
+String formatCountdown(Duration d) {
+  final s = d.isNegative ? 0 : d.inSeconds;
+  final h = s ~/ 3600, m = (s % 3600) ~/ 60, sec = s % 60;
+  final mm = m.toString().padLeft(2, '0'), ss = sec.toString().padLeft(2, '0');
+  return h > 0 ? '$h:$mm:$ss' : '$mm:$ss';
+}
+
+const _arWeekdays = ['الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت', 'الأحد'];
+const _enWeekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+/// "الأحد 5 تشرين الأول" / "Sunday 5 October" from a civil date "2026-10-05".
+String formatDayName(String isoDate, String lang) {
+  final d = DateTime.parse(isoDate);
+  return '${(lang == 'ar' ? _arWeekdays : _enWeekdays)[d.weekday - 1]} ${formatDayMonth(d, lang)}';
+}

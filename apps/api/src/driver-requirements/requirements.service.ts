@@ -8,6 +8,7 @@ export const DEFAULT_REQUIREMENTS: DriverRequirementsDto = {
     { key: 'national_id', label: 'National ID card', labelAr: 'البطاقة الوطنية', required: true },
     { key: 'driving_licence', label: 'Driving licence', labelAr: 'إجازة السوق', required: true },
     { key: 'vehicle_registration', label: 'Vehicle registration (sanwiya)', labelAr: 'سنوية السيارة', required: true },
+    { key: 'vehicle_photo', label: 'Vehicle photo (shown to students)', labelAr: 'صورة المركبة (تظهر للطلاب)', required: true },
   ],
   vehicleTypes: ['coaster', 'minibus'],
   minSeats: 10,

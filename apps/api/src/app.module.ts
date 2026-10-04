@@ -7,6 +7,10 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigCache } from './config-cache/config-cache.service';
 import { DriverRequirementsController } from './driver-requirements/requirements.controller';
 import { DriverRequirementsService } from './driver-requirements/requirements.service';
+import { DISPATCH_QUEUE, DispatchEngine } from './dispatch/dispatch.engine';
+import { DispatchProcessor } from './dispatch/dispatch.processor';
+import { RidesController } from './dispatch/rides.controller';
+import { RidesService } from './dispatch/rides.service';
 import { DriversController } from './drivers/drivers.controller';
 import { DriversService } from './drivers/drivers.service';
 import { ConsoleSmsSender, OtpService, SMS_SENDER } from './drivers/otp.service';
@@ -57,6 +61,7 @@ class CacheModule {}
         };
       },
     }),
+    BullModule.registerQueue({ name: DISPATCH_QUEUE }),
     PrismaModule,
     RedisModule,
     CacheModule,
@@ -76,6 +81,7 @@ class CacheModule {}
     DriversController,
     FilesController,
     SubscriptionsController,
+    RidesController,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
@@ -91,6 +97,9 @@ class CacheModule {}
     StorageService,
     { provide: SMS_SENDER, useClass: ConsoleSmsSender },
     { provide: PAYMENT_PROVIDERS, useValue: [new OfficeCashProvider()] },
+    DispatchEngine,
+    DispatchProcessor,
+    RidesService,
     PaymentsService,
     SubscriptionsService,
   ],

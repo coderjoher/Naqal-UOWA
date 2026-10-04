@@ -145,18 +145,18 @@ describe('P2 driver onboarding (e2e)', () => {
 
   it('[T2-06] submission fails until every requirement from TO-01 is provided', async () => {
     let res = await http().post('/drivers/me/submit').set(auth(driver)).expect(422);
-    expect(res.body.missing).toEqual(['name', 'vehicle_type', 'plate', 'seats', 'model_year', 'doc_national_id', 'doc_driving_licence', 'doc_vehicle_registration']);
+    expect(res.body.missing).toEqual(['name', 'vehicle_type', 'plate', 'seats', 'model_year', 'doc_national_id', 'doc_driving_licence', 'doc_vehicle_registration', 'doc_vehicle_photo']);
 
     await http().patch('/drivers/me').set(auth(driver)).send({ name: 'علي حسن', vehicleType: 'coaster', plate: '45 ك 12345', seats: 20, modelYear: 2019 }).expect(200);
     await http().put('/drivers/me/documents/national_id').set(auth(driver)).attach('file', PNG, { filename: 'id.png', contentType: 'image/png' }).expect(200);
     res = await http().post('/drivers/me/submit').set(auth(driver)).expect(422);
-    expect(res.body.missing).toEqual(['doc_driving_licence', 'doc_vehicle_registration']);
+    expect(res.body.missing).toEqual(['doc_driving_licence', 'doc_vehicle_registration', 'doc_vehicle_photo']);
 
     // Wrong file type and unknown document keys are refused.
     await http().put('/drivers/me/documents/driving_licence').set(auth(driver)).attach('file', Buffer.from('MZ'), { filename: 'x.exe', contentType: 'application/x-msdownload' }).expect(422);
     await http().put('/drivers/me/documents/selfie').set(auth(driver)).attach('file', PNG, { filename: 'a.png', contentType: 'image/png' }).expect(400);
 
-    for (const key of ['driving_licence', 'vehicle_registration']) {
+    for (const key of ['driving_licence', 'vehicle_registration', 'vehicle_photo']) {
       await http().put(`/drivers/me/documents/${key}`).set(auth(driver)).attach('file', PNG, { filename: `${key}.png`, contentType: 'image/png' }).expect(200);
     }
     const ok = (await http().post('/drivers/me/submit').set(auth(driver)).expect(200)).body;

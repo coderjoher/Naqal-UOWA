@@ -33,7 +33,7 @@ export function EmptyState({ icon: Icon, title, message, action }: { icon: Lucid
 }
 
 /** Counts up to `value` when it appears or changes. */
-export function AnimatedNumber({ value, format = (n) => n.toLocaleString() }: { value: number; format?: (n: number) => string }) {
+export function AnimatedNumber({ value, format = (n) => n.toLocaleString('en-US') }: { value: number; format?: (n: number) => string }) {
   const [shown, setShown] = useState(value);
   const from = useRef(0);
   useEffect(() => {

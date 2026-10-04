@@ -13,7 +13,9 @@ import 'screens/onboarding/university_screen.dart';
 import 'screens/onboarding/welcome_screen.dart';
 import 'screens/placeholder_screen.dart';
 import 'screens/status_screen.dart';
-import 'screens/today_screen.dart';
+import 'screens/runs/run_screen.dart';
+import 'screens/runs/today_screen.dart';
+import 'screens/schedule_screen.dart';
 
 const _onboarding = {'/welcome', '/university', '/phone', '/code'};
 
@@ -53,7 +55,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => _Shell(shell: shell),
         branches: [
-          StatefulShellBranch(routes: [GoRoute(path: '/today', builder: (_, _) => const TodayScreen())]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: '/today',
+              builder: (_, _) => const TodayScreen(),
+              routes: [GoRoute(path: 'run/:id', builder: (_, s) => RunScreen(runId: s.pathParameters['id']!))],
+            ),
+          ]),
+          StatefulShellBranch(routes: [GoRoute(path: '/schedule', builder: (_, _) => const ScheduleScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/earnings', builder: (c, _) => PlaceholderScreen(title: AppLocalizations.of(c).tabEarnings))]),
           StatefulShellBranch(routes: [GoRoute(path: '/profile', builder: (c, _) => PlaceholderScreen(title: AppLocalizations.of(c).tabProfile))]),
         ],
@@ -77,6 +86,7 @@ class _Shell extends StatelessWidget {
         onTap: (i) => shell.goBranch(i, initialLocation: i == shell.currentIndex),
         items: [
           NaqlNavItem(icon: LucideIcons.route, label: t.tabToday),
+          NaqlNavItem(icon: LucideIcons.calendarDays, label: t.tabSchedule),
           NaqlNavItem(icon: LucideIcons.wallet, label: t.tabEarnings),
           NaqlNavItem(icon: LucideIcons.circleUser, label: t.tabProfile),
         ],
