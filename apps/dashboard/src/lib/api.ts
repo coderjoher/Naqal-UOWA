@@ -16,6 +16,8 @@ export class ApiError extends Error {
   constructor(
     public status: number,
     message: string,
+    /** Validation / business messages from the API body, if any. */
+    public messages: string[] = [],
   ) {
     super(message);
   }
@@ -57,6 +59,15 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
     saveSession(null);
     window.dispatchEvent(new Event('naql:logout'));
   }
-  if (!res.ok) throw new ApiError(res.status, res.statusText);
+  if (!res.ok) {
+    let messages: string[] = [];
+    try {
+      const body = (await res.json()) as { message?: string | string[] };
+      messages = Array.isArray(body.message) ? body.message : body.message ? [body.message] : [];
+    } catch {
+      /* no JSON body */
+    }
+    throw new ApiError(res.status, res.statusText, messages);
+  }
   return (await res.json()) as T;
 }

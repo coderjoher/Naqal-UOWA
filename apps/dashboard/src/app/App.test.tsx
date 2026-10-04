@@ -38,13 +38,28 @@ describe('app routing', () => {
     expect(screen.getByRole('button', { name: 'دخول' })).toBeInTheDocument();
   });
 
-  it('office users do not see the universities menu and cannot open it', () => {
+  it('office users do not see the universities menu and cannot open it', async () => {
     asRole('office');
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('[]', { status: 200 })));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((url: string) =>
+        Promise.resolve(
+          new Response(
+            url.endsWith('/driver-requirements')
+              ? JSON.stringify({ documents: [], vehicleTypes: [], minSeats: 10, maxVehicleAgeYears: 15 })
+              : url.endsWith('/universities/current')
+                ? JSON.stringify({ id: 'uni', name: 'Warith', nameAr: 'وارث', campusLat: 32.58, campusLng: 44.06 })
+                : '[]',
+            { status: 200 },
+          ),
+        ),
+      ),
+    );
     renderAt('/universities');
     expect(screen.queryByRole('link', { name: 'الجامعات' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'المستخدمون' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('أهلاً');
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('أهلاً');
+    expect(screen.getByRole('link', { name: 'فئات المسافة' })).toBeInTheDocument();
   });
 
   it('shows a login error for wrong credentials', async () => {

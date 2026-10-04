@@ -3,3 +3,6 @@ export * from './Input';
 export * from './Card';
 export * from './Badge';
 export * from './Table';
+export * from './Feedback';
+export * from './Drawer';
+export * from './Layout';

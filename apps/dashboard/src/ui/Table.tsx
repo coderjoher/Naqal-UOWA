@@ -1,4 +1,6 @@
+import { motion } from 'motion/react';
 import type { ReactNode } from 'react';
+import { itemVariants, listVariants } from './motion';
 
 export interface Column<T> {
   key: string;
@@ -29,7 +31,7 @@ export function Table<T>({ columns, rows, rowKey, caption, empty }: TableProps<T
             ))}
           </tr>
         </thead>
-        <tbody>
+        <motion.tbody variants={listVariants} initial="hidden" animate="show">
           {rows.length === 0 ? (
             <tr>
               <td colSpan={columns.length} className="px-4 py-10 text-center text-text-muted">
@@ -38,16 +40,16 @@ export function Table<T>({ columns, rows, rowKey, caption, empty }: TableProps<T
             </tr>
           ) : (
             rows.map((r) => (
-              <tr key={rowKey(r)} className="border-b border-border last:border-0 hover:bg-surface-muted">
+              <motion.tr variants={itemVariants} key={rowKey(r)} className="border-b border-border transition-colors duration-200 last:border-0 hover:bg-surface-muted">
                 {columns.map((c) => (
                   <td key={c.key} className={c.className ?? 'px-4 py-3'}>
                     {c.cell(r)}
                   </td>
                 ))}
-              </tr>
+              </motion.tr>
             ))
           )}
-        </tbody>
+        </motion.tbody>
       </table>
     </div>
   );

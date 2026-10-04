@@ -2,6 +2,13 @@ import { expect, test, type Page } from '@playwright/test';
 
 /** The API is mocked at the network layer; the real API is covered by apps/api e2e tests. */
 async function mockApi(page: Page, role: 'office' | 'super_admin') {
+  // Catch-all first (later routes take precedence): every other endpoint answers with empty data.
+  await page.route('**/api/**', (route) => {
+    const url = route.request().url();
+    if (url.endsWith('/driver-requirements')) return route.fulfill({ json: { documents: [], vehicleTypes: [], minSeats: 10, maxVehicleAgeYears: 15 } });
+    if (url.endsWith('/universities/current')) return route.fulfill({ json: { id: 'uni', name: 'Warith', nameAr: 'جامعة وارث الأنبياء', campusLat: 32.58, campusLng: 44.06, coverage: [] } });
+    return route.fulfill({ json: [] });
+  });
   await page.route('**/api/auth/login', async (route) => {
     const { email, password } = route.request().postDataJSON();
     if (password !== 'password123') return route.fulfill({ status: 401, json: { message: 'Unauthorized' } });
