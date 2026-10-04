@@ -14,3 +14,5 @@ playwright-report/
 .idea/
 .DS_Store
 !packages/design-tokens/build/
+dump.rdb
+apps/api/storage/

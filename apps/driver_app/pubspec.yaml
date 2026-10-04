@@ -13,16 +13,20 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
+  image_picker: ^1.2.3
   flutter_riverpod: ^3.4.3
   go_router: ^18.0.2
   naql_ui:
     path: ../../packages/naql_ui
   naql_core:
     path: ../../packages/naql_core
+  naql_app:
+    path: ../../packages/naql_app
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  http: any
   flutter_lints: ^6.0.0
 
 flutter:

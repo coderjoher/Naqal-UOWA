@@ -15,6 +15,8 @@ const apiEnv = {
   JWT_SECRET: 'e2e-secret-e2e-secret-e2e-secret-0123',
   PORT: '3100',
   QUEUE_PREFIX: 'naql-e2e',
+  OTP_DEV_ECHO: 'true',
+  STORAGE_DIR: '/tmp/naql-e2e-storage',
 };
 
 export default defineConfig({

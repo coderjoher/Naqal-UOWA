@@ -7,6 +7,15 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigCache } from './config-cache/config-cache.service';
 import { DriverRequirementsController } from './driver-requirements/requirements.controller';
 import { DriverRequirementsService } from './driver-requirements/requirements.service';
+import { DriversController } from './drivers/drivers.controller';
+import { DriversService } from './drivers/drivers.service';
+import { ConsoleSmsSender, OtpService, SMS_SENDER } from './drivers/otp.service';
+import { StudentAuthController } from './identity/student-auth.controller';
+import { StudentAuthService } from './identity/student-auth.service';
+import { FilesController } from './storage/files.controller';
+import { StorageService } from './storage/storage.service';
+import { StudentsController } from './students/students.controller';
+import { StudentsService } from './students/students.service';
 import { PointsController } from './gathering-points/points.controller';
 import { PointsService } from './gathering-points/points.service';
 import { HealthController } from './health/health.controller';
@@ -58,6 +67,10 @@ class CacheModule {}
     PointsController,
     WavesController,
     DriverRequirementsController,
+    StudentAuthController,
+    StudentsController,
+    DriversController,
+    FilesController,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
@@ -66,6 +79,12 @@ class CacheModule {}
     PointsService,
     WavesService,
     DriverRequirementsService,
+    StudentAuthService,
+    StudentsService,
+    DriversService,
+    OtpService,
+    StorageService,
+    { provide: SMS_SENDER, useClass: ConsoleSmsSender },
   ],
 })
 export class AppModule implements NestModule {

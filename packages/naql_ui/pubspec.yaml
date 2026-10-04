@@ -11,11 +11,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # Used only by lib/testing.dart (imported from tests).
+  flutter_test:
+    sdk: flutter
   lucide_icons_flutter: ^3.1.21
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
   flutter_lints: ^6.0.0
 
 flutter:

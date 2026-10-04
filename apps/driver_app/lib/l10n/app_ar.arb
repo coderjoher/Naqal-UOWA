@@ -8,5 +8,89 @@
   "tabEarnings": "الأرباح",
   "tabProfile": "حسابي",
   "comingSoon": "قريباً",
-  "comingSoonBody": "هذه الصفحة قيد التطوير."
+  "comingSoonBody": "هذه الصفحة قيد التطوير.",
+  "welcomeTitle": "قُد مع نقل الجامعة",
+  "welcomeBody": "سجّل مرة واحدة، وبعد موافقة مكتب النقل تصلك رحلاتك اليومية ونقاط التوقف.",
+  "chooseLanguage": "اختر اللغة",
+  "arabic": "العربية",
+  "english": "English",
+  "continueLabel": "متابعة",
+  "chooseUniversity": "اختر الجامعة",
+  "chooseUniversityBody": "ستعمل مع مكتب النقل في هذه الجامعة.",
+  "loadFailed": "تعذّر الاتصال. تحقّق من الإنترنت وحاول مجدداً.",
+  "retry": "إعادة المحاولة",
+  "phoneTitle": "رقم هاتفك",
+  "phoneBody": "سنرسل رمز دخول برسالة نصية.",
+  "phone": "رقم الموبايل",
+  "phoneHint": "07XX XXX XXXX",
+  "sendCode": "إرسال الرمز",
+  "invalidPhone": "أدخل رقم موبايل عراقي صحيح",
+  "waitMinute": "انتظر دقيقة قبل طلب رمز جديد",
+  "codeTitle": "رمز التحقق",
+  "codeBody": "أدخل الرمز المرسل إلى {phone}",
+  "@codeBody": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "code": "الرمز",
+  "verify": "تأكيد",
+  "wrongCode": "الرمز غير صحيح أو منتهي",
+  "testCode": "بيئة اختبار — الرمز: {code}",
+  "@testCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "applyTitle": "طلب التسجيل",
+  "applyBody": "أكمل بياناتك ووثائقك ثم أرسلها لمكتب النقل للمراجعة.",
+  "progress": "{done} من {total} مكتمل",
+  "@progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "sectionDriver": "السائق",
+  "sectionVehicle": "المركبة",
+  "sectionDocuments": "الوثائق",
+  "fullName": "الاسم الكامل",
+  "vehicleType": "نوع المركبة",
+  "plate": "رقم اللوحة",
+  "seats": "عدد المقاعد",
+  "modelYear": "سنة الصنع",
+  "saveInfo": "حفظ البيانات",
+  "saved": "تم الحفظ",
+  "saveFailed": "تعذّر الحفظ",
+  "takePhoto": "تصوير",
+  "fromGallery": "من المعرض",
+  "uploaded": "تم الرفع",
+  "notUploaded": "مطلوبة",
+  "optional": "اختيارية",
+  "uploading": "جارٍ الرفع…",
+  "uploadFailed": "تعذّر رفع الملف",
+  "submit": "إرسال للمراجعة",
+  "incomplete": "أكمل الحقول والوثائق المطلوبة أولاً",
+  "coaster": "كوستر",
+  "minibus": "ميني باص",
+  "bus": "باص كبير",
+  "van": "فان",
+  "statusPendingTitle": "طلبك قيد المراجعة",
+  "statusPendingBody": "سيراجع مكتب النقل بياناتك ووثائقك. ستصلك رسالة عند الموافقة.",
+  "statusRejectedTitle": "لم يُقبل الطلب",
+  "statusRejectedBody": "اقرأ سبب الرفض، صحّح البيانات وأرسل الطلب من جديد.",
+  "statusSuspendedTitle": "حسابك موقوف",
+  "statusSuspendedBody": "لا يمكنك تشغيل الرحلات حالياً. تواصل مع مكتب النقل.",
+  "reason": "السبب",
+  "editApplication": "تعديل الطلب",
+  "refresh": "تحديث الحالة",
+  "signOut": "تسجيل الخروج"
 }

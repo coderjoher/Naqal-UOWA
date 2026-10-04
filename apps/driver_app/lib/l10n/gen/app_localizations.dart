@@ -151,6 +151,366 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'هذه الصفحة قيد التطوير.'**
   String get comingSoonBody;
+
+  /// No description provided for @welcomeTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'قُد مع نقل الجامعة'**
+  String get welcomeTitle;
+
+  /// No description provided for @welcomeBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'سجّل مرة واحدة، وبعد موافقة مكتب النقل تصلك رحلاتك اليومية ونقاط التوقف.'**
+  String get welcomeBody;
+
+  /// No description provided for @chooseLanguage.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر اللغة'**
+  String get chooseLanguage;
+
+  /// No description provided for @arabic.
+  ///
+  /// In ar, this message translates to:
+  /// **'العربية'**
+  String get arabic;
+
+  /// No description provided for @english.
+  ///
+  /// In ar, this message translates to:
+  /// **'English'**
+  String get english;
+
+  /// No description provided for @continueLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'متابعة'**
+  String get continueLabel;
+
+  /// No description provided for @chooseUniversity.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر الجامعة'**
+  String get chooseUniversity;
+
+  /// No description provided for @chooseUniversityBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'ستعمل مع مكتب النقل في هذه الجامعة.'**
+  String get chooseUniversityBody;
+
+  /// No description provided for @loadFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر الاتصال. تحقّق من الإنترنت وحاول مجدداً.'**
+  String get loadFailed;
+
+  /// No description provided for @retry.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة المحاولة'**
+  String get retry;
+
+  /// No description provided for @phoneTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'رقم هاتفك'**
+  String get phoneTitle;
+
+  /// No description provided for @phoneBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'سنرسل رمز دخول برسالة نصية.'**
+  String get phoneBody;
+
+  /// No description provided for @phone.
+  ///
+  /// In ar, this message translates to:
+  /// **'رقم الموبايل'**
+  String get phone;
+
+  /// No description provided for @phoneHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'07XX XXX XXXX'**
+  String get phoneHint;
+
+  /// No description provided for @sendCode.
+  ///
+  /// In ar, this message translates to:
+  /// **'إرسال الرمز'**
+  String get sendCode;
+
+  /// No description provided for @invalidPhone.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل رقم موبايل عراقي صحيح'**
+  String get invalidPhone;
+
+  /// No description provided for @waitMinute.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتظر دقيقة قبل طلب رمز جديد'**
+  String get waitMinute;
+
+  /// No description provided for @codeTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'رمز التحقق'**
+  String get codeTitle;
+
+  /// No description provided for @codeBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل الرمز المرسل إلى {phone}'**
+  String codeBody(String phone);
+
+  /// No description provided for @code.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرمز'**
+  String get code;
+
+  /// No description provided for @verify.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد'**
+  String get verify;
+
+  /// No description provided for @wrongCode.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرمز غير صحيح أو منتهي'**
+  String get wrongCode;
+
+  /// No description provided for @testCode.
+  ///
+  /// In ar, this message translates to:
+  /// **'بيئة اختبار — الرمز: {code}'**
+  String testCode(String code);
+
+  /// No description provided for @applyTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلب التسجيل'**
+  String get applyTitle;
+
+  /// No description provided for @applyBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'أكمل بياناتك ووثائقك ثم أرسلها لمكتب النقل للمراجعة.'**
+  String get applyBody;
+
+  /// No description provided for @progress.
+  ///
+  /// In ar, this message translates to:
+  /// **'{done} من {total} مكتمل'**
+  String progress(int done, int total);
+
+  /// No description provided for @sectionDriver.
+  ///
+  /// In ar, this message translates to:
+  /// **'السائق'**
+  String get sectionDriver;
+
+  /// No description provided for @sectionVehicle.
+  ///
+  /// In ar, this message translates to:
+  /// **'المركبة'**
+  String get sectionVehicle;
+
+  /// No description provided for @sectionDocuments.
+  ///
+  /// In ar, this message translates to:
+  /// **'الوثائق'**
+  String get sectionDocuments;
+
+  /// No description provided for @fullName.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم الكامل'**
+  String get fullName;
+
+  /// No description provided for @vehicleType.
+  ///
+  /// In ar, this message translates to:
+  /// **'نوع المركبة'**
+  String get vehicleType;
+
+  /// No description provided for @plate.
+  ///
+  /// In ar, this message translates to:
+  /// **'رقم اللوحة'**
+  String get plate;
+
+  /// No description provided for @seats.
+  ///
+  /// In ar, this message translates to:
+  /// **'عدد المقاعد'**
+  String get seats;
+
+  /// No description provided for @modelYear.
+  ///
+  /// In ar, this message translates to:
+  /// **'سنة الصنع'**
+  String get modelYear;
+
+  /// No description provided for @saveInfo.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ البيانات'**
+  String get saveInfo;
+
+  /// No description provided for @saved.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم الحفظ'**
+  String get saved;
+
+  /// No description provided for @saveFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر الحفظ'**
+  String get saveFailed;
+
+  /// No description provided for @takePhoto.
+  ///
+  /// In ar, this message translates to:
+  /// **'تصوير'**
+  String get takePhoto;
+
+  /// No description provided for @fromGallery.
+  ///
+  /// In ar, this message translates to:
+  /// **'من المعرض'**
+  String get fromGallery;
+
+  /// No description provided for @uploaded.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم الرفع'**
+  String get uploaded;
+
+  /// No description provided for @notUploaded.
+  ///
+  /// In ar, this message translates to:
+  /// **'مطلوبة'**
+  String get notUploaded;
+
+  /// No description provided for @optional.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختيارية'**
+  String get optional;
+
+  /// No description provided for @uploading.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ الرفع…'**
+  String get uploading;
+
+  /// No description provided for @uploadFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر رفع الملف'**
+  String get uploadFailed;
+
+  /// No description provided for @submit.
+  ///
+  /// In ar, this message translates to:
+  /// **'إرسال للمراجعة'**
+  String get submit;
+
+  /// No description provided for @incomplete.
+  ///
+  /// In ar, this message translates to:
+  /// **'أكمل الحقول والوثائق المطلوبة أولاً'**
+  String get incomplete;
+
+  /// No description provided for @coaster.
+  ///
+  /// In ar, this message translates to:
+  /// **'كوستر'**
+  String get coaster;
+
+  /// No description provided for @minibus.
+  ///
+  /// In ar, this message translates to:
+  /// **'ميني باص'**
+  String get minibus;
+
+  /// No description provided for @bus.
+  ///
+  /// In ar, this message translates to:
+  /// **'باص كبير'**
+  String get bus;
+
+  /// No description provided for @van.
+  ///
+  /// In ar, this message translates to:
+  /// **'فان'**
+  String get van;
+
+  /// No description provided for @statusPendingTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلبك قيد المراجعة'**
+  String get statusPendingTitle;
+
+  /// No description provided for @statusPendingBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'سيراجع مكتب النقل بياناتك ووثائقك. ستصلك رسالة عند الموافقة.'**
+  String get statusPendingBody;
+
+  /// No description provided for @statusRejectedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم يُقبل الطلب'**
+  String get statusRejectedTitle;
+
+  /// No description provided for @statusRejectedBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'اقرأ سبب الرفض، صحّح البيانات وأرسل الطلب من جديد.'**
+  String get statusRejectedBody;
+
+  /// No description provided for @statusSuspendedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حسابك موقوف'**
+  String get statusSuspendedTitle;
+
+  /// No description provided for @statusSuspendedBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يمكنك تشغيل الرحلات حالياً. تواصل مع مكتب النقل.'**
+  String get statusSuspendedBody;
+
+  /// No description provided for @reason.
+  ///
+  /// In ar, this message translates to:
+  /// **'السبب'**
+  String get reason;
+
+  /// No description provided for @editApplication.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل الطلب'**
+  String get editApplication;
+
+  /// No description provided for @refresh.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديث الحالة'**
+  String get refresh;
+
+  /// No description provided for @signOut.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الخروج'**
+  String get signOut;
 }
 
 class _AppLocalizationsDelegate

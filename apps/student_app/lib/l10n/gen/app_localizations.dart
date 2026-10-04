@@ -110,6 +110,12 @@ abstract class AppLocalizations {
   /// **'أهلاً بك'**
   String get hello;
 
+  /// No description provided for @helloName.
+  ///
+  /// In ar, this message translates to:
+  /// **'أهلاً، {name}'**
+  String helloName(String name);
+
   /// No description provided for @notifications.
   ///
   /// In ar, this message translates to:
@@ -169,6 +175,312 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'هذه الصفحة قيد التطوير.'**
   String get comingSoonBody;
+
+  /// No description provided for @welcomeTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنقّلك اليومي إلى الجامعة'**
+  String get welcomeTitle;
+
+  /// No description provided for @welcomeBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'اطلب مقعدك كل يوم، وتابع حافلتك على الخريطة، واعرف متى تصل.'**
+  String get welcomeBody;
+
+  /// No description provided for @chooseLanguage.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر اللغة'**
+  String get chooseLanguage;
+
+  /// No description provided for @arabic.
+  ///
+  /// In ar, this message translates to:
+  /// **'العربية'**
+  String get arabic;
+
+  /// No description provided for @english.
+  ///
+  /// In ar, this message translates to:
+  /// **'English'**
+  String get english;
+
+  /// No description provided for @continueLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'متابعة'**
+  String get continueLabel;
+
+  /// No description provided for @chooseUniversity.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر جامعتك'**
+  String get chooseUniversity;
+
+  /// No description provided for @chooseUniversityBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'ستستخدم حساب جامعتك لتسجيل الدخول.'**
+  String get chooseUniversityBody;
+
+  /// No description provided for @loadFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر الاتصال. تحقّق من الإنترنت وحاول مجدداً.'**
+  String get loadFailed;
+
+  /// No description provided for @retry.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة المحاولة'**
+  String get retry;
+
+  /// No description provided for @signInTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الدخول'**
+  String get signInTitle;
+
+  /// No description provided for @studentNumber.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرقم الجامعي'**
+  String get studentNumber;
+
+  /// No description provided for @password.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة المرور'**
+  String get password;
+
+  /// No description provided for @signIn.
+  ///
+  /// In ar, this message translates to:
+  /// **'دخول'**
+  String get signIn;
+
+  /// No description provided for @signInFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرقم الجامعي أو كلمة المرور غير صحيحة'**
+  String get signInFailed;
+
+  /// No description provided for @firstTime.
+  ///
+  /// In ar, this message translates to:
+  /// **'أول مرة؟ فعّل حسابك برمز المكتب'**
+  String get firstTime;
+
+  /// No description provided for @activateTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفعيل الحساب'**
+  String get activateTitle;
+
+  /// No description provided for @activateBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'ادخل الرمز الذي سلّمه لك مكتب النقل، ثم اختر كلمة مرور.'**
+  String get activateBody;
+
+  /// No description provided for @activationCode.
+  ///
+  /// In ar, this message translates to:
+  /// **'رمز التفعيل'**
+  String get activationCode;
+
+  /// No description provided for @newPassword.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة مرور جديدة'**
+  String get newPassword;
+
+  /// No description provided for @passwordHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'٨ أحرف على الأقل'**
+  String get passwordHint;
+
+  /// No description provided for @activate.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفعيل ودخول'**
+  String get activate;
+
+  /// No description provided for @activateFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرمز غير صحيح أو منتهي. اطلب رمزاً جديداً من مكتب النقل.'**
+  String get activateFailed;
+
+  /// No description provided for @changeUniversity.
+  ///
+  /// In ar, this message translates to:
+  /// **'تغيير الجامعة'**
+  String get changeUniversity;
+
+  /// No description provided for @choosePointTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'نقطة التجمّع'**
+  String get choosePointTitle;
+
+  /// No description provided for @choosePointBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر النقطة الأقرب إليك. تركب الحافلة منها كل يوم ويُحسب سعر اشتراكك حسب فئتها.'**
+  String get choosePointBody;
+
+  /// No description provided for @searchPoints.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث عن نقطة'**
+  String get searchPoints;
+
+  /// No description provided for @tierLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفئة {tier}'**
+  String tierLabel(String tier);
+
+  /// No description provided for @kmAway.
+  ///
+  /// In ar, this message translates to:
+  /// **'{km} كم عن الجامعة'**
+  String kmAway(String km);
+
+  /// No description provided for @savePoint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اعتماد النقطة'**
+  String get savePoint;
+
+  /// No description provided for @noPoints.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد نقاط تجمّع بعد'**
+  String get noPoints;
+
+  /// No description provided for @noPointsBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'سيضيفها مكتب النقل قريباً.'**
+  String get noPointsBody;
+
+  /// No description provided for @yourPoint.
+  ///
+  /// In ar, this message translates to:
+  /// **'نقطة تجمّعك'**
+  String get yourPoint;
+
+  /// No description provided for @change.
+  ///
+  /// In ar, this message translates to:
+  /// **'تغيير'**
+  String get change;
+
+  /// No description provided for @profileTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حسابي'**
+  String get profileTitle;
+
+  /// No description provided for @personalInfo.
+  ///
+  /// In ar, this message translates to:
+  /// **'المعلومات الشخصية'**
+  String get personalInfo;
+
+  /// No description provided for @name.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم'**
+  String get name;
+
+  /// No description provided for @gender.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجنس'**
+  String get gender;
+
+  /// No description provided for @male.
+  ///
+  /// In ar, this message translates to:
+  /// **'ذكر'**
+  String get male;
+
+  /// No description provided for @female.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنثى'**
+  String get female;
+
+  /// No description provided for @fromUniversity.
+  ///
+  /// In ar, this message translates to:
+  /// **'من سجلات الجامعة ولا يمكن تعديله'**
+  String get fromUniversity;
+
+  /// No description provided for @phone.
+  ///
+  /// In ar, this message translates to:
+  /// **'رقم الهاتف'**
+  String get phone;
+
+  /// No description provided for @phoneHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'07XX XXX XXXX'**
+  String get phoneHint;
+
+  /// No description provided for @save.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ'**
+  String get save;
+
+  /// No description provided for @saved.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم الحفظ'**
+  String get saved;
+
+  /// No description provided for @saveFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر الحفظ'**
+  String get saveFailed;
+
+  /// No description provided for @invalidPhone.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل رقم موبايل عراقي صحيح'**
+  String get invalidPhone;
+
+  /// No description provided for @language.
+  ///
+  /// In ar, this message translates to:
+  /// **'اللغة'**
+  String get language;
+
+  /// No description provided for @signOut.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الخروج'**
+  String get signOut;
+
+  /// No description provided for @defaultPoint.
+  ///
+  /// In ar, this message translates to:
+  /// **'نقطة التجمّع'**
+  String get defaultPoint;
+
+  /// No description provided for @notSet.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير محدّدة'**
+  String get notSet;
 }
 
 class _AppLocalizationsDelegate

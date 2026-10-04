@@ -49,6 +49,10 @@ model University {
   waves              Wave[]
   driverRequirements DriverRequirementSet?
   travelTimes        TravelTime[]
+  roster             RosterEntry[]
+  drivers            DriverProfile[]
+  driverDocuments    DriverDocument[]
+  documentAccesses   DocumentAccess[]
 
   @@map("universities")
 }
@@ -64,11 +68,20 @@ model User {
   gender       Gender?
   passwordHash String?     @map("password_hash")
   status       UserStatus  @default(active)
+  /// Students: university student number. Unique per university.
+  studentId    String?     @map("student_id")
+  nameAr       String?     @map("name_ar")
+  /// Drivers sign in with this phone (OTP). Globally unique: a driver belongs to one university in v1.
+  loginPhone   String?     @unique @map("login_phone")
+  defaultPointId String?   @map("default_point_id") @db.Uuid
   createdAt    DateTime    @default(now()) @map("created_at")
   updatedAt    DateTime    @updatedAt @map("updated_at")
 
-  university University? @relation(fields: [universityId], references: [id])
+  university   University?     @relation(fields: [universityId], references: [id])
+  defaultPoint GatheringPoint? @relation(fields: [defaultPointId], references: [id])
+  driver       DriverProfile?
 
+  @@unique([universityId, studentId])
   @@index([universityId, role])
   @@map("users")
 }
@@ -131,6 +144,7 @@ model GatheringPoint {
 
   university University   @relation(fields: [universityId], references: [id])
   tier       DistanceTier @relation(fields: [tierId], references: [id])
+  students   User[]
 
   @@index([universityId, active])
   @@map("gathering_points")
@@ -190,4 +204,104 @@ model TravelTime {
 
   @@id([universityId, fromKey, toKey])
   @@map("travel_times")
+}
+
+/// Students known to the university (manual identity provider): imported by the office.
+/// The office issues a one-time activation code when the student comes to pay.
+model RosterEntry {
+  id                  String    @id @default(uuid()) @db.Uuid
+  universityId        String    @map("university_id") @db.Uuid
+  studentId           String    @map("student_id")
+  name                String
+  nameAr              String?   @map("name_ar")
+  gender              Gender
+  activationCodeHash  String?   @map("activation_code_hash")
+  activationExpiresAt DateTime? @map("activation_expires_at")
+  activationAttempts  Int       @default(0) @map("activation_attempts")
+  activatedAt         DateTime? @map("activated_at")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  university University @relation(fields: [universityId], references: [id])
+
+  @@unique([universityId, studentId])
+  @@map("roster_entries")
+}
+
+enum DriverStatus {
+  draft
+  pending
+  approved
+  rejected
+  suspended
+}
+
+/// Driver application + vehicle (DR-01) and its review state (TO-02).
+model DriverProfile {
+  userId       String       @id @map("user_id") @db.Uuid
+  universityId String       @map("university_id") @db.Uuid
+  status       DriverStatus @default(draft)
+  vehicleType  String?      @map("vehicle_type")
+  plate        String?
+  seats        Int?
+  modelYear    Int?         @map("model_year")
+  submittedAt  DateTime?    @map("submitted_at")
+  reviewedAt   DateTime?    @map("reviewed_at")
+  reviewedById String?      @map("reviewed_by_id") @db.Uuid
+  reviewNote   String?      @map("review_note")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  user       User             @relation(fields: [userId], references: [id])
+  university University       @relation(fields: [universityId], references: [id])
+  documents  DriverDocument[]
+
+  @@index([universityId, status])
+  @@map("driver_profiles")
+}
+
+/// Uploaded document, stored privately (NF-13). One per requirement key; re-upload replaces it.
+model DriverDocument {
+  id           String   @id @default(uuid()) @db.Uuid
+  universityId String   @map("university_id") @db.Uuid
+  driverId     String   @map("driver_id") @db.Uuid
+  key          String
+  storageKey   String   @map("storage_key")
+  mime         String
+  sizeBytes    Int      @map("size_bytes")
+  uploadedAt   DateTime @default(now()) @map("uploaded_at")
+
+  university University       @relation(fields: [universityId], references: [id])
+  driver     DriverProfile    @relation(fields: [driverId], references: [userId])
+  accesses   DocumentAccess[]
+
+  @@unique([driverId, key])
+  @@map("driver_documents")
+}
+
+/// Every issued document link is logged (NF-13).
+model DocumentAccess {
+  id           String   @id @default(uuid()) @db.Uuid
+  universityId String   @map("university_id") @db.Uuid
+  documentId   String   @map("document_id") @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  expiresAt    DateTime @map("expires_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  university University     @relation(fields: [universityId], references: [id])
+  document   DriverDocument @relation(fields: [documentId], references: [id])
+
+  @@index([universityId, documentId])
+  @@map("document_accesses")
+}
+
+/// Phone one-time codes for driver sign-in. Not tenant-scoped (the university is chosen after).
+model OtpCode {
+  phone     String   @id
+  codeHash  String   @map("code_hash")
+  expiresAt DateTime @map("expires_at")
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("otp_codes")
 }

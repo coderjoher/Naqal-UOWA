@@ -89,20 +89,23 @@ jobs:
         with: { name: playwright-results, path: apps/dashboard/test-results }
 
   flutter:
-    name: Flutter (naql_ui, naql_core, student_app, driver_app)
+    name: Flutter (naql_ui, naql_core, naql_app, student_app, driver_app)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with: { flutter-version: 3.47.6, channel: stable, cache: true }
       - run: flutter pub get
-      - run: flutter analyze packages/naql_ui packages/naql_core apps/student_app apps/driver_app
+      - run: flutter analyze packages/naql_ui packages/naql_core packages/naql_app apps/student_app apps/driver_app
       - name: naql_ui (goldens + widget tests)
         run: flutter test
         working-directory: packages/naql_ui
       - name: naql_core
         run: flutter test
         working-directory: packages/naql_core
+      - name: naql_app
+        run: flutter test
+        working-directory: packages/naql_app
       - name: student_app
         run: flutter test
         working-directory: apps/student_app
@@ -111,7 +114,7 @@ jobs:
         working-directory: apps/driver_app
       - uses: actions/upload-artifact@v4
         if: failure()
-        with: { name: golden-failures, path: packages/naql_ui/test/failures }
+        with: { name: golden-failures, path: '**/test/failures' }
 
   compose:
     name: Docker Compose stack (T0-06)

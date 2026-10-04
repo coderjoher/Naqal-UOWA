@@ -1,3 +1,4 @@
+import type React from 'react';
 import { clsx } from 'clsx';
 import { forwardRef, useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes } from 'react';
 
@@ -66,6 +67,18 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
       <select ref={ref} id={selectId} aria-invalid={error ? true : undefined} className={control(error)} {...rest}>
         {children}
       </select>
+    </FieldShell>
+  );
+});
+
+export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement>, FieldProps {}
+
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea({ label, error, hint, className, id, ...rest }, ref) {
+  const autoId = useId();
+  const tid = id ?? autoId;
+  return (
+    <FieldShell id={tid} label={label} error={error} hint={hint} className={className}>
+      <textarea ref={ref} id={tid} rows={3} aria-invalid={error ? true : undefined} className={clsx(control(error), 'h-auto py-3')} {...rest} />
     </FieldShell>
   );
 });

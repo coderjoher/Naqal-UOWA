@@ -1,0 +1,23 @@
+name: naql_app
+description: App plumbing shared by the student and driver apps — API address, secure token storage, preferences, language.
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^3.4.3
+  flutter_secure_storage: ^11.2.0
+  shared_preferences: ^2.5.5
+  naql_core:
+    path: ../naql_core
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0

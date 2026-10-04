@@ -19,10 +19,13 @@ dependencies:
     path: ../../packages/naql_ui
   naql_core:
     path: ../../packages/naql_core
+  naql_app:
+    path: ../../packages/naql_app
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  http: any
   flutter_lints: ^6.0.0
 
 flutter:

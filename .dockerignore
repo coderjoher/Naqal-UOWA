@@ -6,6 +6,7 @@ apps/student_app
 apps/driver_app
 packages/naql_ui
 packages/naql_core
+packages/naql_app
 **/.env
 **/test-results
 **/playwright-report

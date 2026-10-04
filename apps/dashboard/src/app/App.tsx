@@ -5,7 +5,9 @@ import { BrowserRouter, Route, Routes } from 'react-router';
 import { AuthProvider } from '../lib/auth';
 import { I18nProvider } from '../lib/i18n';
 import { LoginPage } from '../pages/LoginPage';
+import { DriversPage } from '../pages/DriversPage';
 import { OverviewPage } from '../pages/OverviewPage';
+import { StudentsPage } from '../pages/StudentsPage';
 import { PointsPage } from '../pages/settings/PointsPage';
 import { RequirementsPage } from '../pages/settings/RequirementsPage';
 import { TiersPage } from '../pages/settings/TiersPage';
@@ -38,6 +40,8 @@ export function AppRoutes() {
             </RequireRole>
           }
         />
+        <Route path="drivers" element={office(<DriversPage />)} />
+        <Route path="students" element={office(<StudentsPage />)} />
         <Route path="users" element={office(<UsersPage />)} />
         <Route path="settings/tiers" element={office(<TiersPage />)} />
         <Route path="settings/points" element={office(<PointsPage />)} />
