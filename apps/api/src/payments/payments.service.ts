@@ -13,6 +13,9 @@ export interface RecordInput {
   collectedById: string;
   reference: string;
   note?: string;
+  runId?: string;
+  rideRequestId?: string;
+  idempotencyKey?: string;
 }
 
 /** All money goes through here: provider confirmation, gap-free receipt number, immutable row. */
@@ -54,6 +57,9 @@ export class PaymentsService {
         collectedById: input.collectedById,
         externalRef,
         note: input.note,
+        runId: input.runId ?? null,
+        rideRequestId: input.rideRequestId ?? null,
+        idempotencyKey: input.idempotencyKey ?? null,
       },
     });
   }

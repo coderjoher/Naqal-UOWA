@@ -317,4 +317,90 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get seatsLabel => 'Seats';
+
+  @override
+  String get startRun => 'Start run';
+
+  @override
+  String get leaveCampusNow => 'Leave campus';
+
+  @override
+  String get boardAtCampus => 'Mark who got on at campus';
+
+  @override
+  String get nextStop => 'Next stop';
+
+  @override
+  String get atStop => 'At the stop';
+
+  @override
+  String get imHere => 'I\'m at the stop';
+
+  @override
+  String get navigate => 'Navigate';
+
+  @override
+  String get navGoogle => 'Google Maps';
+
+  @override
+  String get navWaze => 'Waze';
+
+  @override
+  String get boardHint => 'Tap a rider as they get on';
+
+  @override
+  String get onBoard => 'On board';
+
+  @override
+  String get noShowLabel => 'No-show';
+
+  @override
+  String get waiting => 'Waiting';
+
+  @override
+  String get departStop => 'Leave stop';
+
+  @override
+  String departMissing(int n) {
+    return 'Leave — $n no-show';
+  }
+
+  @override
+  String waitLeft(String time) {
+    return 'Wait $time for latecomers';
+  }
+
+  @override
+  String collectFare(String amount) {
+    return 'Got $amount';
+  }
+
+  @override
+  String get paidLabel => 'Paid';
+
+  @override
+  String get arrivedCampus => 'Arrived at campus';
+
+  @override
+  String get finishRun => 'Finish run';
+
+  @override
+  String get runDone => 'Run finished';
+
+  @override
+  String get runDoneBody => 'Thank you! The run is recorded.';
+
+  @override
+  String pendingSync(int n) {
+    return '$n waiting to send';
+  }
+
+  @override
+  String get dropOff => 'Drop-off';
+
+  @override
+  String get endTitleMorning => 'Head to campus';
+
+  @override
+  String get endTitleReturn => 'Everyone is dropped off';
 }

@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
 import 'models.dart';
+import 'live.dart';
 import 'rides.dart';
 import 'session.dart';
 
@@ -115,6 +116,26 @@ class ApiClient {
 
   Future<List<DriverRun>> driverRuns({String? date}) async =>
       [for (final r in await get(date == null ? '/drivers/me/runs' : '/drivers/me/runs?date=$date') as List) DriverRun.fromJson(r as Map<String, dynamic>)];
+
+  // ---------------- Runs, live tracking, notifications (P5) ----------------
+
+  Future<DriverRun> runDetail(String runId) async => DriverRun.fromJson(await get('/runs/$runId') as Map<String, dynamic>);
+
+  /// DR-04 actions; each carries its client id so a retry is applied once.
+  Future<dynamic> runActions(String runId, List<Map<String, dynamic>> actions) => post('/runs/$runId/actions', {'actions': actions});
+
+  Future<dynamic> postGps(String runId, List<Map<String, dynamic>> points) => post('/runs/$runId/gps', {'points': points});
+
+  Future<dynamic> recordFare(String runId, String requestId, String clientId) => post('/runs/$runId/fares', {'requestId': requestId, 'clientId': clientId});
+
+  Future<TrackInfo> track(String requestId) async => TrackInfo.fromJson(await get('/rides/$requestId/track') as Map<String, dynamic>);
+
+  Future<List<AppNotification>> notifications() async =>
+      [for (final n in await get('/notifications/me') as List) AppNotification.fromJson(n as Map<String, dynamic>)];
+
+  Future<void> markNotificationsRead([List<String>? ids]) async => post('/notifications/read', {'ids': ?ids});
+
+  Future<void> registerDevice(String token, String platform) async => post('/devices', {'token': token, 'platform': platform});
 
   Future<List<GatheringPoint>> gatheringPoints() async =>
       (await get('/gathering-points') as List).map((p) => GatheringPoint.fromJson(p as Map<String, dynamic>)).where((p) => p.active).toList();

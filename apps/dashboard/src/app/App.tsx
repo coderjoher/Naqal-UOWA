@@ -8,6 +8,7 @@ import { LoginPage } from '../pages/LoginPage';
 import { DriversPage } from '../pages/DriversPage';
 import { OverviewPage } from '../pages/OverviewPage';
 import { StudentsPage } from '../pages/StudentsPage';
+import { LiveOpsPage } from '../pages/LiveOpsPage';
 import { DispatchPage } from '../pages/DispatchPage';
 import { SubscriptionsPage } from '../pages/SubscriptionsPage';
 import { PointsPage } from '../pages/settings/PointsPage';
@@ -42,6 +43,7 @@ export function AppRoutes() {
             </RequireRole>
           }
         />
+        <Route path="live" element={office(<LiveOpsPage />)} />
         <Route path="dispatch" element={office(<DispatchPage />)} />
         <Route path="subscriptions" element={office(<SubscriptionsPage />)} />
         <Route path="drivers" element={office(<DriversPage />)} />

@@ -287,6 +287,29 @@ const ar = {
   "dispatch.tier": "الفئة",
   "dispatch.femaleOnly": "للطالبات فقط",
   "dispatch.male": "للطلاب",
+  "nav.live": "التشغيل المباشر",
+  "live.title": "التشغيل المباشر",
+  "live.desc": "كل الحافلات على الخريطة الآن، وحالة كل رحلة وقائمة الانتظار.",
+  "live.connected": "مباشر",
+  "live.reconnecting": "جارٍ إعادة الاتصال…",
+  "live.onRoad": "على الطريق",
+  "live.atStop": "في محطة",
+  "live.done": "انتهت",
+  "live.waitlist": "قائمة الانتظار",
+  "live.map": "خريطة الحافلات",
+  "live.campus": "الجامعة",
+  "live.runs": "رحلات اليوم",
+  "live.runsHint": "اختر رحلة لعرض محطاتها على الخريطة.",
+  "live.noRuns": "لا توجد رحلات اليوم",
+  "live.noRunsHint": "تظهر الرحلات هنا بعد التوزيع.",
+  "live.waitlistEmpty": "لا أحد في الانتظار الآن.",
+  "live.updatedAgo": "قبل {s} ث",
+  "live.status.planned": "مجدولة",
+  "live.status.started": "في الطريق",
+  "live.status.at_stop": "في محطة",
+  "live.status.done": "انتهت",
+  "live.status.cancelled": "ملغاة",
+  "nav.group.live": "اليوم",
 };
 
 const en: Record<keyof typeof ar, string> = {
@@ -576,6 +599,29 @@ const en: Record<keyof typeof ar, string> = {
   "dispatch.tier": "Tier",
   "dispatch.femaleOnly": "Female only",
   "dispatch.male": "Male",
+  "nav.live": "Live operations",
+  "live.title": "Live operations",
+  "live.desc": "Every bus on the map right now, the status of each run and the waitlist.",
+  "live.connected": "Live",
+  "live.reconnecting": "Reconnecting…",
+  "live.onRoad": "On the road",
+  "live.atStop": "At a stop",
+  "live.done": "Finished",
+  "live.waitlist": "Waitlist",
+  "live.map": "Bus map",
+  "live.campus": "Campus",
+  "live.runs": "Today's runs",
+  "live.runsHint": "Pick a run to show its stops on the map.",
+  "live.noRuns": "No runs today",
+  "live.noRunsHint": "Runs appear here after dispatch.",
+  "live.waitlistEmpty": "Nobody is waiting right now.",
+  "live.updatedAgo": "{s} s ago",
+  "live.status.planned": "Scheduled",
+  "live.status.started": "On the way",
+  "live.status.at_stop": "At a stop",
+  "live.status.done": "Finished",
+  "live.status.cancelled": "Cancelled",
+  "nav.group.live": "Today",
 };
 
 export type Lang = 'ar' | 'en';
@@ -585,7 +631,7 @@ export const messages: Record<Lang, Record<MessageKey, string>> = { ar, en };
 interface I18n {
   lang: Lang;
   rtl: boolean;
-  t: (key: MessageKey) => string;
+  t: (key: MessageKey, vars?: Record<string, string | number>) => string;
   toggle: () => void;
 }
 
@@ -612,7 +658,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       /* private mode */
     }
   }, [lang]);
-  const value: I18n = { lang, rtl: lang === 'ar', t: (k) => messages[lang][k], toggle: () => setLang((l) => (l === 'ar' ? 'en' : 'ar')) };
+  const value: I18n = { lang, rtl: lang === 'ar', t: (k, vars) => (vars ? messages[lang][k].replace(/\{(\w+)\}/g, (m, n) => (n in vars ? String(vars[n]) : m)) : messages[lang][k]), toggle: () => setLang((l) => (l === 'ar' ? 'en' : 'ar')) };
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 

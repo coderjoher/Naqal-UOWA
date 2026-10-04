@@ -18,4 +18,12 @@ export class OfficeCashProvider implements PaymentProvider {
   }
 }
 
+/** DR-07: a pay-per-ride fare handed to the driver in cash. */
+export class DriverCashProvider implements PaymentProvider {
+  readonly method = 'cash_driver' as const;
+  async collect() {
+    return { externalRef: null };
+  }
+}
+
 export const PAYMENT_PROVIDERS = Symbol('PAYMENT_PROVIDERS');

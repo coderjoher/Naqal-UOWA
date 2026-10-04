@@ -15,7 +15,7 @@ String waveLabel(AppLocalizations t, RideInfo r, {bool? today}) => t.rideWave(
 
 /// ST-05: the bus is confirmed — pickup time and place first, then bus, driver, plate and photo.
 class AssignmentCard extends StatelessWidget {
-  const AssignmentCard({super.key, required this.ride, required this.lang, this.photo, this.femaleOnly = false, this.today = true, this.onCancel});
+  const AssignmentCard({super.key, required this.ride, required this.lang, this.photo, this.femaleOnly = false, this.today = true, this.onCancel, this.onTrack});
 
   final RideInfo ride;
   final String lang;
@@ -23,6 +23,9 @@ class AssignmentCard extends StatelessWidget {
   final bool femaleOnly;
   final bool today;
   final VoidCallback? onCancel;
+
+  /// ST-06: shown while the bus is on its way.
+  final VoidCallback? onTrack;
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +61,11 @@ class AssignmentCard extends StatelessWidget {
             text: ride.fare > 0 ? t.ridePayDriver(formatIqd(ride.fare, lang)) : t.rideCovered,
             strong: ride.fare > 0,
           ),
-          if (onCancel != null) ...[
+          if (onTrack != null) ...[
+            const SizedBox(height: NaqlSpace.s3),
+            NaqlButton(label: t.trackBus, icon: LucideIcons.mapPinned, expand: true, onPressed: onTrack),
+          ],
+          if (onCancel != null && onTrack == null) ...[
             const SizedBox(height: NaqlSpace.s2),
             Align(alignment: AlignmentDirectional.centerStart, child: NaqlButton(label: t.rideCancel, variant: NaqlButtonVariant.ghost, onPressed: onCancel)),
           ],

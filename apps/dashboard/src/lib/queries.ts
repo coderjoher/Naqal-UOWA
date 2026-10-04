@@ -211,3 +211,20 @@ export interface DispatchWave {
 /** Operations board; refreshes every 5 s so planning and re-checks show up without reloading. */
 export const useDispatch = (date: string) => useQuery({ queryKey: ['dispatch', date], queryFn: () => api<DispatchWave[]>(`/dispatch?date=${date}`), refetchInterval: 5000 });
 export const usePlanWave = () => useSave((body: { waveId: string; date: string }) => api<{ queued: boolean }>('/dispatch/plan', json(body)), [['dispatch']]);
+
+export type RunStatus = 'planned' | 'started' | 'at_stop' | 'done' | 'cancelled';
+export interface LiveRun {
+  runId: string;
+  status: RunStatus;
+  wave: { type: 'morning' | 'return'; time: string };
+  driverName: string;
+  plate: string | null;
+  femaleOnly: boolean;
+  capacity: number;
+  booked: number;
+  boarded: number;
+  noShows: number;
+  stops: { seq: number; name: string; lat: number; lng: number; served: boolean; arrived: boolean }[];
+  bus: import('./live').BusPosition | null;
+}
+export const useLiveRuns = (date: string) => useQuery({ queryKey: ['live-runs', date], queryFn: () => api<LiveRun[]>(`/live/runs?date=${date}`), refetchInterval: 30_000 });

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:driver_app/screens/runs/run_screen.dart';
 import 'package:naql_ui/naql_ui.dart';
 
 import 'fakes.dart';
@@ -23,8 +24,9 @@ void main() {
     await tester.pumpAndSettle();
 
     // Stops in driving order (far → near), then campus.
+    Finder inTimeline(String text) => text == 'الجامعة' ? find.text(text) : find.descendant(of: find.byType(StopTile), matching: find.text(text));
     final names = ['حي الحسين', 'ساحة العباس', 'باب بغداد', 'الجامعة'];
-    final ys = [for (final n in names) tester.getTopLeft(find.text(n)).dy];
+    final ys = [for (final n in names) tester.getTopLeft(inTimeline(n)).dy];
     expect([...ys]..sort(), ys);
     expect(find.text('الركاب: 2'), findsOneWidget);
     expect(find.text('الركاب: 3'), findsOneWidget);
@@ -35,7 +37,7 @@ void main() {
     }
 
     // Tapping a stop shows who boards there and who pays cash.
-    await tester.tap(find.text('ساحة العباس'));
+    await tester.tap(inTimeline('ساحة العباس'));
     await tester.pumpAndSettle();
     expect(find.text('حسن جاسم'), findsOneWidget);
     expect(find.text('أحمد فلاح'), findsOneWidget);
@@ -84,7 +86,7 @@ void main() {
     await expectLater(find.byType(MaterialApp), matchesGoldenFile('goldens/today.rtl.png'));
     await tester.tap(find.text('ذهاب 08:00'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('ساحة العباس'));
+    await tester.tap(find.descendant(of: find.byType(StopTile), matching: find.text('ساحة العباس')));
     await tester.pumpAndSettle();
     await expectLater(find.byType(MaterialApp), matchesGoldenFile('goldens/run.rtl.png'));
     await tester.tap(find.byIcon(LucideIcons.calendarDays));

@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     port: 5173,
     // Dev: proxy /api to the NestJS server so the dashboard and API share an origin.
-    proxy: { '/api': { target: process.env.VITE_API_PROXY ?? 'http://localhost:3000', rewrite: (p) => p.replace(/^\/api/, '') } },
+    proxy: { '/api': { target: process.env.VITE_API_PROXY ?? 'http://localhost:3000', rewrite: (p) => p.replace(/^\/api/, ''), ws: true } },
   },
   test: {
     environment: 'jsdom',

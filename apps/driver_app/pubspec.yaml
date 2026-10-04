@@ -22,6 +22,9 @@ dependencies:
     path: ../../packages/naql_core
   naql_app:
     path: ../../packages/naql_app
+  url_launcher: ^6.3.3
+  geolocator: ^14.1.1
+  clock: ^1.1.3
 
 dev_dependencies:
   flutter_test:

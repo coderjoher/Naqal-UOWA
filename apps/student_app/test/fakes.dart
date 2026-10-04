@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -8,6 +9,33 @@ import 'package:http/testing.dart';
 import 'package:naql_app/naql_app.dart';
 import 'package:naql_core/naql_core.dart';
 import 'package:student_app/app.dart';
+import 'package:student_app/data/track.dart';
+
+/// Socket stand-in: tests push bus positions, connection changes and notifications.
+class FakeLiveFeed implements LiveFeed {
+  final busesCtl = StreamController<BusPosition>.broadcast();
+  final connectedCtl = StreamController<bool>.broadcast();
+  final runsCtl = StreamController<String>.broadcast();
+  final notesCtl = StreamController<Map<String, dynamic>>.broadcast();
+  final joined = <String>[];
+  @override
+  Stream<BusPosition> get buses => busesCtl.stream;
+  @override
+  Stream<String> get runChanges => runsCtl.stream;
+  @override
+  Stream<Map<String, dynamic>> get notifications => notesCtl.stream;
+  @override
+  Stream<bool> get connected => connectedCtl.stream;
+  @override
+  Future<BusPosition?> join(String runId) async {
+    joined.add(runId);
+    connectedCtl.add(true);
+    return null;
+  }
+
+  @override
+  void dispose() {}
+}
 
 /// In-memory stand-in for the Naql API with one university, two points and one roster student.
 class FakeBackend {
@@ -41,6 +69,13 @@ class FakeBackend {
         'payAt': {'officeNote': 'مكتب النقل — البناية ب، الطابق الأرضي'},
       };
   final requests = <http.Request>[];
+  final feed = FakeLiveFeed();
+
+  /// GET /rides/:id/track (P5).
+  Map<String, Object?> track = {'runId': 'run1', 'status': 'started', 'boarded': false, 'stop': {'seq': 2, 'lat': 32.616, 'lng': 44.025, 'name': 'Al-Abbas Square', 'nameAr': 'ساحة العباس'}, 'bus': null};
+
+  /// GET /notifications/me (P5).
+  List<Map<String, Object?>> notifications = [];
 
   /// What GET /rides/me returns; tests change it to simulate dispatch (server side).
   List<Map<String, Object?>> rides = [];
@@ -83,7 +118,8 @@ class FakeBackend {
         'assignment': assignment,
       };
 
-  static Map<String, Object?> assignment({DateTime? pickupAt}) => {
+  static Map<String, Object?> assignment({DateTime? pickupAt, String runStatus = 'planned'}) => {
+        'runStatus': runStatus,
         'runId': 'run1',
         'driverName': 'حيدر عباس',
         'driverPhone': '+9647801234567',
@@ -137,6 +173,11 @@ class FakeBackend {
         return _json(points);
       case 'GET /subscriptions/me':
         return _json(subscription);
+      case 'GET /notifications/me':
+        return _json(notifications);
+      case 'POST /notifications/read':
+        notifications = [for (final n in notifications) {...n, 'readAt': DateTime.now().toUtc().toIso8601String()}];
+        return _json({'updated': notifications.length});
       case 'GET /rides/options':
         return _json({'slots': slots, 'defaultPointId': (profile['defaultPoint'] as Map?)?['id'], 'gender': profile['gender']});
       case 'GET /rides/me':
@@ -147,6 +188,7 @@ class FakeBackend {
         rides = [r, ...rides];
         return _json(r, 201);
     }
+    if (RegExp(r'^/rides/[^/]+/track$').hasMatch(req.url.path)) return _json(track);
     final cancel = RegExp(r'^/rides/([^/]+)/cancel$').firstMatch(req.url.path);
     if (req.method == 'POST' && cancel != null) {
       rides = [for (final r in rides) r['id'] == cancel.group(1) ? {...r, 'status': 'cancelled', 'cancelReason': 'student', 'assignment': null} : r];
@@ -169,6 +211,8 @@ class FakeBackend {
         prefsProvider.overrideWithValue(MemoryPrefs({'naql.lang': lang, if (signedIn) 'naql.university': 'warith'})),
         tokenStoreProvider.overrideWithValue(tokens),
         apiProvider.overrideWithValue(ApiClient(baseUrl: Uri.parse('http://api.test/'), tokens: tokens, httpClient: client)),
+        liveFeedProvider.overrideWith((ref) async => feed),
+        mapTilesProvider.overrideWithValue(false),
       ],
       child: const StudentApp(),
     );

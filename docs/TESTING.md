@@ -1,8 +1,9 @@
 # Try Naql yourself
 
-Everything up to **P4 (ride requests and dispatch)** works end to end: the office sets up the
-service, students subscribe and request rides, the dispatcher puts them on buses, and drivers see
-their runs. Live bus tracking, push notifications and driver settlement come in P5–P6.
+Everything up to **P5 (runs and live tracking)** works end to end: the office sets up the
+service, students subscribe and request rides, the dispatcher puts them on buses, drivers run
+their routes with live GPS, and students and the office follow the buses on a map. Driver
+settlement and reports come in P6–P7.
 
 ## 1. Start everything (one command)
 
@@ -75,7 +76,21 @@ Demo data is loaded automatically on the first start: Warith Al-Anbiyaa Universi
    the stop timeline and tap a stop to see who boards there.
 3. **جدولي (Schedule)**: choose which waves you drive this week; dispatched waves are locked.
 
-### E. Office: onboarding
+### E. Live: drive a run and watch it
+1. Dispatch a wave (A), then sign in as the bus's driver in the driver app (Dispatch shows who).
+2. Open the run: **ابدأ الرحلة** → **وصلت إلى المحطة** → tap riders as they board → **انطلق** …
+   If a rider is missing, the bus must wait 3 minutes before it can leave (no-show, no penalty).
+   Pay-per-ride riders show **استلمت 2,000 د.ع** — tap it when the cash is handed over.
+3. In a browser the driver app cannot send GPS like a phone does, so to see buses move run the
+   simulator, which drives every dispatched run of today along its stops:
+   `docker compose exec api npx ts-node scripts/simulate.ts`
+4. Watch it in the dashboard → **التشغيل المباشر**, and in the student app: the assignment card
+   gets **تتبّع الحافلة** (map with the bus, ETA, "updated X ago"); the **الإشعارات** tab shows
+   "seat confirmed", "bus is close", "bus is here".
+5. Turn off Wi-Fi on a phone running the driver APK during a run, keep going, turn it back on: all
+   points and actions arrive, nothing twice.
+
+### F. Office: onboarding
 - **السائقون (Drivers)**: review the pending application (ياسر كاظم), open documents, approve or reject.
 - **الطلبة (Students)**: import a roster (CSV) and issue activation codes.
 - **الإعدادات (Settings)**: distance tiers and prices, gathering points on the map, waves, driver requirements.
@@ -98,8 +113,10 @@ DEMO=false docker compose up -d --build --wait   # empty database, no codes show
 
 ## Not built yet
 
+Push notifications to the phone's lock screen need a Firebase project (google-services.json and
+an FCM service account) from the university; until then notifications show inside the apps.
+
 | Coming in | What |
 |-----------|------|
-| P5 | Live bus map and ETA, driver "start run / boarded / no-show", push notifications, live operations map |
 | P6 | Driver earnings and monthly settlement, money reports, super-admin revenue |
 | P7 | Moving students between buses, extra runs, reports, announcements |

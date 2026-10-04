@@ -39,14 +39,19 @@ export class DispatchProcessor extends WorkerHost implements OnModuleInit {
 
   /** Finds waves due for planning (wave time − lead) today that have no plan yet. */
   async tick(now = this.engine.now()) {
-    const date = baghdadDate(now);
-    const at = secondsInto(date, now);
+    // Today and tomorrow: a wave just after midnight is due for planning the evening before.
+    const dates = [baghdadDate(now), baghdadDate(now, 1)];
     const due = await runAsSystem(async () => {
-      const waves = await this.prisma.db.wave.findMany({ where: { active: true }, include: { plans: { where: { date: new Date(`${date}T00:00:00Z`) } } } });
-      return waves.filter((w) => runsOn(w.weekdays, date) && w.plans.length === 0 && at >= w.minuteOfDay * 60 - PLAN_LEAD_MIN * 60 && at < w.minuteOfDay * 60);
+      const waves = await this.prisma.db.wave.findMany({ where: { active: true }, include: { plans: { where: { date: { in: dates.map((d) => new Date(`${d}T00:00:00Z`)) } } } } });
+      return dates.flatMap((date) => {
+        const at = secondsInto(date, now);
+        return waves
+          .filter((w) => runsOn(w.weekdays, date) && !w.plans.some((p) => p.date.toISOString().startsWith(date)) && at >= w.minuteOfDay * 60 - PLAN_LEAD_MIN * 60 && at < w.minuteOfDay * 60)
+          .map((w) => ({ ...w, date }));
+      });
     });
-    for (const w of due) await this.engine.enqueuePlan({ universityId: w.universityId, waveId: w.id, date });
-    if (due.length) this.log.log(`Tick ${date}: queued ${due.length} wave plan(s)`);
+    for (const w of due) await this.engine.enqueuePlan({ universityId: w.universityId, waveId: w.id, date: w.date });
+    if (due.length) this.log.log(`Tick: queued ${due.length} wave plan(s)`);
     return { queued: due.length };
   }
 }

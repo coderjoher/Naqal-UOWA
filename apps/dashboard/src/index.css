@@ -54,6 +54,33 @@
   height: 38px;
   background: var(--color-ink);
 }
+.naql-pin--bus,
+.naql-pin--bus-female {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: var(--color-primary);
+  z-index: 2;
+}
+.naql-pin--bus-female {
+  background: var(--color-female-only);
+}
+.naql-pin--stop {
+  width: 18px;
+  height: 18px;
+  border-width: 3px;
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+  box-shadow: none;
+}
+.naql-pin--stop-done {
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
+  border-color: var(--color-border);
+  background: var(--color-surface-muted);
+  box-shadow: none;
+}
 .naql-pin--draft {
   background: var(--color-warning);
 }

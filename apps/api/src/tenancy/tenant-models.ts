@@ -19,4 +19,7 @@ export const TENANT_MODELS: ReadonlySet<string> = new Set([
   'RunStop',
   'WavePlan',
   'Notification',
+  'RunEvent',
+  'RunPosition',
+  'DeviceToken',
 ]);

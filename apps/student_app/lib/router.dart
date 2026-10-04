@@ -7,6 +7,8 @@ import 'package:naql_ui/naql_ui.dart';
 import 'data/auth.dart';
 import 'l10n/gen/app_localizations.dart';
 import 'screens/home_screen.dart';
+import 'screens/notifications_screen.dart';
+import 'screens/track_screen.dart';
 import 'screens/onboarding/activate_screen.dart';
 import 'screens/onboarding/choose_point_screen.dart';
 import 'screens/onboarding/sign_in_screen.dart';
@@ -55,9 +57,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => _Shell(shell: shell),
         branches: [
-          StatefulShellBranch(routes: [GoRoute(path: '/home', builder: (_, _) => const HomeScreen())]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: '/home',
+              builder: (_, _) => const HomeScreen(),
+              routes: [GoRoute(path: 'track/:id', builder: (_, s) => TrackScreen(requestId: s.pathParameters['id']!))],
+            ),
+          ]),
           StatefulShellBranch(routes: [GoRoute(path: '/trips', builder: (c, _) => PlaceholderScreen(title: AppLocalizations.of(c).tabTrips))]),
-          StatefulShellBranch(routes: [GoRoute(path: '/alerts', builder: (c, _) => PlaceholderScreen(title: AppLocalizations.of(c).tabAlerts))]),
+          StatefulShellBranch(routes: [GoRoute(path: '/alerts', builder: (_, _) => const NotificationsScreen())]),
           StatefulShellBranch(routes: [
             GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen(), routes: [
               GoRoute(path: 'point', builder: (_, _) => const ChoosePointScreen(changing: true)),

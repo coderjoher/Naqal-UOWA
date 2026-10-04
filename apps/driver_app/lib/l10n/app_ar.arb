@@ -165,5 +165,59 @@
   },
   "setSchedule": "عيّن جدولك",
   "stopsTitle": "المحطات",
-  "seatsLabel": "المقاعد"
+  "seatsLabel": "المقاعد",
+  "startRun": "ابدأ الرحلة",
+  "leaveCampusNow": "انطلق من الجامعة",
+  "boardAtCampus": "سجّل من صعد في الجامعة",
+  "nextStop": "المحطة التالية",
+  "atStop": "في المحطة",
+  "imHere": "وصلت إلى المحطة",
+  "navigate": "ملاحة",
+  "navGoogle": "خرائط Google",
+  "navWaze": "Waze",
+  "boardHint": "اضغط على اسم الطالب عند صعوده",
+  "onBoard": "صعد",
+  "noShowLabel": "لم يحضر",
+  "waiting": "بالانتظار",
+  "departStop": "انطلق",
+  "departMissing": "انطلق — {n} لم يحضر",
+  "@departMissing": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "waitLeft": "انتظر {time} للمتأخرين",
+  "@waitLeft": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "collectFare": "استلمت {amount}",
+  "@collectFare": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "paidLabel": "دُفع",
+  "arrivedCampus": "وصلت إلى الجامعة",
+  "finishRun": "إنهاء الرحلة",
+  "runDone": "انتهت الرحلة",
+  "runDoneBody": "شكراً لك! سُجّلت الرحلة كاملة.",
+  "pendingSync": "بانتظار الإرسال: {n}",
+  "@pendingSync": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "dropOff": "نزول",
+  "endTitleMorning": "توجّه إلى الجامعة",
+  "endTitleReturn": "نزل جميع الطلبة"
 }

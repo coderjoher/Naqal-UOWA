@@ -216,5 +216,69 @@
       }
     }
   },
-  "rideFemaleOnly": "للطالبات فقط"
+  "rideFemaleOnly": "للطالبات فقط",
+  "trackBus": "تتبّع الحافلة",
+  "trackTitle": "حافلتك",
+  "etaMinutes": "تصل خلال {n} د",
+  "@etaMinutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "etaNow": "الحافلة في نقطتك الآن",
+  "onBus": "أنت في الحافلة",
+  "notStarted": "لم تنطلق الحافلة بعد",
+  "updatedAgo": "آخر تحديث قبل {time}",
+  "@updatedAgo": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "lastKnown": "آخر موقع معروف",
+  "agoSeconds": "{n} ث",
+  "@agoSeconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "agoMinutes": "{n} د",
+  "@agoMinutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "yourStop": "نقطتك",
+  "busLabel": "الحافلة",
+  "notificationsTitle": "الإشعارات",
+  "noNotifications": "لا توجد إشعارات",
+  "noNotificationsBody": "ستصلك هنا أخبار مقعدك وحافلتك.",
+  "nAssignedTitle": "تم تأكيد مقعدك",
+  "nAssignedBody": "افتح التطبيق لترى حافلتك ووقت الصعود.",
+  "nWaitlistedTitle": "أنت على قائمة الانتظار",
+  "nWaitlistedBody": "سنخبرك فور توفر مقعد.",
+  "nBumpedTitle": "نُقلت إلى قائمة الانتظار",
+  "nBumpedBody": "أُعطي مقعدك لمشترك. سنحجز لك فور توفر مقعد.",
+  "nApproachingTitle": "الحافلة تقترب",
+  "nApproachingBody": "تصل إلى نقطتك خلال {n} دقائق تقريباً.",
+  "@nApproachingBody": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "nArrivedTitle": "الحافلة وصلت",
+  "nArrivedBody": "الحافلة في نقطة التجمّع الآن.",
+  "nExpiredTitle": "لم نجد مقعداً",
+  "nExpiredBody": "انتهت مدة الانتظار وأُلغي الطلب.",
+  "nCancelledTitle": "أُلغيت الرحلة",
+  "nCancelledBody": "أُلغي طلب رحلتك."
 }

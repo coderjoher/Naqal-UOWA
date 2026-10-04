@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:driver_app/app.dart';
 import 'package:driver_app/data/image_document_picker.dart';
+import 'package:driver_app/data/run_controller.dart';
 import 'package:driver_app/data/session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,6 +24,36 @@ class FakeCamera implements DocumentPicker {
   }
 }
 
+/// GPS stand-in: tests push fixes.
+class FakeLocation implements LocationSource {
+  final controller = StreamController<GpsFix>.broadcast();
+  @override
+  Future<bool> ensurePermission() async => true;
+  @override
+  Stream<GpsFix> positions() => controller.stream;
+}
+
+class FakeLiveFeed implements LiveFeed {
+  final runChangesCtl = StreamController<String>.broadcast();
+  final joined = <String>[];
+  @override
+  Stream<BusPosition> get buses => const Stream.empty();
+  @override
+  Stream<String> get runChanges => runChangesCtl.stream;
+  @override
+  Stream<Map<String, dynamic>> get notifications => const Stream.empty();
+  @override
+  Stream<bool> get connected => Stream.value(true);
+  @override
+  Future<BusPosition?> join(String runId) async {
+    joined.add(runId);
+    return null;
+  }
+
+  @override
+  void dispose() {}
+}
+
 /// In-memory driver backend implementing the P2 endpoints with the default office requirements.
 class FakeDriverBackend {
   FakeDriverBackend({String status = 'draft', String? note}) {
@@ -30,6 +62,18 @@ class FakeDriverBackend {
   }
 
   final requests = <http.BaseRequest>[];
+
+  /// P5: while false, run endpoints fail like a phone without coverage.
+  bool online = true;
+  final gpsReceived = <Map<String, dynamic>>[];
+  final actionsReceived = <Map<String, dynamic>>[];
+  final faresReceived = <Map<String, dynamic>>[];
+  final launched = <Uri>[];
+
+  /// Applies the next action batch but loses the reply (the phone sees a network error).
+  bool loseNextReply = false;
+  final location = FakeLocation();
+  final feed = FakeLiveFeed();
 
   /// GET /drivers/me/runs (P4).
   List<Map<String, Object?>> runs = [];
@@ -69,6 +113,7 @@ class FakeDriverBackend {
           'id': 'run-m',
           'date': day(),
           'status': 'planned',
+          'waitMinutes': 3,
           'gender': 'male',
           'femaleOnly': false,
           'capacity': 14,
@@ -85,6 +130,7 @@ class FakeDriverBackend {
           'id': 'run-r',
           'date': day(),
           'status': 'planned',
+          'waitMinutes': 3,
           'gender': 'female',
           'femaleOnly': true,
           'capacity': 14,
@@ -155,6 +201,35 @@ class FakeDriverBackend {
       expect(req.headers['content-type'], startsWith('multipart/form-data'));
       docs.add(req.url.pathSegments.last);
       res = _json(me);
+    } else if (req.url.path.startsWith('/runs/') && !online) {
+      throw http.ClientException('offline');
+    } else if (req.method == 'GET' && RegExp(r'^/runs/[^/]+$').hasMatch(req.url.path)) {
+      res = _json(runs.firstWhere((r) => r['id'] == req.url.pathSegments[1]));
+    } else if (req.method == 'POST' && req.url.path.endsWith('/actions')) {
+      final run = runs.firstWhere((r) => r['id'] == req.url.pathSegments[1]);
+      final body = jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>;
+      final results = [];
+      for (final a in (body['actions'] as List).cast<Map<String, dynamic>>()) {
+        final dup = actionsReceived.any((x) => x['clientId'] == a['clientId']);
+        if (!dup) {
+          actionsReceived.add(a);
+          _apply(run, a);
+        }
+        results.add({'clientId': a['clientId'], 'applied': !dup});
+      }
+      if (loseNextReply) {
+        loseNextReply = false;
+        throw http.ClientException('connection reset after the server applied it');
+      }
+      res = _json({'results': results, 'run': run});
+    } else if (req.method == 'POST' && req.url.path.endsWith('/gps')) {
+      final body = jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>;
+      gpsReceived.addAll((body['points'] as List).cast<Map<String, dynamic>>());
+      res = _json({'accepted': (body['points'] as List).length});
+    } else if (req.method == 'POST' && req.url.path.endsWith('/fares')) {
+      final body = jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>;
+      if (!faresReceived.any((f) => f['requestId'] == body['requestId'])) faresReceived.add(body);
+      res = _json({'duplicate': false});
     } else if (path == 'GET /drivers/me/runs') {
       res = _json(runs);
     } else if (path == 'GET /drivers/me/availability') {
@@ -178,6 +253,34 @@ class FakeDriverBackend {
     return http.StreamedResponse(Stream.value(res.bodyBytes), res.statusCode, headers: res.headers);
   });
 
+  /// Mirrors the server's run state machine closely enough for the app.
+  void _apply(Map<String, Object?> run, Map<String, dynamic> a) {
+    final stops = (run['stops'] as List).cast<Map<String, Object?>>();
+    final next = stops.where((s) => s['served'] != true).firstOrNull;
+    switch (a['type']) {
+      case 'start':
+        run['status'] = 'started';
+        for (final p in stops.expand((s) => (s['passengers'] as List).cast<Map<String, Object?>>())) {
+          if (((a['requestIds'] as List?) ?? const []).contains(p['requestId'])) p['boarded'] = true;
+        }
+      case 'arrive':
+        run['status'] = 'at_stop';
+        next?['arrivedAt'] = a['at'];
+      case 'board':
+        for (final p in stops.expand((s) => (s['passengers'] as List).cast<Map<String, Object?>>())) {
+          if ((a['requestIds'] as List).contains(p['requestId'])) p['boarded'] = true;
+        }
+      case 'depart':
+        run['status'] = 'started';
+        next?['served'] = true;
+        for (final p in (next?['passengers'] as List? ?? const []).cast<Map<String, Object?>>()) {
+          if (p['boarded'] != true) p['status'] = 'no_show';
+        }
+      case 'end':
+        run['status'] = 'done';
+    }
+  }
+
   Future<Widget> app({String lang = 'ar', bool signedIn = false, DocumentPicker? camera}) async {
     final tokens = MemoryTokenStore();
     if (signedIn) await tokens.write('dt');
@@ -187,6 +290,12 @@ class FakeDriverBackend {
         tokenStoreProvider.overrideWithValue(tokens),
         apiProvider.overrideWithValue(ApiClient(baseUrl: Uri.parse('http://api.test/'), tokens: tokens, httpClient: client)),
         documentPickerProvider.overrideWithValue(camera ?? FakeCamera()),
+        locationSourceProvider.overrideWithValue(location),
+        liveFeedProvider.overrideWith((ref) async => feed),
+        urlLauncherProvider.overrideWithValue((uri) async {
+          launched.add(uri);
+          return true;
+        }),
       ],
       child: const DriverApp(),
     );

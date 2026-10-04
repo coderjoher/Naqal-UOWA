@@ -26,6 +26,7 @@ export class CreateUniversityDto {
   @Max(100)
   commissionPct?: number;
   @ApiPropertyOptional() @IsOptional() @IsInt() @Min(1) @Max(240) waitlistMinutes?: number;
+  @ApiPropertyOptional({ description: 'SM-04: minutes a bus waits at a stop' }) @IsOptional() @IsInt() @Min(1) @Max(15) noShowWaitMinutes?: number;
   @ApiPropertyOptional({ type: OfficeAccountDto })
   @IsOptional()
   @ValidateNested()
@@ -41,5 +42,6 @@ export class UpdateUniversityDto {
   @ApiPropertyOptional() @IsOptional() @IsArray() @ArrayMaxSize(500) coverage?: [number, number][];
   @ApiPropertyOptional() @IsOptional() @IsNumber({ maxDecimalPlaces: 2 }) @Min(0) @Max(100) commissionPct?: number;
   @ApiPropertyOptional() @IsOptional() @IsInt() @Min(1) @Max(240) waitlistMinutes?: number;
+  @ApiPropertyOptional({ description: 'SM-04: minutes a bus waits at a stop' }) @IsOptional() @IsInt() @Min(1) @Max(15) noShowWaitMinutes?: number;
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(300) officeNote?: string;
 }
