@@ -1,0 +1,62 @@
+# P4 — Ride requests and dispatch
+
+Status: planned
+Depends on: P3
+
+## Goal
+
+Students request a ride for today, the dispatcher puts them on a bus or a waitlist, and
+drivers see their runs, while the hard constraints always hold.
+
+## Scope
+
+- ST-04 Request today's ride (wave + point)
+- ST-05 See assignment (bus, driver, plate, photo, pickup time)
+- ST-07 Waitlist status with remaining time
+- ST-08 Cancel before pickup
+- DR-02 Driver availability for coming days
+- DR-03 Today's runs with ordered stops and passengers
+- DS-02 Wave planning job
+- DS-03 Cheapest insertion for same-day requests, subscribers first
+- DS-04 Waitlist with re-check and expiry
+- DS-05 Hard constraints
+- DS-06 Run tier = farthest stop tier; keep runs single-tier where possible
+- SM-02 Gender separation
+- SM-03 Subscriber priority
+- NF-03 Heavy work in background queues
+
+## Deliverables
+
+- `dispatch` module as **pure TypeScript domain code** (no Nest/Prisma imports) so it is tested
+  in isolation: `planWave()`, `insertRequest()`, `recheckWaitlist()`.
+- BullMQ jobs: `wave.plan` (T − 60 min, configurable), `waitlist.recheck` (on cancel/new run),
+  `waitlist.expire` (delayed job per request).
+- Request state machine: `open → assigned | waitlisted → cancelled | done`.
+- Run mixing tiers: **open question Q3** — default rule: run counts toward its farthest-stop tier
+  (DS-06), recorded on the run so settlement can be recomputed if the rule changes.
+- Student app: Request sheet (wave chips, point picker), Assignment card, Waitlist countdown.
+- Driver app: Availability calendar, Today list, Run detail with stop list.
+
+## Tests
+
+| Test ID | Layer | Covers | What must pass |
+|---------|-------|--------|----------------|
+| T4-01 | unit | DS-05, SM-02 | Property test (fast-check, 10 000 random scenarios): no run ever has mixed gender, overflows capacity or arrives after wave time |
+| T4-02 | unit | DS-02 | `planWave` groups by gender and tier and uses the fewest runs for fixture cities (golden JSON fixtures) |
+| T4-03 | unit | DS-03 | Insertion picks the smallest detour among runs with a free seat that have not passed the point |
+| T4-04 | unit | DS-03, SM-03 | When one seat remains and a subscriber and pay-per-ride student compete, the subscriber gets it, and a pay-per-ride waitlister is bumped before a subscriber |
+| T4-05 | unit | DS-04 | Waitlisted request is assigned on a cancellation; expires exactly at configured minutes with notification event |
+| T4-06 | unit | DS-06 | Run tier = tier of farthest stop; single-tier solution preferred when cost difference ≤ threshold |
+| T4-07 | integration | NF-03 | `wave.plan`, `waitlist.recheck`, `waitlist.expire` run in BullMQ workers; API request path returns < 100 ms without waiting for planning |
+| T4-08 | e2e | ST-04, ST-08 | Request → assigned → cancel before pickup frees the seat; cancel after pickup rejected |
+| T4-09 | e2e | DR-02, DR-03 | Driver availability drives which drivers get runs; driver gets ordered stops with passenger list |
+| T4-10 | widget | ST-05, ST-07 | Assignment card shows bus, driver, plate, photo, pickup time; waitlist card counts down and updates |
+| T4-11 | flutter-int | ST-04, ST-05 | Student requests a ride against a seeded API and sees the assignment |
+| T4-12 | widget | DR-03 | Driver run screen lists stops in order with passenger counts, large touch targets (≥ 56 dp) |
+
+## Exit gate
+
+- [ ] All P4 tests green in CI
+- [ ] Property test T4-01 runs with a fixed seed in CI and 100 000 cases nightly
+- [ ] Simulation of one real morning (seed data: 500 requests, 30 buses) assigns ≥ 95 % with zero constraint violations
+- [ ] Q3 answered or default rule accepted in writing by the office
