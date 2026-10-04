@@ -5,3 +5,4 @@ export 'src/config.dart';
 export 'src/prefs.dart';
 export 'src/providers.dart';
 export 'src/secure_token_store.dart';
+export 'src/server_settings.dart';

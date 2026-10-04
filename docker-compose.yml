@@ -1,7 +1,11 @@
-# Local stack: PostgreSQL (PostGIS), Redis, OSRM, API, dashboard.
+# Local stack: PostgreSQL (PostGIS), Redis, OSRM, API, dashboard, student and driver web apps.
 #   docker compose up -d --build --wait
-#   open http://localhost:8080   (dashboard)   http://localhost:3000/docs   (API docs)
-# First start downloads the Iraq map extract and prepares OSRM (a few minutes, cached in a volume).
+#   http://localhost:8080  dashboard (office / super admin)
+#   http://localhost:8081  student app (web)        http://localhost:8082  driver app (web)
+#   http://localhost:3000/docs  API docs
+# First start downloads the Iraq map extract and prepares OSRM, and builds the Flutter apps
+# (several minutes; cached afterwards). Demo data is loaded once — see docs/TESTING.md.
+# Set DEMO=false for an empty database and real SMS codes (no codes shown on screen).
 
 services:
   postgres:
@@ -56,6 +60,11 @@ services:
       OSRM_URL: http://osrm:5000
       JWT_SECRET: ${JWT_SECRET:-dev-only-secret-change-me-0123456789}
       PORT: 3000
+      # Demo mode: load demo data once and show driver sign-in codes in the app instead of SMS.
+      DEMO_SEED: ${DEMO:-true}
+      OTP_DEV_ECHO: ${DEMO:-true}
+      STORAGE_DIR: /data/storage
+    volumes: [storage:/data/storage]
     ports: ['3000:3000']
     depends_on:
       postgres: { condition: service_healthy }
@@ -72,6 +81,19 @@ services:
     depends_on:
       api: { condition: service_started }
 
+  student-web:
+    build: { context: ., dockerfile: infra/flutter-web/Dockerfile, args: { APP: student_app } }
+    ports: ['8081:80']
+    depends_on:
+      api: { condition: service_started }
+
+  driver-web:
+    build: { context: ., dockerfile: infra/flutter-web/Dockerfile, args: { APP: driver_app } }
+    ports: ['8082:80']
+    depends_on:
+      api: { condition: service_started }
+
 volumes:
   pgdata:
   osrm:
+  storage:

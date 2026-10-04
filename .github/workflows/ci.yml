@@ -159,6 +159,18 @@ jobs:
         run: |
           curl -fsS http://localhost:8080/ | grep -q '<div id="root">'
           curl -fsS http://localhost:8080/api/health | grep -q '"db":"ok"'
+      - name: Student and driver web apps are served and proxy the API
+        run: |
+          for port in 8081 8082; do
+            curl -fsS http://localhost:$port/ | grep -q 'flutter_bootstrap.js'
+            curl -fsS http://localhost:$port/main.dart.js -o /dev/null
+            curl -fsS http://localhost:$port/api/public/universities | grep -q '"slug":"warith"'
+          done
+      - name: Demo data is loaded and a student can sign in
+        run: |
+          curl -fsS -X POST http://localhost:3000/auth/student/login -H 'content-type: application/json' \
+            -d '{"university":"warith","studentId":"W-1001","password":"student123"}' | grep -q accessToken
+          curl -fsS -X POST http://localhost:3000/auth/driver/otp -H 'content-type: application/json' -d '{"phone":"07800000001"}' | grep -q devCode
       - name: Save OSRM volume
         if: success()
         run: |

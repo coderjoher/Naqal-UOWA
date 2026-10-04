@@ -34,23 +34,26 @@ docs/
 
 ## Getting started
 
+**Just want to try it?** Follow [docs/TESTING.md](docs/TESTING.md): one `docker compose` command
+starts the dashboard (:8080), the student app (:8081) and the driver app (:8082) with demo data.
+
 Requirements: Node 22 + pnpm 10, Flutter 3.47, Docker (or local PostgreSQL 16 and Redis 7).
 
 ```bash
 pnpm install
 flutter pub get                       # resolves the Dart workspace (naql_ui, naql_core, both apps)
 
-# Everything in containers (first start prepares the OSRM map, a few minutes):
-docker compose up -d --build --wait   # dashboard http://localhost:8080 · API docs http://localhost:3000/docs
+# Everything in containers (first start prepares the OSRM map and builds the Flutter apps):
+docker compose up -d --build --wait   # dashboard :8080 · student app :8081 · driver app :8082 · API docs :3000/docs
 
 # Or run the API and dashboard locally against your own PostgreSQL + Redis:
-cd apps/api && cp .env.example .env && pnpm db:migrate && pnpm db:seed && pnpm start:dev
+cd apps/api && cp .env.example .env && pnpm db:migrate && pnpm db:demo && pnpm start:dev
 cd apps/dashboard && pnpm dev         # http://localhost:5173 (proxies /api to :3000)
 cd apps/student_app && flutter run
 ```
 
-Seeded dev accounts (password `password123`): `admin@naql.app` (super admin),
-`office@uowa.edu.iq`, `student@uowa.edu.iq`, `driver@uowa.edu.iq`.
+Demo accounts are listed in [docs/TESTING.md](docs/TESTING.md#2-demo-accounts)
+(`pnpm db:demo`; the minimal `pnpm db:seed` only creates `admin@naql.app` / `office@uowa.edu.iq`, password `password123`).
 
 ### Tests
 
