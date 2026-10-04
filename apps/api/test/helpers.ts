@@ -14,7 +14,7 @@ let hash: string | undefined;
 
 export async function resetDb() {
   await raw.$executeRawUnsafe(
-    'TRUNCATE travel_times, gathering_points, distance_tiers, waves, driver_requirement_sets, audit_events, users, universities CASCADE',
+    'TRUNCATE otp_codes, document_accesses, driver_documents, driver_profiles, roster_entries, travel_times, gathering_points, distance_tiers, waves, driver_requirement_sets, audit_events, users, universities CASCADE',
   );
 }
 

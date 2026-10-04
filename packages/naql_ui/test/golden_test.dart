@@ -121,4 +121,15 @@ void main() {
       ]);
     }, size: const Size(420, 420));
   });
+
+  testWidgets('[T0-03] NaqlOtpField, NaqlListRow and NaqlInfoRow', (tester) async {
+    await expectGoldens(tester, 'rows', (d) {
+      return Column(mainAxisSize: MainAxisSize.min, spacing: NaqlSpace.s3, children: [
+        NaqlOtpField(label: tr(d, 'Code from SMS', 'رمز الرسالة'), onCompleted: (_) {}, controller: TextEditingController(text: '482')),
+        NaqlListRow(title: tr(d, 'Al-Abbas Square', 'ساحة العباس'), subtitle: tr(d, 'Tier B · 4.8 km', 'الفئة ب · ٤٫٨ كم'), leading: const NaqlLetterBadge('B'), selected: true, onTap: () {}),
+        NaqlListRow(title: tr(d, 'Bab Baghdad', 'باب بغداد'), subtitle: tr(d, 'Tier A · 2.7 km', 'الفئة أ · ٢٫٧ كم'), leading: const NaqlLetterBadge('A', active: false), onTap: () {}),
+        NaqlInfoRow(label: tr(d, 'Gender', 'الجنس'), value: tr(d, 'Female', 'أنثى'), locked: true),
+      ]);
+    }, size: const Size(420, 420));
+  });
 }

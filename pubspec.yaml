@@ -6,5 +6,6 @@ environment:
 workspace:
   - packages/naql_ui
   - packages/naql_core
+  - packages/naql_app
   - apps/student_app
   - apps/driver_app

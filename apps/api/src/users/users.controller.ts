@@ -1,6 +1,6 @@
 import { Controller, Get, NotFoundException, Param, ParseUUIDPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { AuthUser, CurrentUser, Roles } from '../auth/decorators';
+import { Roles } from '../auth/decorators';
 import { PrismaService } from '../prisma/prisma.service';
 
 const PUBLIC_FIELDS = { id: true, name: true, email: true, phone: true, role: true, gender: true, status: true, universityId: true } as const;
@@ -24,17 +24,5 @@ export class UsersController {
     const user = await this.prisma.db.user.findUnique({ where: { id }, select: PUBLIC_FIELDS });
     if (!user) throw new NotFoundException();
     return user;
-  }
-
-  @Roles('student')
-  @Get('students/me')
-  student(@CurrentUser() user: AuthUser) {
-    return this.get(user.id);
-  }
-
-  @Roles('driver')
-  @Get('drivers/me')
-  driver(@CurrentUser() user: AuthUser) {
-    return this.get(user.id);
   }
 }

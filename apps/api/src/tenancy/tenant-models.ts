@@ -7,4 +7,8 @@ export const TENANT_MODELS: ReadonlySet<string> = new Set([
   'Wave',
   'DriverRequirementSet',
   'TravelTime',
+  'RosterEntry',
+  'DriverProfile',
+  'DriverDocument',
+  'DocumentAccess',
 ]);

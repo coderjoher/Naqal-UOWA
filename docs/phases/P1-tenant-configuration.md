@@ -57,6 +57,6 @@ everything dispatch needs: driver requirements, tiers, gathering points and wave
 
 ## Exit gate
 
-- [ ] All P1 tests green in CI
-- [ ] Real Karbala OSRM extract builds a matrix for 50 points in < 30 s (checked by the CI `compose` job)
+- [x] All P1 tests green in CI (PR #2)
+- [x] Real Karbala OSRM extract builds a matrix for 50 points in < 30 s (CI `compose` job: 0.18 s)
 - [ ] Transport office reviews the Points / Tiers / Waves screens and signs off

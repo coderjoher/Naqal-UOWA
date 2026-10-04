@@ -9,7 +9,7 @@ test('[T0-01] CI has a job for every app and package', () => {
   for (const job of ['tokens:', 'api:', 'dashboard:', 'flutter:', 'compose:']) {
     assert.match(ci, new RegExp(`^  ${job}`, 'm'), `missing job ${job}`);
   }
-  for (const dir of ['packages/naql_ui', 'packages/naql_core', 'apps/student_app', 'apps/driver_app']) {
+  for (const dir of ['packages/naql_ui', 'packages/naql_core', 'packages/naql_app', 'apps/student_app', 'apps/driver_app']) {
     assert.ok(ci.includes(`working-directory: ${dir}`), `flutter tests not run for ${dir}`);
   }
   for (const cmd of ['pnpm test:cov', 'pnpm test:int', 'pnpm test:e2e', 'pnpm test\n']) {

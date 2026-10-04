@@ -2,6 +2,14 @@
   "@@locale": "ar",
   "appTitle": "نقل جامعة وارث",
   "hello": "أهلاً بك",
+  "helloName": "أهلاً، {name}",
+  "@helloName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "notifications": "الإشعارات",
   "noSubscription": "لا يوجد اشتراك",
   "noRideToday": "لا توجد رحلة اليوم",
@@ -11,5 +19,70 @@
   "tabAlerts": "التنبيهات",
   "tabProfile": "حسابي",
   "comingSoon": "قريباً",
-  "comingSoonBody": "هذه الصفحة قيد التطوير."
+  "comingSoonBody": "هذه الصفحة قيد التطوير.",
+  "welcomeTitle": "تنقّلك اليومي إلى الجامعة",
+  "welcomeBody": "اطلب مقعدك كل يوم، وتابع حافلتك على الخريطة، واعرف متى تصل.",
+  "chooseLanguage": "اختر اللغة",
+  "arabic": "العربية",
+  "english": "English",
+  "continueLabel": "متابعة",
+  "chooseUniversity": "اختر جامعتك",
+  "chooseUniversityBody": "ستستخدم حساب جامعتك لتسجيل الدخول.",
+  "loadFailed": "تعذّر الاتصال. تحقّق من الإنترنت وحاول مجدداً.",
+  "retry": "إعادة المحاولة",
+  "signInTitle": "تسجيل الدخول",
+  "studentNumber": "الرقم الجامعي",
+  "password": "كلمة المرور",
+  "signIn": "دخول",
+  "signInFailed": "الرقم الجامعي أو كلمة المرور غير صحيحة",
+  "firstTime": "أول مرة؟ فعّل حسابك برمز المكتب",
+  "activateTitle": "تفعيل الحساب",
+  "activateBody": "ادخل الرمز الذي سلّمه لك مكتب النقل، ثم اختر كلمة مرور.",
+  "activationCode": "رمز التفعيل",
+  "newPassword": "كلمة مرور جديدة",
+  "passwordHint": "٨ أحرف على الأقل",
+  "activate": "تفعيل ودخول",
+  "activateFailed": "الرمز غير صحيح أو منتهي. اطلب رمزاً جديداً من مكتب النقل.",
+  "changeUniversity": "تغيير الجامعة",
+  "choosePointTitle": "نقطة التجمّع",
+  "choosePointBody": "اختر النقطة الأقرب إليك. تركب الحافلة منها كل يوم ويُحسب سعر اشتراكك حسب فئتها.",
+  "searchPoints": "ابحث عن نقطة",
+  "tierLabel": "الفئة {tier}",
+  "@tierLabel": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "kmAway": "{km} كم عن الجامعة",
+  "@kmAway": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "savePoint": "اعتماد النقطة",
+  "noPoints": "لا توجد نقاط تجمّع بعد",
+  "noPointsBody": "سيضيفها مكتب النقل قريباً.",
+  "yourPoint": "نقطة تجمّعك",
+  "change": "تغيير",
+  "profileTitle": "حسابي",
+  "personalInfo": "المعلومات الشخصية",
+  "name": "الاسم",
+  "gender": "الجنس",
+  "male": "ذكر",
+  "female": "أنثى",
+  "fromUniversity": "من سجلات الجامعة ولا يمكن تعديله",
+  "phone": "رقم الهاتف",
+  "phoneHint": "07XX XXX XXXX",
+  "save": "حفظ",
+  "saved": "تم الحفظ",
+  "saveFailed": "تعذّر الحفظ",
+  "invalidPhone": "أدخل رقم موبايل عراقي صحيح",
+  "language": "اللغة",
+  "signOut": "تسجيل الخروج",
+  "defaultPoint": "نقطة التجمّع",
+  "notSet": "غير محدّدة"
 }

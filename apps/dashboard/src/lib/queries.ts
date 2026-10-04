@@ -96,3 +96,42 @@ export function errorMessages(e: unknown): string[] {
   if (e instanceof ApiError) return e.messages;
   return [];
 }
+
+export type DriverStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'suspended';
+export interface DriverRow {
+  id: string;
+  name: string;
+  phone: string | null;
+  status: DriverStatus;
+  vehicleType: string | null;
+  plate: string | null;
+  seats: number | null;
+  modelYear: number | null;
+  documents: string[];
+  submittedAt: string | null;
+  reviewNote: string | null;
+}
+export interface DriverDetail extends Omit<DriverRow, 'documents'> {
+  documents: { key: string; label: string; labelAr?: string; required: boolean; uploaded: boolean; mime: string | null }[];
+  missing: string[];
+}
+export interface RosterStudent {
+  id: string;
+  studentId: string;
+  name: string;
+  nameAr: string | null;
+  gender: 'male' | 'female';
+  activated: boolean;
+  activationPending: boolean;
+  phone: string | null;
+}
+
+export const useDrivers = () => useQuery({ queryKey: ['drivers'], queryFn: () => api<DriverRow[]>('/drivers') });
+export const useDriver = (id: string | null) => useQuery({ queryKey: ['driver', id], queryFn: () => api<DriverDetail>(`/drivers/${id}`), enabled: !!id });
+export const useReviewDriver = () =>
+  useSave(({ id, action, note }: { id: string; action: 'approve' | 'reject' | 'suspend' | 'reinstate'; note?: string }) => api(`/drivers/${id}/${action}`, json({ note })), [['drivers'], ['driver']]);
+export const documentLink = (driverId: string, key: string) => api<{ url: string; expiresAt: string }>(`/drivers/${driverId}/documents/${key}/link`, json({}));
+
+export const useStudents = () => useQuery({ queryKey: ['students'], queryFn: () => api<RosterStudent[]>('/students') });
+export const useImportRoster = () => useSave((rows: { studentId: string; name: string; nameAr?: string; gender: 'male' | 'female' }[]) => api<{ created: number; updated: number }>('/students/roster', json({ rows })), [['students']]);
+export const useIssueCode = () => useSave((studentId: string) => api<{ studentId: string; code: string; expiresAt: string }>(`/students/${encodeURIComponent(studentId)}/activation-code`, json({})), [['students']]);
