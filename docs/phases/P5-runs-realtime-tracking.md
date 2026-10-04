@@ -82,6 +82,6 @@ office sees every bus. This must work on weak Iraqi mobile networks.
 
 ## Exit gate
 
-- [ ] All P5 tests green in CI
+- [x] All P5 tests green in CI (PR #7)
 - [ ] Field test: one real bus, one full morning in Karbala, no lost run, ETA error ≤ 3 min median
 - [ ] Battery drain on driver app ≤ 8 %/hour on a mid-range Android device
