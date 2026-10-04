@@ -369,4 +369,104 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rideFemaleOnly => 'Female only';
+
+  @override
+  String get trackBus => 'Track the bus';
+
+  @override
+  String get trackTitle => 'Your bus';
+
+  @override
+  String etaMinutes(int n) {
+    return 'Arrives in $n min';
+  }
+
+  @override
+  String get etaNow => 'The bus is at your stop';
+
+  @override
+  String get onBus => 'You are on the bus';
+
+  @override
+  String get notStarted => 'The bus has not left yet';
+
+  @override
+  String updatedAgo(String time) {
+    return 'Updated $time ago';
+  }
+
+  @override
+  String get lastKnown => 'Last known position';
+
+  @override
+  String agoSeconds(int n) {
+    return '$n s';
+  }
+
+  @override
+  String agoMinutes(int n) {
+    return '$n min';
+  }
+
+  @override
+  String get yourStop => 'Your stop';
+
+  @override
+  String get busLabel => 'The bus';
+
+  @override
+  String get notificationsTitle => 'Notifications';
+
+  @override
+  String get noNotifications => 'No notifications';
+
+  @override
+  String get noNotificationsBody =>
+      'News about your seat and bus will appear here.';
+
+  @override
+  String get nAssignedTitle => 'Your seat is confirmed';
+
+  @override
+  String get nAssignedBody => 'See your bus and pickup time.';
+
+  @override
+  String get nWaitlistedTitle => 'You are on the waitlist';
+
+  @override
+  String get nWaitlistedBody => 'We will tell you as soon as a seat frees up.';
+
+  @override
+  String get nBumpedTitle => 'Moved to the waitlist';
+
+  @override
+  String get nBumpedBody =>
+      'Your seat went to a subscriber. We will seat you when one frees up.';
+
+  @override
+  String get nApproachingTitle => 'Your bus is close';
+
+  @override
+  String nApproachingBody(int n) {
+    return 'About $n minutes to your stop.';
+  }
+
+  @override
+  String get nArrivedTitle => 'Your bus is here';
+
+  @override
+  String get nArrivedBody => 'The bus is at your gathering point now.';
+
+  @override
+  String get nExpiredTitle => 'No seat found';
+
+  @override
+  String get nExpiredBody =>
+      'The waiting time ended and the request was cancelled.';
+
+  @override
+  String get nCancelledTitle => 'Ride cancelled';
+
+  @override
+  String get nCancelledBody => 'Your ride request was cancelled.';
 }

@@ -661,6 +661,162 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'المقاعد'**
   String get seatsLabel;
+
+  /// No description provided for @startRun.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ الرحلة'**
+  String get startRun;
+
+  /// No description provided for @leaveCampusNow.
+  ///
+  /// In ar, this message translates to:
+  /// **'انطلق من الجامعة'**
+  String get leaveCampusNow;
+
+  /// No description provided for @boardAtCampus.
+  ///
+  /// In ar, this message translates to:
+  /// **'سجّل من صعد في الجامعة'**
+  String get boardAtCampus;
+
+  /// No description provided for @nextStop.
+  ///
+  /// In ar, this message translates to:
+  /// **'المحطة التالية'**
+  String get nextStop;
+
+  /// No description provided for @atStop.
+  ///
+  /// In ar, this message translates to:
+  /// **'في المحطة'**
+  String get atStop;
+
+  /// No description provided for @imHere.
+  ///
+  /// In ar, this message translates to:
+  /// **'وصلت إلى المحطة'**
+  String get imHere;
+
+  /// No description provided for @navigate.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملاحة'**
+  String get navigate;
+
+  /// No description provided for @navGoogle.
+  ///
+  /// In ar, this message translates to:
+  /// **'خرائط Google'**
+  String get navGoogle;
+
+  /// No description provided for @navWaze.
+  ///
+  /// In ar, this message translates to:
+  /// **'Waze'**
+  String get navWaze;
+
+  /// No description provided for @boardHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اضغط على اسم الطالب عند صعوده'**
+  String get boardHint;
+
+  /// No description provided for @onBoard.
+  ///
+  /// In ar, this message translates to:
+  /// **'صعد'**
+  String get onBoard;
+
+  /// No description provided for @noShowLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم يحضر'**
+  String get noShowLabel;
+
+  /// No description provided for @waiting.
+  ///
+  /// In ar, this message translates to:
+  /// **'بالانتظار'**
+  String get waiting;
+
+  /// No description provided for @departStop.
+  ///
+  /// In ar, this message translates to:
+  /// **'انطلق'**
+  String get departStop;
+
+  /// No description provided for @departMissing.
+  ///
+  /// In ar, this message translates to:
+  /// **'انطلق — {n} لم يحضر'**
+  String departMissing(int n);
+
+  /// No description provided for @waitLeft.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتظر {time} للمتأخرين'**
+  String waitLeft(String time);
+
+  /// No description provided for @collectFare.
+  ///
+  /// In ar, this message translates to:
+  /// **'استلمت {amount}'**
+  String collectFare(String amount);
+
+  /// No description provided for @paidLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'دُفع'**
+  String get paidLabel;
+
+  /// No description provided for @arrivedCampus.
+  ///
+  /// In ar, this message translates to:
+  /// **'وصلت إلى الجامعة'**
+  String get arrivedCampus;
+
+  /// No description provided for @finishRun.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنهاء الرحلة'**
+  String get finishRun;
+
+  /// No description provided for @runDone.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتهت الرحلة'**
+  String get runDone;
+
+  /// No description provided for @runDoneBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'شكراً لك! سُجّلت الرحلة كاملة.'**
+  String get runDoneBody;
+
+  /// No description provided for @pendingSync.
+  ///
+  /// In ar, this message translates to:
+  /// **'بانتظار الإرسال: {n}'**
+  String pendingSync(int n);
+
+  /// No description provided for @dropOff.
+  ///
+  /// In ar, this message translates to:
+  /// **'نزول'**
+  String get dropOff;
+
+  /// No description provided for @endTitleMorning.
+  ///
+  /// In ar, this message translates to:
+  /// **'توجّه إلى الجامعة'**
+  String get endTitleMorning;
+
+  /// No description provided for @endTitleReturn.
+  ///
+  /// In ar, this message translates to:
+  /// **'نزل جميع الطلبة'**
+  String get endTitleReturn;
 }
 
 class _AppLocalizationsDelegate

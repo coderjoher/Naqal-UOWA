@@ -36,7 +36,7 @@ class RideOptions {
 enum RideStatus { open, assigned, waitlisted, cancelled, done }
 
 class RideAssignment {
-  const RideAssignment({required this.runId, required this.driverName, this.driverPhone, this.plate, this.vehicleType, this.vehiclePhotoUrl, this.pickupAt, this.stopNumber, this.stops});
+  const RideAssignment({required this.runId, required this.driverName, this.driverPhone, this.plate, this.vehicleType, this.vehiclePhotoUrl, this.pickupAt, this.stopNumber, this.stops, this.runStatus = 'planned'});
 
   factory RideAssignment.fromJson(Map<String, dynamic> j) => RideAssignment(
         runId: j['runId'] as String,
@@ -48,6 +48,7 @@ class RideAssignment {
         pickupAt: _date(j['pickupAt']),
         stopNumber: j['stopNumber'] as int?,
         stops: j['stops'] as int?,
+        runStatus: j['runStatus'] as String? ?? 'planned',
       );
 
   final String runId;
@@ -61,6 +62,10 @@ class RideAssignment {
   final DateTime? pickupAt;
   final int? stopNumber;
   final int? stops;
+
+  /// `planned` | `started` | `at_stop` | `done` — the bus can be followed while it is under way.
+  final String runStatus;
+  bool get trackable => runStatus == 'started' || runStatus == 'at_stop';
 }
 
 class RideInfo {
@@ -149,7 +154,7 @@ class AvailabilityDay {
 }
 
 class RunPassenger {
-  const RunPassenger({required this.requestId, required this.name, this.studentId, this.phone, this.fare = 0, this.subscriber = false, this.boarded = false});
+  const RunPassenger({required this.requestId, required this.name, this.studentId, this.phone, this.fare = 0, this.subscriber = false, this.boarded = false, this.status = 'assigned', this.paid = false});
 
   factory RunPassenger.fromJson(Map<String, dynamic> j) => RunPassenger(
         requestId: j['requestId'] as String,
@@ -159,8 +164,15 @@ class RunPassenger {
         fare: j['fare'] as int? ?? 0,
         subscriber: j['subscriber'] as bool? ?? false,
         boarded: j['boarded'] as bool? ?? false,
+        status: j['status'] as String? ?? 'assigned',
+        paid: j['paid'] as bool? ?? false,
       );
 
+  /// `assigned` | `done` | `no_show`
+  final String status;
+
+  /// A cash fare has been recorded for this ride.
+  final bool paid;
   final String requestId;
   final String name;
   final String? studentId;
@@ -171,7 +183,7 @@ class RunPassenger {
 }
 
 class RunStopInfo {
-  const RunStopInfo({required this.seq, required this.eta, required this.pointName, this.pointNameAr, required this.lat, required this.lng, required this.passengers, this.served = false, this.cashToCollect = 0});
+  const RunStopInfo({required this.seq, required this.eta, required this.pointName, this.pointNameAr, required this.lat, required this.lng, required this.passengers, this.served = false, this.cashToCollect = 0, this.arrivedAt});
 
   factory RunStopInfo.fromJson(Map<String, dynamic> j) {
     final p = j['point'] as Map<String, dynamic>;
@@ -184,6 +196,7 @@ class RunStopInfo {
       lat: (p['lat'] as num).toDouble(),
       lng: (p['lng'] as num).toDouble(),
       cashToCollect: j['cashToCollect'] as int? ?? 0,
+      arrivedAt: _date(j['arrivedAt']),
       passengers: [for (final x in j['passengers'] as List) RunPassenger.fromJson(x as Map<String, dynamic>)],
     );
   }
@@ -197,6 +210,7 @@ class RunStopInfo {
   final double lng;
   final int cashToCollect;
   final List<RunPassenger> passengers;
+  final DateTime? arrivedAt;
 
   String point(String lang) => lang == 'ar' && pointNameAr != null ? pointNameAr! : pointName;
 }
@@ -213,6 +227,7 @@ class DriverRun {
     required this.waveTime,
     this.departAt,
     required this.stops,
+    this.waitMinutes = 3,
   });
 
   factory DriverRun.fromJson(Map<String, dynamic> j) {
@@ -227,6 +242,7 @@ class DriverRun {
       waveType: _wave(wave['type']),
       waveTime: wave['time'] as String,
       departAt: _date(j['departAt']),
+      waitMinutes: j['waitMinutes'] as int? ?? 3,
       stops: [for (final s in j['stops'] as List) RunStopInfo.fromJson(s as Map<String, dynamic>)],
     );
   }
@@ -242,5 +258,12 @@ class DriverRun {
   final DateTime? departAt;
   final List<RunStopInfo> stops;
 
+  /// SM-04: minutes the bus waits at a stop for missing riders.
+  final int waitMinutes;
+
   int get cashToCollect => stops.fold(0, (n, s) => n + s.cashToCollect);
+
+  /// The next stop the bus has not left yet (null when all are done).
+  RunStopInfo? get nextStop => stops.where((s) => !s.served).firstOrNull;
+  bool get underway => status == 'started' || status == 'at_stop';
 }

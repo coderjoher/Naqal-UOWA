@@ -9,6 +9,13 @@ import { DriverRequirementsController } from './driver-requirements/requirements
 import { DriverRequirementsService } from './driver-requirements/requirements.service';
 import { DISPATCH_QUEUE, DispatchEngine } from './dispatch/dispatch.engine';
 import { DispatchProcessor } from './dispatch/dispatch.processor';
+import { LiveGateway } from './live/live.gateway';
+import { LiveHub } from './live/live.hub';
+import { LiveService } from './live/live.service';
+import { NotificationsService } from './notifications/notifications.service';
+import { PUSH_SENDER, pushSenderFromEnv } from './notifications/push';
+import { RunsController } from './runs/runs.controller';
+import { RunsService } from './runs/runs.service';
 import { RidesController } from './dispatch/rides.controller';
 import { RidesService } from './dispatch/rides.service';
 import { DriversController } from './drivers/drivers.controller';
@@ -18,7 +25,7 @@ import { StudentAuthController } from './identity/student-auth.controller';
 import { StudentAuthService } from './identity/student-auth.service';
 import { FilesController } from './storage/files.controller';
 import { StorageService } from './storage/storage.service';
-import { OfficeCashProvider, PAYMENT_PROVIDERS } from './payments/payment-provider';
+import { DriverCashProvider, OfficeCashProvider, PAYMENT_PROVIDERS } from './payments/payment-provider';
 import { PaymentsService } from './payments/payments.service';
 import { StudentsController } from './students/students.controller';
 import { SubscriptionsController } from './subscriptions/subscriptions.controller';
@@ -82,6 +89,7 @@ class CacheModule {}
     FilesController,
     SubscriptionsController,
     RidesController,
+    RunsController,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
@@ -96,10 +104,16 @@ class CacheModule {}
     OtpService,
     StorageService,
     { provide: SMS_SENDER, useClass: ConsoleSmsSender },
-    { provide: PAYMENT_PROVIDERS, useValue: [new OfficeCashProvider()] },
+    { provide: PAYMENT_PROVIDERS, useValue: [new OfficeCashProvider(), new DriverCashProvider()] },
     DispatchEngine,
     DispatchProcessor,
     RidesService,
+    LiveHub,
+    LiveService,
+    LiveGateway,
+    NotificationsService,
+    { provide: PUSH_SENDER, useFactory: pushSenderFromEnv },
+    RunsService,
     PaymentsService,
     SubscriptionsService,
   ],

@@ -745,6 +745,180 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'للطالبات فقط'**
   String get rideFemaleOnly;
+
+  /// No description provided for @trackBus.
+  ///
+  /// In ar, this message translates to:
+  /// **'تتبّع الحافلة'**
+  String get trackBus;
+
+  /// No description provided for @trackTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حافلتك'**
+  String get trackTitle;
+
+  /// No description provided for @etaMinutes.
+  ///
+  /// In ar, this message translates to:
+  /// **'تصل خلال {n} د'**
+  String etaMinutes(int n);
+
+  /// No description provided for @etaNow.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحافلة في نقطتك الآن'**
+  String get etaNow;
+
+  /// No description provided for @onBus.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنت في الحافلة'**
+  String get onBus;
+
+  /// No description provided for @notStarted.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم تنطلق الحافلة بعد'**
+  String get notStarted;
+
+  /// No description provided for @updatedAgo.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر تحديث قبل {time}'**
+  String updatedAgo(String time);
+
+  /// No description provided for @lastKnown.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر موقع معروف'**
+  String get lastKnown;
+
+  /// No description provided for @agoSeconds.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} ث'**
+  String agoSeconds(int n);
+
+  /// No description provided for @agoMinutes.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} د'**
+  String agoMinutes(int n);
+
+  /// No description provided for @yourStop.
+  ///
+  /// In ar, this message translates to:
+  /// **'نقطتك'**
+  String get yourStop;
+
+  /// No description provided for @busLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحافلة'**
+  String get busLabel;
+
+  /// No description provided for @notificationsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإشعارات'**
+  String get notificationsTitle;
+
+  /// No description provided for @noNotifications.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد إشعارات'**
+  String get noNotifications;
+
+  /// No description provided for @noNotificationsBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'ستصلك هنا أخبار مقعدك وحافلتك.'**
+  String get noNotificationsBody;
+
+  /// No description provided for @nAssignedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم تأكيد مقعدك'**
+  String get nAssignedTitle;
+
+  /// No description provided for @nAssignedBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'افتح التطبيق لترى حافلتك ووقت الصعود.'**
+  String get nAssignedBody;
+
+  /// No description provided for @nWaitlistedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنت على قائمة الانتظار'**
+  String get nWaitlistedTitle;
+
+  /// No description provided for @nWaitlistedBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'سنخبرك فور توفر مقعد.'**
+  String get nWaitlistedBody;
+
+  /// No description provided for @nBumpedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'نُقلت إلى قائمة الانتظار'**
+  String get nBumpedTitle;
+
+  /// No description provided for @nBumpedBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'أُعطي مقعدك لمشترك. سنحجز لك فور توفر مقعد.'**
+  String get nBumpedBody;
+
+  /// No description provided for @nApproachingTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحافلة تقترب'**
+  String get nApproachingTitle;
+
+  /// No description provided for @nApproachingBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'تصل إلى نقطتك خلال {n} دقائق تقريباً.'**
+  String nApproachingBody(int n);
+
+  /// No description provided for @nArrivedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحافلة وصلت'**
+  String get nArrivedTitle;
+
+  /// No description provided for @nArrivedBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحافلة في نقطة التجمّع الآن.'**
+  String get nArrivedBody;
+
+  /// No description provided for @nExpiredTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم نجد مقعداً'**
+  String get nExpiredTitle;
+
+  /// No description provided for @nExpiredBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتهت مدة الانتظار وأُلغي الطلب.'**
+  String get nExpiredBody;
+
+  /// No description provided for @nCancelledTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أُلغيت الرحلة'**
+  String get nCancelledTitle;
+
+  /// No description provided for @nCancelledBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'أُلغي طلب رحلتك.'**
+  String get nCancelledBody;
 }
 
 class _AppLocalizationsDelegate

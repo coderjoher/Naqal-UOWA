@@ -365,4 +365,101 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get rideFemaleOnly => 'للطالبات فقط';
+
+  @override
+  String get trackBus => 'تتبّع الحافلة';
+
+  @override
+  String get trackTitle => 'حافلتك';
+
+  @override
+  String etaMinutes(int n) {
+    return 'تصل خلال $n د';
+  }
+
+  @override
+  String get etaNow => 'الحافلة في نقطتك الآن';
+
+  @override
+  String get onBus => 'أنت في الحافلة';
+
+  @override
+  String get notStarted => 'لم تنطلق الحافلة بعد';
+
+  @override
+  String updatedAgo(String time) {
+    return 'آخر تحديث قبل $time';
+  }
+
+  @override
+  String get lastKnown => 'آخر موقع معروف';
+
+  @override
+  String agoSeconds(int n) {
+    return '$n ث';
+  }
+
+  @override
+  String agoMinutes(int n) {
+    return '$n د';
+  }
+
+  @override
+  String get yourStop => 'نقطتك';
+
+  @override
+  String get busLabel => 'الحافلة';
+
+  @override
+  String get notificationsTitle => 'الإشعارات';
+
+  @override
+  String get noNotifications => 'لا توجد إشعارات';
+
+  @override
+  String get noNotificationsBody => 'ستصلك هنا أخبار مقعدك وحافلتك.';
+
+  @override
+  String get nAssignedTitle => 'تم تأكيد مقعدك';
+
+  @override
+  String get nAssignedBody => 'افتح التطبيق لترى حافلتك ووقت الصعود.';
+
+  @override
+  String get nWaitlistedTitle => 'أنت على قائمة الانتظار';
+
+  @override
+  String get nWaitlistedBody => 'سنخبرك فور توفر مقعد.';
+
+  @override
+  String get nBumpedTitle => 'نُقلت إلى قائمة الانتظار';
+
+  @override
+  String get nBumpedBody => 'أُعطي مقعدك لمشترك. سنحجز لك فور توفر مقعد.';
+
+  @override
+  String get nApproachingTitle => 'الحافلة تقترب';
+
+  @override
+  String nApproachingBody(int n) {
+    return 'تصل إلى نقطتك خلال $n دقائق تقريباً.';
+  }
+
+  @override
+  String get nArrivedTitle => 'الحافلة وصلت';
+
+  @override
+  String get nArrivedBody => 'الحافلة في نقطة التجمّع الآن.';
+
+  @override
+  String get nExpiredTitle => 'لم نجد مقعداً';
+
+  @override
+  String get nExpiredBody => 'انتهت مدة الانتظار وأُلغي الطلب.';
+
+  @override
+  String get nCancelledTitle => 'أُلغيت الرحلة';
+
+  @override
+  String get nCancelledBody => 'أُلغي طلب رحلتك.';
 }

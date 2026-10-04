@@ -1,6 +1,6 @@
 # P5 — Runs, realtime tracking and notifications
 
-Status: planned
+Status: in-progress
 Depends on: P4
 
 ## Goal
@@ -29,14 +29,39 @@ office sees every bus. This must work on weak Iraqi mobile networks.
 
 ## Deliverables
 
-- NestJS WebSocket gateway (Socket.IO + Redis adapter) replacing Laravel Reverb in the PRD.
-  Rooms: `run:{id}` (students on that run only), `ops:{universityId}` (office).
-- GPS ingest: driver emits `gps` → `GEOADD` + publish to room; a sampler persists 1 point/min.
-- ETA = OSRM matrix remaining legs + live offset from the last point.
-- Driver app: drift-backed local queue for GPS + actions with idempotency keys; background location
-  service; "Arrived" starts the no-show countdown; cash fare quick entry (tier price prefilled).
-- FCM notifications: assigned, approaching (ETA ≤ 5 min), arrived, cancelled.
-- Dashboard Live Ops: MapLibre with bus markers, run list with status, waitlist panel.
+- **Realtime:** NestJS Socket.IO gateway at `/live` (replaces Laravel Reverb), with the Redis adapter so every API
+  instance reaches every socket. Rooms: `run:{id}` (a student may join only the run they ride on,
+  NF-02), `ops:{universityId}` (office), `driver:{id}`, `user:{id}`. Broadcasts carry only the bus:
+  `runId, lat, lng, at, speed, heading, etas` (NF-12).
+- **GPS ingest** (`LiveService`): socket `gps` or `POST /runs/:id/gps` (batches after an offline gap).
+  - Redis `GEOADD` + last point + broadcast.
+  - One stored row per run per minute through a Redis `SET NX` bucket, also for late points (NF-01).
+  - Older points never move the bus backwards.
+  - Measured (T5-06): 150 buses × 5 s, 2 000 sockets, p95 10 ms.
+- **ETA:** the live leg is straight line × 1.3 at 30 km/h; later legs come from the OSRM matrix, plus dwell.
+- **Run state machine** (pure `run-rules.ts`): `planned → started → at_stop → started … → done`.
+  - Actions arrive via `POST /runs/:id/actions`, each with a client id, applied once (`run_events`) under the wave lock shared with dispatch.
+  - Return runs board on campus before leaving.
+- **SM-04:** `universities.no_show_wait_minutes` (default 3). Leaving a stop before the wait while riders are missing is refused (409 with `waitLeftS`); after it, missing riders become `no_show` with no penalty.
+- **DR-07 / PA-03:** `POST /runs/:id/fares` writes an immutable `cash_fare` / `cash_driver` payment at the ride's fare (tier price, or the tier difference for subscribers).
+  - It is linked to the run, the ride and the driver.
+  - It is idempotent: there is one fare per ride, and the client key is unique.
+- **DR-09:** any dispatch change emits `run:updated` to the driver, the run room and the office.
+- **ST-09 notifications:**
+  - Pure rules with stable dedupe keys (`assigned:<ride>:<run>`, `approaching:<ride>`, `arrived:<ride>`, `cancelled:<ride>`), stored once (unique key).
+  - After commit, each is delivered over the socket and by FCM HTTP v1 (`FCM_SERVICE_ACCOUNT`; without it, push is logged).
+  - Apps register with `POST /devices`. The list is `GET /notifications/me`, and `POST /notifications/read` marks it read.
+- **Driver app:**
+  - Offline-first `SyncQueue` (naql_core) persisted in preferences: GPS, actions and fares in order, batched, with idempotent retries (NF-09).
+  - geolocator foreground service every 5 s.
+  - One big action per state: start, I'm at the stop, board riders, collect cash, wait countdown, leave, finish.
+  - Navigation hand-off to Google Maps or Waze (DR-06), live refresh on `run:updated`, and a "waiting to send" indicator.
+- **Student app:**
+  - Track screen (flutter_map, CARTO light tiles) showing the bus gliding, the student's stop, and the ETA ("arrives in 4 min", "the bus is at your stop", "you are on the bus").
+  - Last known position with "updated X ago" when the connection drops (NF-10).
+  - Notifications tab.
+- **Dashboard:** Live operations page (TO-07) with MapLibre bus markers updated live, run list with status, progress and boarded count, waitlist, and connection state.
+- **Demo:** `pnpm simulate` (or `docker compose exec api npx ts-node scripts/simulate.ts`) drives today's dispatched runs through the API, so the live views can be tried without a bus.
 
 ## Tests
 

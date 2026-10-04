@@ -36,6 +36,8 @@ model University {
   campusLng         Float    @map("campus_lng")
   commissionPct     Decimal  @default(0) @map("commission_pct") @db.Decimal(5, 2)
   waitlistMinutes   Int      @default(30) @map("waitlist_minutes")
+  /// SM-04: how long a bus waits at a stop for missing students.
+  noShowWaitMinutes Int      @default(3) @map("no_show_wait_minutes")
   integrationConfig Json     @default("{}") @map("integration_config")
   /// Service area as [[lat, lng], ...] polygon. Gathering points must lie inside it.
   coverage          Json     @default("[]")
@@ -64,6 +66,9 @@ model University {
   runStops           RunStop[]
   wavePlans          WavePlan[]
   notifications      Notification[]
+  runEvents          RunEvent[]
+  runPositions       RunPosition[]
+  deviceTokens       DeviceToken[]
 
   @@map("universities")
 }
@@ -97,6 +102,7 @@ model User {
   rideRequests  RideRequest[]        @relation("RideRequests")
   runs          Run[]                @relation("DriverRuns")
   notifications Notification[]       @relation("Notifications")
+  deviceTokens  DeviceToken[]        @relation("DeviceTokens")
 
   @@unique([universityId, studentId])
   @@index([universityId, role])
@@ -358,6 +364,11 @@ model Payment {
   collectedById     String        @map("collected_by_id") @db.Uuid
   externalRef       String?       @map("external_ref")
   reversesPaymentId String?       @unique @map("reverses_payment_id") @db.Uuid
+  /// Cash fares (DR-07): the run and ride they were collected on; one fare per ride.
+  runId             String?       @map("run_id") @db.Uuid
+  rideRequestId     String?       @unique @map("ride_request_id") @db.Uuid
+  /// Client-generated key so a retried request never records a second payment.
+  idempotencyKey    String?       @unique @map("idempotency_key")
   note              String?
   createdAt         DateTime      @default(now()) @map("created_at")
 
@@ -365,6 +376,7 @@ model Payment {
   student      User?         @relation("PaymentStudent", fields: [studentId], references: [id])
   reverses     Payment?      @relation("Reversal", fields: [reversesPaymentId], references: [id])
   reversedBy   Payment?      @relation("Reversal")
+  run          Run?          @relation(fields: [runId], references: [id])
   subscription Subscription?
 
   @@unique([universityId, receiptNo])
@@ -437,6 +449,8 @@ enum RideStatus {
   waitlisted
   cancelled
   done
+  /// SM-04: the bus waited the configured time and the student did not come. No penalty.
+  no_show
 }
 
 /// ST-04: a request for one wave on one date. At most one live request per student, wave and date.
@@ -476,6 +490,7 @@ model RideRequest {
 enum RunStatus {
   planned
   started
+  at_stop
   done
   cancelled
 }
@@ -492,6 +507,8 @@ model Run {
   tierId       String    @map("tier_id") @db.Uuid
   capacity     Int
   status       RunStatus @default(planned)
+  startedAt    DateTime? @map("started_at")
+  endedAt      DateTime? @map("ended_at")
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
 
@@ -500,6 +517,9 @@ model Run {
   wave       Wave          @relation(fields: [waveId], references: [id])
   stops      RunStop[]
   requests   RideRequest[]
+  events     RunEvent[]
+  positions  RunPosition[]
+  payments   Payment[]
 
   @@unique([driverId, waveId, date])
   @@index([universityId, date, waveId])
@@ -514,6 +534,7 @@ model RunStop {
   pointId      String    @map("point_id") @db.Uuid
   /// Planned pickup (morning) or drop-off (return).
   eta          DateTime
+  arrivedAt    DateTime? @map("arrived_at")
   servedAt     DateTime? @map("served_at")
 
   university University     @relation(fields: [universityId], references: [id])
@@ -545,6 +566,9 @@ model Notification {
   userId       String    @map("user_id") @db.Uuid
   kind         String
   data         Json      @default("{}")
+  /// ST-09: each event notifies once (e.g. "approaching:<requestId>").
+  dedupeKey    String?   @unique @map("dedupe_key")
+  pushedAt     DateTime? @map("pushed_at")
   readAt       DateTime? @map("read_at")
   createdAt    DateTime  @default(now()) @map("created_at")
 
@@ -553,4 +577,60 @@ model Notification {
 
   @@index([userId, createdAt])
   @@map("notifications")
+}
+
+// ── P5: runs, live tracking, notifications ───────────────────────────────────
+
+/// Every driver action on a run, keyed by a client id so offline retries are applied once (NF-09).
+model RunEvent {
+  id           String   @id @default(uuid()) @db.Uuid
+  universityId String   @map("university_id") @db.Uuid
+  runId        String   @map("run_id") @db.Uuid
+  clientId     String   @map("client_id")
+  type         String
+  payload      Json     @default("{}")
+  /// When it happened on the device (may be earlier than receipt when buffered offline).
+  at           DateTime
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  university University @relation(fields: [universityId], references: [id])
+  run        Run        @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@unique([runId, clientId])
+  @@index([runId, at])
+  @@map("run_events")
+}
+
+/// NF-01: one stored GPS point per run per minute (live points stay in Redis).
+model RunPosition {
+  id           String   @id @default(uuid()) @db.Uuid
+  universityId String   @map("university_id") @db.Uuid
+  runId        String   @map("run_id") @db.Uuid
+  lat          Float
+  lng          Float
+  speed        Float?
+  heading      Float?
+  at           DateTime
+
+  university University @relation(fields: [universityId], references: [id])
+  run        Run        @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId, at])
+  @@map("run_positions")
+}
+
+/// Firebase Cloud Messaging registration of one app install (ST-09).
+model DeviceToken {
+  id           String   @id @default(uuid()) @db.Uuid
+  universityId String   @map("university_id") @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  token        String   @unique
+  platform     String
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  university University @relation(fields: [universityId], references: [id])
+  user       User       @relation("DeviceTokens", fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("device_tokens")
 }

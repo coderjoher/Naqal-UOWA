@@ -315,4 +315,90 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get seatsLabel => 'المقاعد';
+
+  @override
+  String get startRun => 'ابدأ الرحلة';
+
+  @override
+  String get leaveCampusNow => 'انطلق من الجامعة';
+
+  @override
+  String get boardAtCampus => 'سجّل من صعد في الجامعة';
+
+  @override
+  String get nextStop => 'المحطة التالية';
+
+  @override
+  String get atStop => 'في المحطة';
+
+  @override
+  String get imHere => 'وصلت إلى المحطة';
+
+  @override
+  String get navigate => 'ملاحة';
+
+  @override
+  String get navGoogle => 'خرائط Google';
+
+  @override
+  String get navWaze => 'Waze';
+
+  @override
+  String get boardHint => 'اضغط على اسم الطالب عند صعوده';
+
+  @override
+  String get onBoard => 'صعد';
+
+  @override
+  String get noShowLabel => 'لم يحضر';
+
+  @override
+  String get waiting => 'بالانتظار';
+
+  @override
+  String get departStop => 'انطلق';
+
+  @override
+  String departMissing(int n) {
+    return 'انطلق — $n لم يحضر';
+  }
+
+  @override
+  String waitLeft(String time) {
+    return 'انتظر $time للمتأخرين';
+  }
+
+  @override
+  String collectFare(String amount) {
+    return 'استلمت $amount';
+  }
+
+  @override
+  String get paidLabel => 'دُفع';
+
+  @override
+  String get arrivedCampus => 'وصلت إلى الجامعة';
+
+  @override
+  String get finishRun => 'إنهاء الرحلة';
+
+  @override
+  String get runDone => 'انتهت الرحلة';
+
+  @override
+  String get runDoneBody => 'شكراً لك! سُجّلت الرحلة كاملة.';
+
+  @override
+  String pendingSync(int n) {
+    return 'بانتظار الإرسال: $n';
+  }
+
+  @override
+  String get dropOff => 'نزول';
+
+  @override
+  String get endTitleMorning => 'توجّه إلى الجامعة';
+
+  @override
+  String get endTitleReturn => 'نزل جميع الطلبة';
 }

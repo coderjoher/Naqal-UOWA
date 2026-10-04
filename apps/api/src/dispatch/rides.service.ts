@@ -106,7 +106,7 @@ export class RidesService {
       },
     });
     let assignment = null;
-    if (r.run && r.status === 'assigned') {
+    if (r.run && (r.status === 'assigned' || r.status === 'done')) {
       const stop = r.run.stops.find((s) => s.pointId === r.pointId);
       const photo = await db.driverDocument.findFirst({ where: { driverId: r.run.driverId, key: 'vehicle_photo' } });
       const link = photo ? await this.drivers.documentLink(r.run.driverId, 'vehicle_photo', viewerId ?? r.studentId, r.universityId) : null;
@@ -120,6 +120,7 @@ export class RidesService {
         pickupAt: stop?.eta ?? null,
         stopNumber: stop ? stop.seq + 1 : null,
         stops: r.run.stops.length,
+        runStatus: r.run.status,
       };
     }
     return {
@@ -190,6 +191,7 @@ export class RidesService {
   async driverRuns(driverId: string, date = baghdadDate(this.engine.now())) {
     if (!isDate(date)) throw new BadRequestException('Bad date');
     await this.drivers.assertApproved(driverId);
+    const uni = await this.prisma.db.user.findUniqueOrThrow({ where: { id: driverId }, select: { university: { select: { noShowWaitMinutes: true } } } });
     const runs = await this.prisma.db.run.findMany({
       where: { driverId, date: dbDate(date), status: { not: 'cancelled' } },
       include: {
@@ -199,11 +201,12 @@ export class RidesService {
       },
       orderBy: { wave: { minuteOfDay: 'asc' } },
     });
-    return runs.map((run) => this.runView(run));
+    return runs.map((run) => ({ ...this.runView(run), waitMinutes: uni.university?.noShowWaitMinutes ?? 3 }));
   }
 
   runView(run: {
     id: string;
+    driverId: string;
     date: Date;
     gender: string;
     capacity: number;
@@ -216,6 +219,7 @@ export class RidesService {
     const morning = run.wave.type === 'morning';
     return {
       id: run.id,
+      driverId: run.driverId,
       date: fromDbDate(run.date),
       status: run.status,
       gender: run.gender,

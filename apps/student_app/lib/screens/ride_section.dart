@@ -1,6 +1,7 @@
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:naql_app/naql_app.dart';
 import 'package:naql_core/naql_core.dart';
 import 'package:naql_ui/naql_ui.dart';
@@ -35,6 +36,7 @@ class RideSection extends ConsumerWidget {
               femaleOnly: user?.gender == Gender.female,
               photo: ride.assignment!.vehiclePhotoUrl == null ? null : NetworkImage(ref.read(apiProvider).resolve(ride.assignment!.vehiclePhotoUrl!).toString()),
               onCancel: cancel,
+              onTrack: ride.assignment!.trackable ? () => context.go('/home/track/${ride.id}') : null,
             ),
           RideStatus.waitlisted => WaitlistCard(ride: ride!, today: today, onCancel: cancel),
           RideStatus.open || RideStatus.assigned => PendingRideCard(ride: ride!, lang: lang, today: today, onCancel: cancel),

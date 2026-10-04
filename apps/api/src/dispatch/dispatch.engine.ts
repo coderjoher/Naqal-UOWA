@@ -3,6 +3,9 @@ import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { RideRequest, Run as DbRun, RunStop as DbStop } from '@prisma/client';
 import { Queue } from 'bullmq';
 import { haversineKm } from '../geo/geo';
+import { LiveHub } from '../live/live.hub';
+import { NotificationsService } from '../notifications/notifications.service';
+import { notificationsFor } from '../notifications/rules';
 import { PrismaService, Tx } from '../prisma/prisma.service';
 import { CAMPUS_KEY } from '../routing/travel-matrix.processor';
 import { runAsTenant } from '../tenancy/tenant-context';
@@ -38,6 +41,8 @@ export class DispatchEngine {
   constructor(
     private readonly prisma: PrismaService,
     @InjectQueue(DISPATCH_QUEUE) private readonly queue: Queue,
+    private readonly hub: LiveHub,
+    private readonly notifications: NotificationsService,
   ) {}
 
   /** Overridable in tests. */
@@ -70,7 +75,7 @@ export class DispatchEngine {
       this.log.log(`Planned wave ${ref.waveId} ${ref.date}: ${plan.runs.length} runs, ${plan.waitlisted.length} waitlisted`);
       return result;
     });
-    await this.scheduleExpiries(ref, out.expiries);
+    await this.afterCommit(ref, out);
     return out.summary;
   }
 
@@ -78,27 +83,30 @@ export class DispatchEngine {
   async recheck(ref: WaveRef) {
     const out = await this.locked(ref, async (tx) => {
       const done = await tx.wavePlan.findUnique({ where: { waveId_date: { waveId: ref.waveId, date: dbDate(ref.date) } } });
-      if (!done) return { summary: { planned: false, runs: 0, assigned: 0, waitlisted: 0 }, expiries: [] };
+      if (!done) return { summary: { planned: false, runs: 0, assigned: 0, waitlisted: 0 }, expiries: [], changed: [] };
       return this.recheckIn(tx, ref);
     });
-    await this.scheduleExpiries(ref, out.expiries);
+    await this.afterCommit(ref, out);
     return out.summary;
   }
 
   /** ST-08: cancel before pickup. Frees the seat and triggers a re-check. */
   async cancel(ref: WaveRef, requestId: string, reason: 'student' | 'office') {
-    await this.locked(ref, async (tx) => {
+    const out = await this.locked(ref, async (tx) => {
+      let changed: { runId: string; driverId: string }[] = [];
       const req = await tx.rideRequest.findUniqueOrThrow({ where: { id: requestId } });
-      if (req.status === 'cancelled' || req.status === 'done') throw new ConflictException('This request is already closed');
+      if (req.status === 'cancelled' || req.status === 'done' || req.status === 'no_show') throw new ConflictException('This request is already closed');
       if (req.boardedAt) throw new ConflictException('You have already been picked up');
       if (req.status === 'assigned') {
         const s = await this.load(tx, ref);
         const r = cancelRequest(s.domainRuns, requestId, s.ctx);
         if (!r.freed) throw new ConflictException('The bus has already passed your stop');
-        await this.save(tx, s, r.runs, [], []);
+        changed = (await this.save(tx, s, r.runs, [], [])).changed;
       }
       await tx.rideRequest.update({ where: { id: requestId }, data: { status: 'cancelled', cancelReason: reason, runId: null, waitlistedUntil: null } });
+      return { expiries: [], changed };
     });
+    await this.afterCommit(ref, out);
     await this.enqueueRecheck(ref);
   }
 
@@ -116,7 +124,8 @@ export class DispatchEngine {
 
   // ── internals ───────────────────────────────────────────────────────────────
 
-  private async locked<T>(ref: WaveRef, fn: (tx: Tx) => Promise<T>): Promise<T> {
+  /** Also used by run actions, so they never interleave with dispatch on the same wave. */
+  async locked<T>(ref: WaveRef, fn: (tx: Tx) => Promise<T>): Promise<T> {
     return runAsTenant(ref.universityId, () =>
       this.prisma.db.$transaction(
         async (tx) => {
@@ -146,7 +155,7 @@ export class DispatchEngine {
       tx.university.findUniqueOrThrow({ where: { id: ref.universityId } }),
       tx.wave.findUniqueOrThrow({ where: { id: ref.waveId } }),
       tx.distanceTier.findMany({ orderBy: { minKm: 'asc' } }),
-      tx.run.findMany({ where: { waveId: ref.waveId, date, status: { in: ['planned', 'started'] } }, include: { stops: { orderBy: { seq: 'asc' } }, requests: { where: { status: 'assigned' } } } }),
+      tx.run.findMany({ where: { waveId: ref.waveId, date, status: { in: ['planned', 'started', 'at_stop'] } }, include: { stops: { orderBy: { seq: 'asc' } }, requests: { where: { status: { in: ['assigned', 'no_show'] } } } } }),
       tx.rideRequest.findMany({ where: { waveId: ref.waveId, date, status: { in: ['open', 'assigned', 'waitlisted'] } }, orderBy: { createdAt: 'asc' } }),
     ]);
     const rank = new Map(tiers.map((t, i) => [t.id, i]));
@@ -165,7 +174,7 @@ export class DispatchEngine {
       tierRank: rank.get(r.tierId) ?? 0,
       subscriber: r.subscriber,
       createdAt: r.createdAt.getTime(),
-      boarded: !!r.boardedAt,
+      boarded: !!r.boardedAt || r.status === 'no_show',
     });
     const domainRuns: Run[] = (dbRuns as LoadedRun[]).map((run) => {
       const stops = run.stops
@@ -212,6 +221,7 @@ export class DispatchEngine {
     const before = new Map(s.requests.map((r) => [r.id, r]));
     const idMap = new Map<string, string>();
     const keep = new Set<string>();
+    const changed: { runId: string; driverId: string }[] = [];
 
     for (const run of after) {
       if (run.stops.length === 0) continue;
@@ -225,16 +235,21 @@ export class DispatchEngine {
       }
       idMap.set(run.id, id);
       keep.add(id);
-      const servedAt = old ? new Map(old.stops.filter((st) => st.servedAt).map((st) => [st.pointId, st.servedAt])) : new Map();
+      const history = new Map((old?.stops ?? []).map((st) => [st.pointId, { servedAt: st.servedAt, arrivedAt: st.arrivedAt }]));
       await tx.runStop.createMany({
-        data: run.stops.map((st, seq) => ({ universityId: ref.universityId, runId: id, seq, pointId: st.pointId, eta: instantAt(ref.date, st.time), servedAt: servedAt.get(st.pointId) ?? null })),
+        data: run.stops.map((st, seq) => ({ universityId: ref.universityId, runId: id, seq, pointId: st.pointId, eta: instantAt(ref.date, st.time), servedAt: history.get(st.pointId)?.servedAt ?? null, arrivedAt: history.get(st.pointId)?.arrivedAt ?? null })),
       });
       const ids = run.stops.flatMap((st) => st.passengers.map((p) => p.id));
-      await tx.rideRequest.updateMany({ where: { id: { in: ids } }, data: { runId: id, status: 'assigned', waitlistedUntil: null } });
+      // No-shows keep their status: they stay counted on the bus they missed.
+      await tx.rideRequest.updateMany({ where: { id: { in: ids }, status: { not: 'no_show' } }, data: { runId: id, status: 'assigned', waitlistedUntil: null } });
+      const sig = (stops: { pointId: string; passengers: { id: string }[] }[]) => stops.map((st) => `${st.pointId}:${st.passengers.map((p) => p.id).sort().join(',')}`).join('|');
+      const oldSig = old ? sig(s.domainRuns.find((d) => d.id === old.id)?.stops ?? []) : '';
+      if (!old || oldSig !== sig(run.stops)) changed.push({ runId: id, driverId: run.driverId });
     }
     // Runs left with nobody on board are removed, which frees the driver.
     for (const old of s.dbRuns) {
       if (keep.has(old.id)) continue;
+      changed.push({ runId: old.id, driverId: old.driverId });
       await tx.rideRequest.updateMany({ where: { runId: old.id, status: 'assigned' }, data: { runId: null } });
       await tx.run.delete({ where: { id: old.id } });
     }
@@ -248,21 +263,37 @@ export class DispatchEngine {
     const expired = events.filter((e) => e.type === 'expired').map((e) => e.requestId);
     if (expired.length) await tx.rideRequest.updateMany({ where: { id: { in: expired } }, data: { status: 'cancelled', cancelReason: 'expired', runId: null, waitlistedUntil: null } });
 
-    // Outbox (ST-07): one message per change a student should hear about.
-    const notes = events
-      .filter((e) => !(e.type === 'assigned' && before.get(e.requestId)?.status === 'assigned' && before.get(e.requestId)?.runId === idMap.get(e.runId)))
-      .map((e) => {
-        const req = before.get(e.requestId)!;
-        const runId = 'runId' in e ? idMap.get(e.runId) ?? e.runId : undefined;
-        return { universityId: ref.universityId, userId: req.studentId, kind: `ride.${e.type}`, data: { requestId: e.requestId, waveId: ref.waveId, date: ref.date, ...(runId ? { runId } : {}) } };
-      });
-    if (notes.length) await tx.notification.createMany({ data: notes });
+    // Outbox (ST-07/ST-09): one message per change, deduplicated by key.
+    const drafts = events.flatMap((e) => {
+      const req = before.get(e.requestId);
+      if (!req) return [];
+      const base = { requestId: e.requestId, studentId: req.studentId };
+      switch (e.type) {
+        case 'assigned':
+          return notificationsFor({ type: 'assigned', ...base, runId: idMap.get(e.runId) ?? e.runId });
+        case 'waitlisted':
+          return notificationsFor({ type: 'waitlisted', ...base });
+        case 'bumped':
+          return notificationsFor({ type: 'bumped', ...base });
+        case 'expired':
+          return notificationsFor({ type: 'expired', ...base });
+      }
+    });
+    await NotificationsService.add(tx, ref.universityId, drafts, { waveId: ref.waveId, date: ref.date });
 
     const runs = after.filter((r) => r.stops.length > 0);
     return {
       summary: { planned: true, runs: runs.length, assigned: runs.reduce((n, r) => n + r.stops.reduce((k, st) => k + st.passengers.length, 0), 0), waitlisted: waitlist.length },
       expiries,
+      changed,
     };
+  }
+
+  /** After the transaction: expiry jobs, live run updates to drivers (DR-09), notification delivery. */
+  private async afterCommit(ref: WaveRef, out: { expiries: { requestId: string; at: Date }[]; changed: { runId: string; driverId: string }[] }) {
+    await this.scheduleExpiries(ref, out.expiries);
+    for (const c of out.changed) this.hub.runChanged(ref.universityId, c.runId, c.driverId);
+    await this.notifications.deliverPending(ref.universityId);
   }
 
   private async scheduleExpiries(ref: WaveRef, expiries: { requestId: string; at: Date }[]) {

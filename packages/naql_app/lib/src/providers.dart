@@ -89,3 +89,13 @@ String apiErrorMessage(Object e, String fallback) {
   if (e is ApiException && e.statusCode != 500 && e.message.isNotEmpty) return e.message;
   return fallback;
 }
+
+/// Realtime feed for the signed-in user (Socket.IO). Tests override it with a fake.
+final liveFeedProvider = FutureProvider.autoDispose<LiveFeed?>((ref) async {
+  final token = await ref.watch(tokenStoreProvider).read();
+  if (token == null) return null;
+  final custom = ref.watch(serverUrlProvider);
+  final feed = SocketLiveFeed(apiBase: custom == null ? apiBaseUrl() : Uri.parse(custom), token: token);
+  ref.onDispose(feed.dispose);
+  return feed;
+});
