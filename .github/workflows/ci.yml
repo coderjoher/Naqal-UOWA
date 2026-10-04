@@ -131,4 +131,5 @@ jobs:
         if: success()
         run: |
           mkdir -p /tmp/osrm-volume
-          docker run --rm -v naql-uowa_osrm:/data -v /tmp/osrm-volume:/backup alpine sh -c 'cp -a /data/. /backup/'
+          # Files are created by root inside the container; make them readable so actions/cache can archive them.
+          docker run --rm -v naql-uowa_osrm:/data -v /tmp/osrm-volume:/backup alpine sh -c 'cp -a /data/. /backup/ && chmod -R a+rX /backup'
