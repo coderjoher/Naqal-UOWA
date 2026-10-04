@@ -63,5 +63,17 @@
   "language": "Language",
   "signOut": "Sign out",
   "defaultPoint": "Gathering point",
-  "notSet": "Not set"
+  "notSet": "Not set",
+  "subActive": "Subscription active",
+  "subExpiring": "Ends in {days} days",
+  "subExpired": "Subscription ended",
+  "subNone": "No subscription",
+  "subUntil": "Until {date}",
+  "subMonthly": "Monthly subscription",
+  "subTierPrice": "Tier {tier} · {price}",
+  "subPayAtOffice": "Pay in cash at the transport office and your subscription is active immediately.",
+  "subRenew": "Renew at the transport office before it ends.",
+  "subNext": "Next month is paid: {month}",
+  "subUnlimited": "Unlimited rides and seat priority",
+  "subTier": "Tier {tier}"
 }

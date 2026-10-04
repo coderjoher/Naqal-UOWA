@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   await prisma.$executeRawUnsafe(
-    'TRUNCATE otp_codes, document_accesses, driver_documents, driver_profiles, roster_entries, travel_times, gathering_points, distance_tiers, waves, driver_requirement_sets, audit_events, users, universities CASCADE',
+    'TRUNCATE subscriptions, payments, receipt_counters, otp_codes, document_accesses, driver_documents, driver_profiles, roster_entries, travel_times, gathering_points, distance_tiers, waves, driver_requirement_sets, audit_events, users, universities CASCADE',
   );
   const hash = await bcrypt.hash('password123', 4);
   const uni = await prisma.university.create({

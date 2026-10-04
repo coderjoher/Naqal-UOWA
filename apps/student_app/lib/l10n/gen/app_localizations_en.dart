@@ -212,4 +212,51 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notSet => 'Not set';
+
+  @override
+  String get subActive => 'Subscription active';
+
+  @override
+  String subExpiring(int days) {
+    return 'Ends in $days days';
+  }
+
+  @override
+  String get subExpired => 'Subscription ended';
+
+  @override
+  String get subNone => 'No subscription';
+
+  @override
+  String subUntil(String date) {
+    return 'Until $date';
+  }
+
+  @override
+  String get subMonthly => 'Monthly subscription';
+
+  @override
+  String subTierPrice(String tier, String price) {
+    return 'Tier $tier · $price';
+  }
+
+  @override
+  String get subPayAtOffice =>
+      'Pay in cash at the transport office and your subscription is active immediately.';
+
+  @override
+  String get subRenew => 'Renew at the transport office before it ends.';
+
+  @override
+  String subNext(String month) {
+    return 'Next month is paid: $month';
+  }
+
+  @override
+  String get subUnlimited => 'Unlimited rides and seat priority';
+
+  @override
+  String subTier(String tier) {
+    return 'Tier $tier';
+  }
 }

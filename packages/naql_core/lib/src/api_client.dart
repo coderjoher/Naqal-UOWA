@@ -89,6 +89,8 @@ class ApiClient {
         await patch('/students/me', {'phone': ?phone, 'defaultPointId': ?defaultPointId}) as Map<String, dynamic>,
       );
 
+  Future<SubscriptionInfo> subscription() async => SubscriptionInfo.fromJson(await get('/subscriptions/me') as Map<String, dynamic>);
+
   Future<List<GatheringPoint>> gatheringPoints() async =>
       (await get('/gathering-points') as List).map((p) => GatheringPoint.fromJson(p as Map<String, dynamic>)).where((p) => p.active).toList();
 

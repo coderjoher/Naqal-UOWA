@@ -168,3 +168,46 @@ class DriverApplication {
         _ => null,
       };
 }
+
+enum SubscriptionStatus { active, expiring, expired, none }
+
+class SubscriptionPeriod {
+  const SubscriptionPeriod({required this.month, required this.start, required this.end, required this.price});
+
+  factory SubscriptionPeriod.fromJson(Map<String, dynamic> j) => SubscriptionPeriod(
+        month: j['month'] as String,
+        start: DateTime.parse(j['start'] as String),
+        end: DateTime.parse(j['end'] as String),
+        price: j['price'] as int,
+      );
+
+  final String month;
+  final DateTime start;
+  final DateTime end;
+  final int price;
+}
+
+/// ST-03: what the student sees about their monthly subscription.
+class SubscriptionInfo {
+  const SubscriptionInfo({required this.status, required this.daysLeft, this.current, this.upcoming, this.price, this.tierName, this.officeNote});
+
+  factory SubscriptionInfo.fromJson(Map<String, dynamic> j) => SubscriptionInfo(
+        status: SubscriptionStatus.values.firstWhere((s) => s.name == j['status'], orElse: () => SubscriptionStatus.none),
+        daysLeft: j['daysLeft'] as int? ?? 0,
+        current: j['current'] == null ? null : SubscriptionPeriod.fromJson(j['current'] as Map<String, dynamic>),
+        upcoming: j['upcoming'] == null ? null : SubscriptionPeriod.fromJson(j['upcoming'] as Map<String, dynamic>),
+        price: j['price'] as int?,
+        tierName: j['tierName'] as String?,
+        officeNote: (j['payAt'] as Map<String, dynamic>?)?['officeNote'] as String?,
+      );
+
+  final SubscriptionStatus status;
+  final int daysLeft;
+  final SubscriptionPeriod? current;
+  final SubscriptionPeriod? upcoming;
+  final int? price;
+  final String? tierName;
+  final String? officeNote;
+
+  bool get isActive => status == SubscriptionStatus.active || status == SubscriptionStatus.expiring;
+}

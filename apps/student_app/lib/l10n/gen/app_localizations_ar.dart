@@ -210,4 +210,51 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get notSet => 'غير محدّدة';
+
+  @override
+  String get subActive => 'اشتراك فعّال';
+
+  @override
+  String subExpiring(int days) {
+    return 'ينتهي خلال $days أيام';
+  }
+
+  @override
+  String get subExpired => 'الاشتراك منتهي';
+
+  @override
+  String get subNone => 'لا يوجد اشتراك';
+
+  @override
+  String subUntil(String date) {
+    return 'حتى $date';
+  }
+
+  @override
+  String get subMonthly => 'اشتراك شهري';
+
+  @override
+  String subTierPrice(String tier, String price) {
+    return 'الفئة $tier · $price';
+  }
+
+  @override
+  String get subPayAtOffice =>
+      'ادفع نقداً في مكتب النقل وسيُفعّل اشتراكك فوراً.';
+
+  @override
+  String get subRenew => 'جدّد اشتراكك في مكتب النقل قبل انتهائه.';
+
+  @override
+  String subNext(String month) {
+    return 'الشهر القادم مدفوع: $month';
+  }
+
+  @override
+  String get subUnlimited => 'رحلات غير محدودة وأولوية في المقاعد';
+
+  @override
+  String subTier(String tier) {
+    return 'الفئة $tier';
+  }
 }
