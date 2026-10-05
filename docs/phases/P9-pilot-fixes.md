@@ -47,5 +47,5 @@ below cover again.
 
 ## Exit gate
 
-- [ ] All P9 tests green in CI
+- [x] All P9 tests green in CI (PR #11)
 - [ ] Maps show streets on the dashboard (points, live operations) and the student tracking screen

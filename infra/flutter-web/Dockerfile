@@ -3,7 +3,9 @@
 FROM debian:bookworm-slim AS sdk
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl git unzip xz-utils && rm -rf /var/lib/apt/lists/*
 ARG FLUTTER_VERSION=3.47.6
-RUN curl -fsSL "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz" | tar -xJ -C /opt \
+# From git rather than the release tarball: the tarball is x86-only, git works on ARM hosts too
+# (Oracle Ampere); `flutter precache` then fetches the Dart SDK for the build machine's architecture.
+RUN git clone --depth 1 --branch "${FLUTTER_VERSION}" https://github.com/flutter/flutter.git /opt/flutter \
   && git config --global --add safe.directory /opt/flutter
 ENV PATH=/opt/flutter/bin:$PATH
 RUN flutter config --no-analytics --no-cli-animations && flutter precache --web
