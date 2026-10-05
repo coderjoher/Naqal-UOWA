@@ -5,6 +5,10 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuditInterceptor } from './audit/audit.interceptor';
 import { AuditService } from './audit/audit.service';
 import { SettlementController } from './settlement/settlement.controller';
+import { FeedbackController } from './feedback/feedback.controller';
+import { FeedbackService } from './feedback/feedback.service';
+import { AnnouncementsService } from './announcements/announcements.service';
+import { ReportsService } from './reports/reports.service';
 import { SettlementService } from './settlement/settlement.service';
 import { AuthModule } from './auth/auth.module';
 import { ConfigCache } from './config-cache/config-cache.service';
@@ -94,11 +98,15 @@ class CacheModule {}
     RidesController,
     RunsController,
     SettlementController,
+    FeedbackController,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
     AuditService,
     SettlementService,
+    FeedbackService,
+    AnnouncementsService,
+    ReportsService,
     UniversitiesService,
     TiersService,
     PointsService,

@@ -77,6 +77,51 @@ class FakeBackend {
   /// GET /notifications/me (P5).
   List<Map<String, Object?>> notifications = [];
 
+  /// ST-10: everything the history endpoints page through (20 per page), newest first.
+  List<Map<String, Object?>> rideHistory = [];
+  List<Map<String, Object?>> paymentHistory = [];
+
+  /// While true the history endpoints fail like a phone without coverage.
+  bool historyFails = false;
+  final ratings = <Map<String, dynamic>>[];
+  final problems = <Map<String, dynamic>>[];
+
+  /// GET /announcements/active (TO-11).
+  List<Map<String, Object?>> announcements = [];
+
+  static Map<String, Object?> pastRide(int i, {String status = 'done', bool canRate = true, int? rating}) => {
+        'id': 'h$i',
+        'date': '2026-09-${(30 - (i % 28)).toString().padLeft(2, '0')}',
+        'waveType': i.isEven ? 'morning' : 'return',
+        'waveTime': i.isEven ? '08:00' : '14:00',
+        'point': {'name': 'Al-Abbas Square', 'nameAr': 'ساحة العباس'},
+        'status': status,
+        'cancelReason': status == 'cancelled' ? 'expired' : null,
+        'fare': 0,
+        'driverName': 'حيدر عباس',
+        'plate': '12345',
+        'rating': rating,
+        'canRate': canRate && rating == null && status == 'done',
+      };
+
+  static Map<String, Object?> payment(int receiptNo, {int amount = 2000, String type = 'cash_fare', String? month}) => {
+        'id': 'pay$receiptNo',
+        'type': type,
+        'method': type == 'subscription' ? 'cash_office' : 'cash_driver',
+        'amount': amount,
+        'receiptNo': receiptNo,
+        'month': month,
+        'reversal': amount < 0,
+        'createdAt': DateTime.utc(2026, 9, 1 + receiptNo % 28, 9).toIso8601String(),
+      };
+
+  http.Response _page(List<Map<String, Object?>> all, String? cursor) {
+    final start = cursor == null ? 0 : all.indexWhere((x) => x['id'] == cursor) + 1;
+    final items = all.skip(start).take(20).toList();
+    final more = start + 20 < all.length;
+    return _json({'items': items, 'next': more ? items.last['id'] : null});
+  }
+
   /// What GET /rides/me returns; tests change it to simulate dispatch (server side).
   List<Map<String, Object?>> rides = [];
 
@@ -176,7 +221,9 @@ class FakeBackend {
       case 'GET /notifications/me':
         return _json(notifications);
       case 'POST /notifications/read':
-        notifications = [for (final n in notifications) {...n, 'readAt': DateTime.now().toUtc().toIso8601String()}];
+        final ids = (body['ids'] as List?)?.cast<String>();
+        notifications = [for (final n in notifications) ids == null || ids.contains(n['id']) ? {...n, 'readAt': DateTime.now().toUtc().toIso8601String()} : n];
+        if (ids != null) announcements = [for (final a in announcements) if (!ids.contains(a['id'])) a];
         return _json({'updated': notifications.length});
       case 'GET /rides/options':
         return _json({'slots': slots, 'defaultPointId': (profile['defaultPoint'] as Map?)?['id'], 'gender': profile['gender']});
@@ -188,6 +235,21 @@ class FakeBackend {
         rides = [r, ...rides];
         return _json(r, 201);
     }
+    if (req.url.path == '/rides/history' || req.url.path == '/payments/me') {
+      if (historyFails) throw http.ClientException('offline');
+      return _page(req.url.path == '/rides/history' ? rideHistory : paymentHistory, req.url.queryParameters['cursor']);
+    }
+    final rate = RegExp(r'^/rides/([^/]+)/rating$').firstMatch(req.url.path);
+    if (req.method == 'POST' && rate != null) {
+      if (ratings.any((r) => r['requestId'] == rate.group(1))) return _json({'message': 'You have already rated this ride'}, 409);
+      ratings.add({'requestId': rate.group(1), ...body});
+      return _json({'id': 'rt${ratings.length}', 'requestId': rate.group(1), 'stars': body['stars']}, 201);
+    }
+    if (req.method == 'POST' && req.url.path == '/problems') {
+      problems.add(body);
+      return _json({'id': 'pr${problems.length}', 'status': 'open', ...body}, 201);
+    }
+    if (req.url.path == '/announcements/active') return _json(announcements);
     if (RegExp(r'^/rides/[^/]+/track$').hasMatch(req.url.path)) return _json(track);
     final cancel = RegExp(r'^/rides/([^/]+)/cancel$').firstMatch(req.url.path);
     if (req.method == 'POST' && cancel != null) {

@@ -6,7 +6,18 @@ export const APPROACHING_S = 5 * 60;
 
 export interface NotificationDraft {
   userId: string;
-  kind: 'ride.assigned' | 'ride.waitlisted' | 'ride.approaching' | 'ride.arrived' | 'ride.cancelled' | 'ride.bumped' | 'ride.expired';
+  kind:
+    | 'ride.assigned'
+    | 'ride.waitlisted'
+    | 'ride.approaching'
+    | 'ride.arrived'
+    | 'ride.cancelled'
+    | 'ride.bumped'
+    | 'ride.expired'
+    | 'ride.moved'
+    | 'run.changed'
+    | 'announcement'
+    | 'problem.answered';
   dedupeKey: string;
   data: Record<string, unknown>;
 }
@@ -71,5 +82,13 @@ export function messageFor(n: Pick<NotificationDraft, 'kind' | 'data'>, lang: 'a
       return ar ? { title: 'لم نجد مقعداً', body: 'انتهت مدة الانتظار وأُلغي الطلب. يمكنك طلب موعد آخر.' } : { title: 'No seat found', body: 'The waiting time ended and the request was cancelled.' };
     case 'ride.cancelled':
       return ar ? { title: 'أُلغيت الرحلة', body: 'أُلغي طلب رحلتك.' } : { title: 'Ride cancelled', body: 'Your ride request was cancelled.' };
+    case 'ride.moved':
+      return ar ? { title: 'تغيّرت حافلتك', body: 'نقلك مكتب النقل إلى حافلة أخرى. افتح التطبيق لترى التفاصيل.' } : { title: 'Your bus changed', body: 'The transport office moved you to another bus. Open the app for details.' };
+    case 'run.changed':
+      return ar ? { title: 'تغيّرت رحلتك', body: 'عدّل مكتب النقل ركاب رحلتك. راجع المحطات.' } : { title: 'Your run changed', body: 'The transport office changed your riders. Check the stops.' };
+    case 'announcement':
+      return { title: String(n.data.title ?? (ar ? 'إعلان' : 'Announcement')), body: String(n.data.body ?? '') };
+    case 'problem.answered':
+      return ar ? { title: 'ردّ مكتب النقل على بلاغك', body: String(n.data.reply ?? '') } : { title: 'The transport office answered your report', body: String(n.data.reply ?? '') };
   }
 }

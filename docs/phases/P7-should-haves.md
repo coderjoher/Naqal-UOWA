@@ -1,6 +1,6 @@
 # P7 — Should-have features
 
-Status: planned
+Status: in-progress
 Depends on: P6
 
 ## Goal
@@ -15,6 +15,24 @@ parallel with P8 if capacity allows.
 - TO-08 Manual override (move student, add extra run)
 - TO-10 Reports
 - TO-11 Announcements
+
+## Built
+
+- **ST-10** `GET /rides/history`, `GET /payments/me` (cursor pages of 20, newest first). Student
+  app **رحلاتي** tab: rides and payments, loads the next page as the list scrolls, empty / error /
+  retry states.
+- **ST-11** `POST /rides/:id/rating` (1–5, once, finished rides only), `POST /problems`. Student app:
+  rate from the history, report a problem from a ride or the profile. Dashboard **البلاغات
+  والتقييمات**: answer and close reports (the student is notified), average rating per driver.
+- **TO-08** `POST /dispatch/move` re-runs the hard constraints on the target bus (gender, seats,
+  arrival by the wave time, ride length) and notifies the student and both drivers;
+  `POST /dispatch/extra-run` adds a bus that takes the waitlist (subscribers first). Dashboard:
+  move a student from any stop of a run; "add a bus" on the waitlist.
+- **TO-10** `reports/metrics.ts` (definitions in the file header), `GET /reports`,
+  `GET /reports/export.csv`. Dashboard **التقارير** with month and tier filters.
+- **TO-11** `POST /announcements` to all students, one wave on a date, or one gathering point;
+  push + in-app banner on Home until dismissed or expired. Dashboard **الإعلانات** with a live
+  recipient count.
 
 ## Tests
 

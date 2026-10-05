@@ -14,8 +14,8 @@ import 'screens/onboarding/choose_point_screen.dart';
 import 'screens/onboarding/sign_in_screen.dart';
 import 'screens/onboarding/university_screen.dart';
 import 'screens/onboarding/welcome_screen.dart';
-import 'screens/placeholder_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/trips_screen.dart';
 
 const _onboarding = {'/welcome', '/university', '/sign-in', '/activate'};
 
@@ -64,7 +64,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               routes: [GoRoute(path: 'track/:id', builder: (_, s) => TrackScreen(requestId: s.pathParameters['id']!))],
             ),
           ]),
-          StatefulShellBranch(routes: [GoRoute(path: '/trips', builder: (c, _) => PlaceholderScreen(title: AppLocalizations.of(c).tabTrips))]),
+          StatefulShellBranch(routes: [GoRoute(path: '/trips', builder: (_, _) => const TripsScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/alerts', builder: (_, _) => const NotificationsScreen())]),
           StatefulShellBranch(routes: [
             GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen(), routes: [

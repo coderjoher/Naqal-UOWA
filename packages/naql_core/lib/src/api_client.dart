@@ -5,6 +5,7 @@ import 'package:http_parser/http_parser.dart';
 
 import 'models.dart';
 import 'live.dart';
+import 'history.dart';
 import 'money.dart';
 import 'rides.dart';
 import 'session.dart';
@@ -121,6 +122,31 @@ class ApiClient {
   /// DR-08: this month's runs and estimated payout, and past settlements.
   Future<DriverEarnings> driverEarnings({String? month}) async =>
       DriverEarnings.fromJson(await get(month == null ? '/drivers/me/earnings' : '/drivers/me/earnings?month=$month') as Map<String, dynamic>);
+
+  // ---------------- History, feedback, announcements (P7) ----------------
+
+  /// ST-10: past rides, newest first; pass `next` from the previous page.
+  Future<Paged<RideHistoryItem>> rideHistory({String? cursor}) async {
+    final j = await get(cursor == null ? '/rides/history' : '/rides/history?cursor=$cursor') as Map<String, dynamic>;
+    return Paged(items: [for (final r in j['items'] as List) RideHistoryItem.fromJson(r as Map<String, dynamic>)], next: j['next'] as String?);
+  }
+
+  /// ST-10: payments and reversals, newest first.
+  Future<Paged<PaymentItem>> paymentHistory({String? cursor}) async {
+    final j = await get(cursor == null ? '/payments/me' : '/payments/me?cursor=$cursor') as Map<String, dynamic>;
+    return Paged(items: [for (final r in j['items'] as List) PaymentItem.fromJson(r as Map<String, dynamic>)], next: j['next'] as String?);
+  }
+
+  /// ST-11: 1–5 stars, once per finished ride.
+  Future<void> rateRide(String requestId, int stars, {String? comment}) async => post('/rides/$requestId/rating', {'stars': stars, 'comment': ?comment});
+
+  /// ST-11: lands in the office inbox.
+  Future<void> reportProblem({required String category, required String text, String? requestId}) async =>
+      post('/problems', {'category': category, 'text': text, 'requestId': ?requestId});
+
+  /// TO-11: announcements to show as banners.
+  Future<List<Announcement>> activeAnnouncements() async =>
+      [for (final a in await get('/announcements/active') as List) Announcement.fromJson(a as Map<String, dynamic>)];
 
   // ---------------- Runs, live tracking, notifications (P5) ----------------
 

@@ -7,6 +7,7 @@ import 'package:naql_ui/naql_ui.dart';
 
 import '../data/auth.dart';
 import '../l10n/gen/app_localizations.dart';
+import 'feedback_sheets.dart';
 
 final _iraqiMobile = RegExp(r'^(\+?964|0)?7\d{9}$');
 
@@ -116,6 +117,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               subtitle: lang == 'ar' ? t.arabic : t.english,
               leading: const Icon(LucideIcons.languages, color: NaqlColors.primary),
               onTap: () => ref.read(localeProvider.notifier).toggle(),
+            ),
+          ),
+          const SizedBox(height: NaqlSpace.s2),
+          NaqlEntrance(
+            index: 3,
+            child: NaqlListRow(
+              title: t.reportProblem,
+              subtitle: t.reportProblemHint,
+              leading: const Icon(LucideIcons.messageSquareWarning, color: NaqlColors.primary),
+              onTap: () => showProblemSheet(context),
             ),
           ),
           const SizedBox(height: NaqlSpace.s6),

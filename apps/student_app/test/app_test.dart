@@ -71,6 +71,6 @@ void main() {
     expect(find.text('أهلاً، زينب'), findsOneWidget);
     await tester.tap(find.bySemanticsLabel('رحلاتي'));
     await tester.pumpAndSettle();
-    expect(find.text('قريباً'), findsOneWidget);
+    expect(find.text('لا رحلات سابقة'), findsOneWidget);
   });
 }

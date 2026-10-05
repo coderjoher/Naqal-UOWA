@@ -280,5 +280,67 @@
   "nExpiredTitle": "لم نجد مقعداً",
   "nExpiredBody": "انتهت مدة الانتظار وأُلغي الطلب.",
   "nCancelledTitle": "أُلغيت الرحلة",
-  "nCancelledBody": "أُلغي طلب رحلتك."
+  "nCancelledBody": "أُلغي طلب رحلتك.",
+  "historyRides": "الرحلات",
+  "historyPayments": "المدفوعات",
+  "historyNoRides": "لا رحلات سابقة",
+  "historyNoRidesBody": "تظهر هنا رحلاتك بعد انتهائها.",
+  "historyNoPayments": "لا مدفوعات بعد",
+  "historyNoPaymentsBody": "يظهر هنا كل ما دفعته للاشتراك أو للسائق.",
+  "historyEnd": "لا شيء أقدم",
+  "historyDone": "تمت",
+  "historyNoShow": "لم تحضر",
+  "historyCancelled": "أُلغيت",
+  "historyExpired": "بلا مقعد",
+  "historyMissed": "لم تتم",
+  "rateRide": "قيّم الرحلة",
+  "rateTitle": "كيف كانت الرحلة؟",
+  "rateBody": "تقييمك يصل إلى مكتب النقل ويساعد في تحسين الخدمة.",
+  "rateComment": "ملاحظة (اختياري)",
+  "rateSend": "أرسل التقييم",
+  "rateThanks": "شكراً لتقييمك",
+  "reportProblem": "أبلغ عن مشكلة",
+  "reportProblemHint": "يصل بلاغك إلى مكتب النقل مباشرة",
+  "problemTitle": "ما المشكلة؟",
+  "problemBody": "اختر نوع المشكلة واكتب ما حدث. سيرد عليك مكتب النقل.",
+  "problemLate": "تأخير",
+  "problemDriver": "السائق",
+  "problemVehicle": "الحافلة",
+  "problemSafety": "السلامة",
+  "problemApp": "التطبيق",
+  "problemOther": "أخرى",
+  "problemText": "ماذا حدث؟",
+  "problemSend": "أرسل البلاغ",
+  "problemSent": "وصل بلاغك إلى مكتب النقل",
+  "paySubscription": "اشتراك شهري",
+  "paySubscriptionMonth": "اشتراك {month}",
+  "@paySubscriptionMonth": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "payTierDifference": "فرق الفئة",
+  "payCashFare": "أجرة رحلة نقداً",
+  "payReversal": "إلغاء: {what}",
+  "@payReversal": {
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "payReceipt": "إيصال {no}",
+  "@payReceipt": {
+    "placeholders": {
+      "no": {
+        "type": "int"
+      }
+    }
+  },
+  "nMovedTitle": "تغيّرت حافلتك",
+  "nMovedBody": "نقلك مكتب النقل إلى حافلة أخرى. افتح الرئيسية لترى التفاصيل.",
+  "nAnsweredTitle": "ردّ مكتب النقل على بلاغك",
+  "dismiss": "إخفاء"
 }

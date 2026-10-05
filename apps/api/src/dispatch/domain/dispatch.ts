@@ -203,3 +203,42 @@ function mergeInto(others: Run[], riders: Passenger[], ctx: Ctx): Run[] | null {
 }
 
 export { load, passengers, started };
+
+export type MoveError = 'not-found' | 'boarded' | 'same-run' | 'passed' | 'gender' | 'capacity' | 'time';
+
+/**
+ * TO-08: the office moves one passenger to another run. The hard constraints are checked again
+ * on the target (same gender, a free seat, arrival by the wave time and ride length); the source
+ * run is re-timed without them. Nothing is bumped.
+ */
+export function moveRequest(runsIn: Run[], requestId: string, targetRunId: string, ctx: Ctx): { runs: Run[]; fromRunId: string } | { error: MoveError } {
+  const runs = runsIn.map(cloneRun);
+  const fromIndex = runs.findIndex((r) => passengers(r).some((p) => p.id === requestId));
+  const toIndex = runs.findIndex((r) => r.id === targetRunId);
+  if (fromIndex < 0 || toIndex < 0) return { error: 'not-found' };
+  if (fromIndex === toIndex) return { error: 'same-run' };
+  const p = passengers(runs[fromIndex]).find((x) => x.id === requestId)!;
+  if (p.boarded) return { error: 'boarded' };
+  const target = runs[toIndex];
+  if (target.gender !== p.gender) return { error: 'gender' };
+  if (load(target) >= target.capacity) return { error: 'capacity' };
+  const without = removePassenger(runs[fromIndex], requestId, ctx);
+  if (!without) return { error: 'passed' };
+  const placed = bestInsertionInRun(target, p, ctx);
+  if (!placed) return { error: 'time' };
+  runs[fromIndex] = without;
+  runs[toIndex] = placed.run;
+  return { runs, fromRunId: runsIn[fromIndex].id };
+}
+
+/**
+ * TO-08: an extra bus for a wave that has people waiting. It starts empty and takes waitlisted
+ * passengers like any freed seat would (subscribers first, then by request time).
+ */
+export function addExtraRun(runsIn: Run[], extra: { id: string; driverId: string; gender: Run['gender']; capacity: number }, waitlist: WaitlistEntry[], ctx: Ctx, waitlistS: number) {
+  const empty: Run = { id: extra.id, driverId: extra.driverId, gender: extra.gender, capacity: extra.capacity, tierId: '', tierRank: 0, stops: [] };
+  // Only the new bus takes people; existing runs keep their passengers and seats as they are.
+  const r = recheckWaitlist([empty], waitlist.filter((w) => w.passenger.gender === extra.gender), ctx, waitlistS);
+  const run = r.runs[0];
+  return { runs: [...runsIn.map(cloneRun), run], placed: load(run), events: r.events.filter((e) => e.type === 'assigned') };
+}

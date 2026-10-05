@@ -282,4 +282,27 @@ export class RidesService {
         };
       });
   }
+
+  /** The wave and date a request belongs to (for locking). */
+  async refOf(requestId: string) {
+    const r = await this.prisma.db.rideRequest.findUnique({ where: { id: requestId } });
+    if (!r) throw new NotFoundException('Request not found');
+    return { universityId: r.universityId, waveId: r.waveId, date: fromDbDate(r.date) };
+  }
+
+  async freeDrivers(waveId: string, date: string) {
+    if (!isDate(date) || !/^[0-9a-f-]{36}$/i.test(waveId ?? '')) throw new BadRequestException('Bad wave or date');
+    const db = this.prisma.db;
+    const busy = await db.run.findMany({ where: { waveId, date: dbDate(date) }, select: { driverId: true } });
+    const offered = await db.driverAvailability.findMany({ where: { waveId, date: dbDate(date) }, select: { driverId: true } });
+    const drivers = await db.user.findMany({
+      where: { role: 'driver', status: 'active', id: { notIn: busy.map((b) => b.driverId) }, driver: { status: 'approved', seats: { gt: 0 } } },
+      include: { driver: true },
+      orderBy: { name: 'asc' },
+    });
+    const offeredIds = new Set(offered.map((o) => o.driverId));
+    return drivers
+      .map((d) => ({ id: d.id, name: d.nameAr ?? d.name, plate: d.driver?.plate ?? null, seats: d.driver?.seats ?? 0, offered: offeredIds.has(d.id) }))
+      .sort((a, b) => Number(b.offered) - Number(a.offered));
+  }
 }
