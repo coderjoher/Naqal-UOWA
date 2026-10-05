@@ -6,6 +6,11 @@
 # First start downloads the Iraq map extract and prepares OSRM, and builds the Flutter apps
 # (several minutes; cached afterwards). Demo data is loaded once — see docs/TESTING.md.
 # Set DEMO=false for an empty database and real SMS codes (no codes shown on screen).
+#
+# Optional profiles (P8):
+#   docker compose --profile backup up -d          nightly PostgreSQL backups into ./backups
+#   docker compose --profile observability up -d   Prometheus :9090, Grafana :3001, Jaeger :16686
+#   docker compose --profile https up -d           HTTPS with Let's Encrypt (see infra/caddy/Caddyfile)
 
 services:
   postgres:
@@ -64,8 +69,14 @@ services:
       DEMO_SEED: ${DEMO:-true}
       OTP_DEV_ECHO: ${DEMO:-true}
       STORAGE_DIR: /data/storage
+      # One process per core; metrics of all of them on :9464 (P8).
+      API_WORKERS: ${API_WORKERS:-2}
+      METRICS_TOKEN: ${METRICS_TOKEN:-}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      # Traces go to Jaeger when the observability profile runs (ignored when nothing listens).
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
     volumes: [storage:/data/storage]
-    ports: ['3000:3000']
+    ports: ['3000:3000', '9464:9464']
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
@@ -93,7 +104,61 @@ services:
     depends_on:
       api: { condition: service_started }
 
+  # ── P8 operations (opt-in profiles) ─────────────────────────────────────────
+
+  backup:
+    profiles: [backup]
+    build: { context: infra/backup }
+    environment:
+      DATABASE_URL: postgresql://naql:naql@postgres:5432/naql
+      BACKUP_HOUR: ${BACKUP_HOUR:-3}
+      KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+      BACKUP_REMOTE: ${BACKUP_REMOTE:-}
+    volumes: ['./backups:/backups']
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  prometheus:
+    profiles: [observability]
+    image: prom/prometheus:v3.1.0
+    volumes:
+      - ./infra/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./infra/observability/alerts.yml:/etc/prometheus/alerts.yml:ro
+    ports: ['9090:9090']
+
+  grafana:
+    profiles: [observability]
+    image: grafana/grafana:11.4.0
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: 'true'
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - ./infra/observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./infra/observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports: ['3001:3000']
+
+  https:
+    profiles: [https]
+    image: caddy:2.9-alpine
+    environment:
+      ACME_EMAIL: ${ACME_EMAIL:-}
+      DASHBOARD_DOMAIN: ${DASHBOARD_DOMAIN:-}
+      STUDENT_DOMAIN: ${STUDENT_DOMAIN:-}
+      DRIVER_DOMAIN: ${DRIVER_DOMAIN:-}
+    volumes:
+      - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy:/data
+    ports: ['80:80', '443:443']
+    depends_on: [dashboard, student-web, driver-web]
+
+  jaeger:
+    profiles: [observability]
+    image: jaegertracing/all-in-one:1.64.0
+    environment: { COLLECTOR_OTLP_ENABLED: 'true' }
+    ports: ['16686:16686', '4318:4318']
+
 volumes:
+  caddy:
   pgdata:
   osrm:
   storage:

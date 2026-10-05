@@ -8,6 +8,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { notificationsFor } from '../notifications/rules';
 import { PrismaService, Tx } from '../prisma/prisma.service';
 import { CAMPUS_KEY } from '../routing/travel-matrix.processor';
+import { officeViews } from '../common/swr-cache';
 import { runAsTenant } from '../tenancy/tenant-context';
 import { dbDate, instantAt, secondsInto } from './clock';
 import { addExtraRun, cancelRequest, insertRequest, MoveError, moveRequest, planWave, recheckWaitlist } from './domain/dispatch';
@@ -139,6 +140,7 @@ export class DispatchEngine {
       return { ...saved, summary: { ...saved.summary, fromRunId: r.fromRunId, toRunId: targetRunId } };
     });
     await this.afterCommit(ref, out);
+    officeViews.invalidate(`${ref.universityId}:`, true); // the office sees its own move at once
     // The source run has a free seat now.
     await this.enqueueRecheck(ref);
     return out.summary;
@@ -164,6 +166,7 @@ export class DispatchEngine {
       return { ...saved, summary: { ...saved.summary, runId: run.id, placed: r.placed } };
     });
     await this.afterCommit(ref, out);
+    officeViews.invalidate(`${ref.universityId}:`, true);
     return out.summary;
   }
 
@@ -348,6 +351,7 @@ export class DispatchEngine {
 
   /** After the transaction: expiry jobs, live run updates to drivers (DR-09), notification delivery. */
   private async afterCommit(ref: WaveRef, out: { expiries: { requestId: string; at: Date }[]; changed: { runId: string; driverId: string }[] }) {
+    officeViews.invalidate(`${ref.universityId}:`);
     await this.scheduleExpiries(ref, out.expiries);
     for (const c of out.changed) this.hub.runChanged(ref.universityId, c.runId, c.driverId);
     await this.notifications.deliverPending(ref.universityId);

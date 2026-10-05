@@ -1,0 +1,24 @@
+groups:
+  - name: naql
+    rules:
+      - alert: ApiSlow
+        # NF-06: p95 over 300 ms for 10 minutes on any route.
+        expr: histogram_quantile(0.95, sum by (le, route) (rate(naql_http_request_duration_seconds_bucket[5m]))) > 0.3
+        for: 10m
+        labels: { severity: warning }
+        annotations: { summary: 'p95 of {{ $labels.route }} is above 300 ms' }
+      - alert: ApiErrors
+        expr: sum(rate(naql_http_errors_total[5m])) / sum(rate(naql_http_request_duration_seconds_count[5m])) > 0.005
+        for: 5m
+        labels: { severity: critical }
+        annotations: { summary: 'More than 0.5 % of requests fail' }
+      - alert: DispatchBacklog
+        expr: naql_queue_jobs{state="waiting"} > 50
+        for: 10m
+        labels: { severity: critical }
+        annotations: { summary: 'Dispatch jobs are piling up' }
+      - alert: ApiDown
+        expr: up{job="naql-api"} == 0
+        for: 2m
+        labels: { severity: critical }
+        annotations: { summary: 'The API is not answering metrics scrapes' }

@@ -1,0 +1,27 @@
+# HTTPS in front of the stack (P8): automatic Let's Encrypt certificates for three domains.
+#   DASHBOARD_DOMAIN=office.naql.example STUDENT_DOMAIN=app.naql.example DRIVER_DOMAIN=driver.naql.example \
+#   ACME_EMAIL=it@uowa.edu.iq docker compose --profile https up -d
+{
+	email {$ACME_EMAIL}
+}
+
+(common) {
+	encode zstd gzip
+	header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+	header -Server
+}
+
+{$DASHBOARD_DOMAIN} {
+	import common
+	reverse_proxy dashboard:80
+}
+
+{$STUDENT_DOMAIN} {
+	import common
+	reverse_proxy student-web:80
+}
+
+{$DRIVER_DOMAIN} {
+	import common
+	reverse_proxy driver-web:80
+}

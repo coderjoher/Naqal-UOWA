@@ -1,0 +1,99 @@
+name: Release
+
+# P8 release: both apps to the Google Play internal testing track, the student app to TestFlight.
+# Runs on a version tag (v1.2.3) or by hand. Each store job runs only when its secrets are set:
+#
+#   Google Play  ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS,
+#                ANDROID_KEY_PASSWORD, PLAY_SERVICE_ACCOUNT_JSON
+#   TestFlight   IOS_P12_BASE64, IOS_P12_PASSWORD, IOS_PROVISIONING_PROFILE_BASE64,
+#                APPSTORE_ISSUER_ID, APPSTORE_KEY_ID, APPSTORE_PRIVATE_KEY
+#   Both         API_URL (the production API), SENTRY_DSN_APPS (optional)
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  android:
+    name: Play internal track (${{ matrix.app }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      matrix:
+        include:
+          - { app: student_app, package: iq.edu.uowa.naql.student_app }
+          - { app: driver_app, package: iq.edu.uowa.naql.driver_app }
+    env:
+      HAS_SECRETS: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.PLAY_SERVICE_ACCOUNT_JSON != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Skip without Play secrets
+        if: env.HAS_SECRETS != 'true'
+        run: echo "::notice::Google Play secrets are not set; skipping the Play upload for ${{ matrix.app }}."
+      - uses: actions/setup-java@v4
+        if: env.HAS_SECRETS == 'true'
+        with: { distribution: temurin, java-version: '17' }
+      - uses: subosito/flutter-action@v2
+        if: env.HAS_SECRETS == 'true'
+        with: { flutter-version: 3.47.6, channel: stable, cache: true }
+      - name: Signing key
+        if: env.HAS_SECRETS == 'true'
+        working-directory: apps/${{ matrix.app }}/android
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > upload.jks
+          printf 'storeFile=%s\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' "$PWD/upload.jks" '${{ secrets.ANDROID_KEYSTORE_PASSWORD }}' '${{ secrets.ANDROID_KEY_ALIAS }}' '${{ secrets.ANDROID_KEY_PASSWORD }}' > key.properties
+      - name: Build app bundle
+        if: env.HAS_SECRETS == 'true'
+        working-directory: apps/${{ matrix.app }}
+        run: |
+          flutter pub get
+          flutter build appbundle --release --build-number=${{ github.run_number }} \
+            --dart-define=API_URL=${{ secrets.API_URL }} --dart-define=SENTRY_DSN=${{ secrets.SENTRY_DSN_APPS }} --dart-define=SENTRY_ENVIRONMENT=production
+      - uses: r0adkll/upload-google-play@v1
+        if: env.HAS_SECRETS == 'true'
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: ${{ matrix.package }}
+          releaseFiles: apps/${{ matrix.app }}/build/app/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
+
+  testflight:
+    name: TestFlight (student_app)
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      HAS_SECRETS: ${{ secrets.IOS_P12_BASE64 != '' && secrets.APPSTORE_PRIVATE_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Skip without App Store secrets
+        if: env.HAS_SECRETS != 'true'
+        run: echo "::notice::App Store secrets are not set; skipping TestFlight."
+      - uses: subosito/flutter-action@v2
+        if: env.HAS_SECRETS == 'true'
+        with: { flutter-version: 3.47.6, channel: stable, cache: true }
+      - name: Certificate and provisioning profile
+        if: env.HAS_SECRETS == 'true'
+        uses: apple-actions/import-codesign-certs@v3
+        with:
+          p12-file-base64: ${{ secrets.IOS_P12_BASE64 }}
+          p12-password: ${{ secrets.IOS_P12_PASSWORD }}
+      - name: Install provisioning profile
+        if: env.HAS_SECRETS == 'true'
+        run: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 -d > ~/Library/MobileDevice/Provisioning\ Profiles/naql.mobileprovision
+      - name: Build IPA
+        if: env.HAS_SECRETS == 'true'
+        working-directory: apps/student_app
+        run: |
+          flutter pub get
+          flutter build ipa --release --build-number=${{ github.run_number }} \
+            --dart-define=API_URL=${{ secrets.API_URL }} --dart-define=SENTRY_DSN=${{ secrets.SENTRY_DSN_APPS }}
+      - uses: apple-actions/upload-testflight-build@v1
+        if: env.HAS_SECRETS == 'true'
+        with:
+          app-path: apps/student_app/build/ios/ipa/student_app.ipa
+          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+          api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
+          api-private-key: ${{ secrets.APPSTORE_PRIVATE_KEY }}

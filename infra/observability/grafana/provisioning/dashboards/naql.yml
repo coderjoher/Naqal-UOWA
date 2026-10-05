@@ -1,0 +1,6 @@
+apiVersion: 1
+providers:
+  - name: naql
+    folder: Naql
+    type: file
+    options: { path: /var/lib/grafana/dashboards }

@@ -1,6 +1,6 @@
 # P8 — Hardening and pilot readiness
 
-Status: planned
+Status: in-progress
 Depends on: P6 (P7 optional)
 
 ## Goal
@@ -19,6 +19,24 @@ phase 0 (pilot).
 - Observability: OpenTelemetry traces, Prometheus metrics, Grafana dashboard, Sentry for all apps.
 - Backups: nightly PostgreSQL dump + weekly restore drill.
 - Release: Play Store internal track (both apps), TestFlight (student), dashboard behind HTTPS.
+
+## Built
+
+See [docs/OPERATIONS.md](../OPERATIONS.md) for how to run each piece.
+
+- Load: `scripts/load/morning-peak.js` and `month-end.js` (k6), `apps/api/scripts/load/prepare.ts`
+  (peak data and tokens), `apps/api/scripts/load/sockets.ts` (6 000 student sockets); workflow
+  `.github/workflows/load.yml` (manual / weekly / PR self-check, staging target supported).
+- Performance: API cluster mode (`API_WORKERS`), token and user-status caches, stale-while-
+  revalidate cache for the dispatch board and live operations, photo-link reuse.
+- Security: Redis rate limits on every sign-in endpoint, helmet headers on the API, CSP and
+  hardening headers on the web apps, ZAP baseline in CI.
+- Observability: Prometheus metrics (aggregated across workers on `:9464`), alert rules, Grafana
+  dashboard, OpenTelemetry tracing (Jaeger), Sentry for API, dashboard and apps — all opt-in.
+- Backups: nightly `pg_dump` service with retention and off-site copy, restore drill script (run in
+  CI on every pull request).
+- Release: Play internal track (both apps) and TestFlight (student app) workflow; HTTPS with Caddy.
+- Full-day smoke script run against the compose stack in CI.
 
 ## Tests
 

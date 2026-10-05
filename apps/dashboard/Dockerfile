@@ -7,6 +7,8 @@ COPY apps/dashboard/package.json apps/dashboard/
 RUN pnpm install --frozen-lockfile --filter @naql/dashboard
 COPY packages/design-tokens packages/design-tokens
 COPY apps/dashboard apps/dashboard
+ARG VITE_SENTRY_DSN=
+ENV VITE_SENTRY_DSN=$VITE_SENTRY_DSN
 RUN pnpm --filter @naql/dashboard build
 
 FROM nginx:1.27-alpine

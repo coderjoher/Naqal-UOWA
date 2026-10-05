@@ -6,6 +6,7 @@ import { tenantUniversityId } from '../tiers/tiers.service';
 import { DriverStatus, ReviewAction } from './driver-rules';
 import { RequestOtpDto, ReviewDto, UpdateApplicationDto, VerifyOtpDto } from './drivers.dto';
 import { DriversService, MAX_DOC_BYTES } from './drivers.service';
+import { OTP_SEND_LIMITS, OTP_VERIFY_LIMITS, RateLimit } from '../security/rate-limit';
 
 const STATUSES: DriverStatus[] = ['draft', 'pending', 'approved', 'rejected', 'suspended'];
 
@@ -16,6 +17,7 @@ export class DriversController {
 
   @Public()
   @Post('auth/driver/otp')
+  @RateLimit(...OTP_SEND_LIMITS)
   @HttpCode(200)
   otp(@Body() dto: RequestOtpDto) {
     return this.drivers.requestOtp(dto.phone);
@@ -23,6 +25,7 @@ export class DriversController {
 
   @Public()
   @Post('auth/driver/verify')
+  @RateLimit(...OTP_VERIFY_LIMITS)
   @HttpCode(200)
   verify(@Body() dto: VerifyOtpDto) {
     return this.drivers.verifyOtp(dto.phone, dto.code, dto.university);

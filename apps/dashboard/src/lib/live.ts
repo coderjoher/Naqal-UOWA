@@ -10,7 +10,8 @@ export function liveSocket(): Socket {
   return io(`${base.origin}/live`, {
     path: `${prefix}/socket.io`,
     auth: (cb) => cb({ token: loadSession()?.accessToken ?? '' }),
-    transports: ['websocket', 'polling'],
+    // WebSocket only, like the phone apps: works across API worker processes without sticky sessions.
+    transports: ['websocket'],
     reconnectionDelayMax: 5000,
   });
 }
@@ -49,15 +50,38 @@ export function useLiveFeed(initial: Record<string, BusPosition | null> | undefi
     s.on('disconnect', () => setConnected(false));
     s.on('bus', (p: BusPosition) => setBuses((cur) => ({ ...cur, [p.runId]: p })));
     const refresh = () => qc.invalidateQueries({ queryKey });
-    s.on('run', refresh);
+    // A status change carries everything the list shows: apply it at once, then reconcile with
+    // the server a little later (its snapshot is cached for a few seconds under load).
+    let later: ReturnType<typeof setTimeout> | undefined;
+    s.on('run', (e: RunStatusEvent) => {
+      qc.setQueryData(queryKey, (old: unknown) => (Array.isArray(old) ? old.map((r) => (r?.runId === e.runId ? applyRunStatus(r, e) : r)) : old));
+      clearTimeout(later);
+      later = setTimeout(refresh, 6000);
+    });
     s.on('run:updated', refresh);
     return () => {
+      clearTimeout(later);
       s.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { buses, connected };
+}
+
+export interface RunStatusEvent {
+  runId: string;
+  status: string;
+  /** Stop number (1-based) the bus arrived at or left. */
+  seq?: number | null;
+}
+
+/** The live-ops row after a run status event: new status, and the stop it reached or left. */
+export function applyRunStatus<T extends { status: string; stops?: { seq: number; arrived: boolean; served: boolean }[] }>(run: T, e: RunStatusEvent): T {
+  const stops = run.stops?.map((st) =>
+    e.seq != null && st.seq === e.seq ? { ...st, arrived: true, served: st.served || (run.status === 'at_stop' && e.status !== 'at_stop') } : st,
+  );
+  return { ...run, status: e.status || run.status, ...(stops ? { stops } : {}) };
 }
 
 /** Re-render every `ms` (for "updated 12 s ago" labels). */

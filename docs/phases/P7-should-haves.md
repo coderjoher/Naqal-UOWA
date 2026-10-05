@@ -47,5 +47,5 @@ parallel with P8 if capacity allows.
 
 ## Exit gate
 
-- [ ] All P7 tests green in CI
+- [x] All P7 tests green in CI (PR #9)
 - [ ] Office confirms report numbers against its own spreadsheet for one month

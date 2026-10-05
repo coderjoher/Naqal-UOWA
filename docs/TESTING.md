@@ -143,11 +143,12 @@ docker compose down -v       # stop and delete all data; the next start loads fr
 DEMO=false docker compose up -d --build --wait   # empty database, no codes shown on screen
 ```
 
-## Not built yet
+## Before launch
 
 Push notifications to the phone's lock screen need a Firebase project (google-services.json and
 an FCM service account) from the university; until then notifications show inside the apps.
 
-| Coming in | What |
-|-----------|------|
-| P8 | Load tests at 3× the morning peak, security scan, monitoring, backups, store releases |
+Everything in the plan is built. What remains are the human steps of each phase's exit gate
+(field test with a real bus, store accounts, a month's settlement checked against office records)
+— see the **Exit gate** section of each file in `docs/phases/`, and `docs/OPERATIONS.md` for
+running in production.

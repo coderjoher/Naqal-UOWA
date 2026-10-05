@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuditInterceptor } from './audit/audit.interceptor';
 import { AuditService } from './audit/audit.service';
+import { MetricsController, MetricsMiddleware } from './observability/metrics';
 import { SettlementController } from './settlement/settlement.controller';
 import { FeedbackController } from './feedback/feedback.controller';
 import { FeedbackService } from './feedback/feedback.service';
@@ -99,6 +100,7 @@ class CacheModule {}
     RunsController,
     SettlementController,
     FeedbackController,
+    MetricsController,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
@@ -134,6 +136,6 @@ class CacheModule {}
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(TenantMiddleware).forRoutes('*path');
+    consumer.apply(MetricsMiddleware, TenantMiddleware).forRoutes('*path');
   }
 }

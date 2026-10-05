@@ -5,6 +5,7 @@ import type { Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { currentTenant, runAsSystem } from '../tenancy/tenant-context';
 import { AuthUser, IS_PUBLIC } from './decorators';
+import { tokenCache, userCache } from './user-cache';
 
 interface JwtPayload {
   sub: string;
@@ -33,13 +34,13 @@ export class JwtAuthGuard implements CanActivate {
 
     let payload: JwtPayload;
     try {
-      payload = await this.jwt.verifyAsync<JwtPayload>(token);
+      payload = await tokenCache.verify(token, () => this.jwt.verifyAsync<JwtPayload & Record<string, unknown>>(token));
     } catch {
       throw new UnauthorizedException();
     }
 
-    const user = await runAsSystem(() =>
-      this.prisma.db.user.findUnique({ where: { id: payload.sub }, select: { id: true, role: true, universityId: true, status: true } }),
+    const user = await userCache.get(payload.sub, () =>
+      runAsSystem(() => this.prisma.db.user.findUnique({ where: { id: payload.sub }, select: { id: true, role: true, universityId: true, status: true } })),
     );
     if (!user || user.status !== 'active') throw new UnauthorizedException();
     if (user.role !== 'super_admin' && !user.universityId) throw new UnauthorizedException();

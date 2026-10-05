@@ -10,6 +10,7 @@ import { notificationsFor } from '../notifications/rules';
 import { PaymentsService } from '../payments/payments.service';
 import { PrismaService, Tx } from '../prisma/prisma.service';
 import { SettlementService } from '../settlement/settlement.service';
+import { officeViews } from '../common/swr-cache';
 import { runAsTenant } from '../tenancy/tenant-context';
 import { nextRunState, RunAction, RunState, stopDeparture } from './run-rules';
 
@@ -158,6 +159,7 @@ export class RunsService {
       return { status, seq };
     });
     if (!out) return false;
+    officeViews.invalidate(`${universityId}:`);
     this.hub.runStatus(universityId, runId, driverId, { status: out.status ?? '', seq: out.seq });
     // SE-02: check the GPS track as soon as the run ends (rechecked when the month is settled).
     if (out.status === 'done') await runAsTenant(universityId, () => this.settlement.verifyRun(runId));
@@ -249,12 +251,17 @@ export class RunsService {
   }
 
   /** TO-07: today's runs with status and last position, for the live operations map. */
-  async ops(universityId: string, date: string) {
+  /** Live operations snapshot (sockets push changes afterwards); cached like the dispatch board. */
+  ops(universityId: string, date: string) {
+    return officeViews.get(`${universityId}:ops:${date}`, () => this.loadOps(universityId, date));
+  }
+
+  private async loadOps(universityId: string, date: string) {
     return runAsTenant(universityId, async () => {
       const runs = await this.prisma.db.run.findMany({
         // Today's runs, plus any bus on the road now (a run for a wave just after midnight starts the evening before).
         where: { OR: [{ date: new Date(`${date}T00:00:00Z`), status: { not: 'cancelled' } }, { status: { in: ['started', 'at_stop'] } }] },
-        include: { wave: true, driver: { include: { driver: true } }, stops: { orderBy: { seq: 'asc' }, include: { point: true } }, requests: { where: { status: { in: ['assigned', 'done', 'no_show'] } } } },
+        include: { wave: true, driver: { include: { driver: true } }, stops: { orderBy: { seq: 'asc' }, include: { point: true } }, requests: { where: { status: { in: ['assigned', 'done', 'no_show'] } }, select: { status: true, boardedAt: true } } },
         orderBy: { wave: { minuteOfDay: 'asc' } },
       });
       return Promise.all(

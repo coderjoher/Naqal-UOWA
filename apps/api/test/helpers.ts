@@ -2,6 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { PrismaClient, Role } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import Redis from 'ioredis';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { setupApp } from '../src/setup-app';
@@ -12,7 +13,17 @@ export const raw = new PrismaClient();
 export const PASSWORD = 'password123';
 let hash: string | undefined;
 
+/** Sign-in rate-limit counters (T8-03) start empty in every suite. */
+async function resetRateLimits() {
+  const redis = new Redis(process.env.REDIS_URL!, { lazyConnect: true });
+  await redis.connect();
+  const keys = await redis.keys('rl:*');
+  if (keys.length) await redis.del(...keys);
+  redis.disconnect();
+}
+
 export async function resetDb() {
+  await resetRateLimits();
   await raw.$executeRawUnsafe(
     'TRUNCATE announcements, problem_reports, ride_ratings, settlement_lines, settlements, device_tokens, run_positions, run_events, notifications, wave_plans, run_stops, ride_requests, runs, driver_availability, subscriptions, payments, receipt_counters, otp_codes, document_accesses, driver_documents, driver_profiles, roster_entries, travel_times, gathering_points, distance_tiers, waves, driver_requirement_sets, audit_events, users, universities CASCADE',
   );
