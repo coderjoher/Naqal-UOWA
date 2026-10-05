@@ -177,6 +177,16 @@ jobs:
           mkdir -p /tmp/osrm-volume
           # Files are created by root inside the container; make them readable so actions/cache can archive them.
           docker run --rm -v naql-uowa_osrm:/data -v /tmp/osrm-volume:/backup alpine sh -c 'cp -a /data/. /backup/ && chmod -R a+rX /backup'
+      - name: Public-server overrides expose only HTTPS (docs/DEPLOY-ORACLE.md)
+        run: |
+          DB_PASSWORD=x JWT_SECRET=y docker compose -f docker-compose.yml -f deploy/oracle/compose.server.yml \
+            --profile https --profile backup config --format json | python3 -c "
+          import json, sys
+          services = json.load(sys.stdin)['services']
+          published = {p.get('published') for s in services.values() for p in s.get('ports', [])}
+          assert published == {'80', '443'}, published
+          assert all(services[n].get('restart') == 'unless-stopped' for n in ('postgres', 'redis', 'osrm', 'api', 'https'))
+          "
       - name: Security headers on the API and the web apps (T8-03)
         run: |
           h=$(curl -fsSI http://localhost:3000/public/universities)

@@ -30,12 +30,16 @@ docs/
   requirements.md   every PRD requirement with an ID
   phases/P0…P9      scope, tests, exit gate per phase
   design-system.md  visual language
+  DEPLOY-ORACLE.md  free test server (Oracle Cloud ARM)
 ```
 
 ## Getting started
 
 **Just want to try it?** Follow [docs/TESTING.md](docs/TESTING.md): one `docker compose` command
 starts the dashboard (:8080), the student app (:8081) and the driver app (:8082) with demo data.
+
+**Want it online for free?** [docs/DEPLOY-ORACLE.md](docs/DEPLOY-ORACLE.md) puts the whole system on
+an Oracle Cloud *Always Free* ARM server with HTTPS, step by step.
 
 Requirements: Node 22 + pnpm 10, Flutter 3.47, Docker (or local PostgreSQL 16 and Redis 7).
 

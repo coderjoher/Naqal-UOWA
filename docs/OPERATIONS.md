@@ -1,7 +1,9 @@
 # Running Naql in production
 
 Everything here is about P8: the measures that make the system ready for the pilot. Docker Compose
-is the reference deployment; each section says what to set and how to check it.
+is the reference deployment; each section says what to set and how to check it. For a free test
+server with HTTPS, follow [DEPLOY-ORACLE.md](DEPLOY-ORACLE.md) (it uses `deploy/oracle/up.sh`, which
+publishes only ports 80/443 and sets a database password).
 
 ## 1. Deploy
 

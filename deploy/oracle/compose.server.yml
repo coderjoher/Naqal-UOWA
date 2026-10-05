@@ -1,0 +1,36 @@
+# Public server overrides (Oracle Cloud or any VM): only Caddy (80/443) is reachable from the
+# internet; the database gets its own password. Used by deploy/oracle/up.sh — see docs/DEPLOY-ORACLE.md.
+# Every long-running service restarts after a reboot. Needs Docker Compose 2.24+ (for !reset).
+services:
+  postgres:
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    ports: !reset []
+    restart: unless-stopped
+  redis:
+    ports: !reset []
+    restart: unless-stopped
+  osrm:
+    ports: !reset []
+    restart: unless-stopped
+  api:
+    environment:
+      DATABASE_URL: postgresql://naql:${DB_PASSWORD}@postgres:5432/naql
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+    ports: !reset []
+    restart: unless-stopped
+  dashboard:
+    ports: !reset []
+    restart: unless-stopped
+  student-web:
+    ports: !reset []
+    restart: unless-stopped
+  driver-web:
+    ports: !reset []
+    restart: unless-stopped
+  https:
+    restart: unless-stopped
+  backup:
+    environment:
+      DATABASE_URL: postgresql://naql:${DB_PASSWORD}@postgres:5432/naql
+    restart: unless-stopped
