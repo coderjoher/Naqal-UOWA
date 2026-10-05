@@ -9,6 +9,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { notificationsFor } from '../notifications/rules';
 import { PaymentsService } from '../payments/payments.service';
 import { PrismaService, Tx } from '../prisma/prisma.service';
+import { SettlementService } from '../settlement/settlement.service';
 import { runAsTenant } from '../tenancy/tenant-context';
 import { nextRunState, RunAction, RunState, stopDeparture } from './run-rules';
 
@@ -43,6 +44,7 @@ export class RunsService {
     private readonly hub: LiveHub,
     private readonly notifications: NotificationsService,
     private readonly payments: PaymentsService,
+    private readonly settlement: SettlementService,
   ) {}
 
   /** DR-04: apply driver actions in order (a batch arrives after an offline period). */
@@ -157,6 +159,8 @@ export class RunsService {
     });
     if (!out) return false;
     this.hub.runStatus(universityId, runId, driverId, { status: out.status ?? '', seq: out.seq });
+    // SE-02: check the GPS track as soon as the run ends (rechecked when the month is settled).
+    if (out.status === 'done') await runAsTenant(universityId, () => this.settlement.verifyRun(runId));
     return true;
   }
 

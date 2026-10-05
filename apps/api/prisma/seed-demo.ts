@@ -9,6 +9,7 @@
 import { DistanceTier, GatheringPoint, Gender, PrismaClient, Wave } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { Queue } from 'bullmq';
+import { seedMonth } from './month-fixture';
 
 const prisma = new PrismaClient();
 const OFFICE_PASSWORD = 'password123';
@@ -70,7 +71,9 @@ async function main() {
     create: { name: 'Warith Al-Anbiyaa University', nameAr: 'جامعة وارث الأنبياء', slug: 'warith', campusLat: CAMPUS.lat, campusLng: CAMPUS.lng, commissionPct: 10, waitlistMinutes: 30 },
   });
   if ((await prisma.distanceTier.count({ where: { universityId: uni.id } })) > 0) {
-    console.log('Demo data already present — nothing to do.');
+    // Stacks created before P6 get last month's history once (skipped when it already has runs).
+    await seedLastMonth(uni.id);
+    console.log('Demo data already present — nothing else to do.');
     return;
   }
   const universityId = uni.id;
@@ -196,6 +199,8 @@ async function main() {
     });
   }
 
+  await seedLastMonth(universityId);
+
   await queueMatrixRebuild(universityId);
 
   console.log(`Demo data ready for ${uni.nameAr}.
@@ -203,6 +208,22 @@ async function main() {
   Students:   W-1001 … W-1030 / ${STUDENT_PASSWORD}       (W-1031 … W-1040 activate with code ${ACTIVATION_CODE})
   Drivers:    07800000001 … 07800000006 (sign-in code is shown in the app in demo mode)
   22 open requests for ${String(wave.minuteOfDay / 60).padStart(2, '0')}:00 on ${date} are waiting for dispatch.`);
+}
+
+/**
+ * P6: last month already happened — runs with GPS tracks, subscriptions and cash fares for three
+ * of the drivers, ready for the office to compute and approve the settlement.
+ */
+async function seedLastMonth(universityId: string) {
+  const d = new Date(Date.now() + 3 * 3600_000);
+  const m = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - 1, 1));
+  const month = `${m.getUTCFullYear()}-${String(m.getUTCMonth() + 1).padStart(2, '0')}`;
+  const from = new Date(`${month}-01T00:00:00Z`);
+  if (await prisma.run.count({ where: { universityId, date: { gte: from, lt: new Date(Date.UTC(m.getUTCFullYear(), m.getUTCMonth() + 1, 1)) } } })) return;
+  const office = await prisma.user.findFirstOrThrow({ where: { universityId, role: 'office' } });
+  const history = await prisma.user.findMany({ where: { universityId, role: 'driver', driver: { status: 'approved' } }, orderBy: { loginPhone: 'asc' }, take: 3 });
+  await seedMonth(prisma, universityId, month, { officeUserId: office.id, driverIds: history.map((x) => x.id) });
+  console.log(`  ${month} is ready to settle (Dashboard → التسوية الشهرية).`);
 }
 
 /** Ask the API's worker to build the OSRM travel-time matrix for the new points (DS-01). */

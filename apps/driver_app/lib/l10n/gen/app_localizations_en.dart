@@ -403,4 +403,62 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get endTitleReturn => 'Everyone is dropped off';
+
+  @override
+  String earningsTitle(String month) {
+    return 'Earnings for $month';
+  }
+
+  @override
+  String get earningsEstimate => 'Estimated payout so far';
+
+  @override
+  String get earningsApproved => 'Amount approved by the office';
+
+  @override
+  String get earningsDraft => 'Being reviewed by the office';
+
+  @override
+  String get earningsHint =>
+      'Based on your GPS-verified runs and your share of the tier\'s subscriptions after commission, minus the commission on cash fares.';
+
+  @override
+  String get earningsRuns => 'Runs counted';
+
+  @override
+  String get earningsCash => 'Cash you collected';
+
+  @override
+  String get earningsCashCommission => 'Commission on cash';
+
+  @override
+  String earningsFlagged(String count) {
+    return '$count runs whose track did not verify — the office will review them';
+  }
+
+  @override
+  String get earningsRunsTitle => 'This month\'s runs';
+
+  @override
+  String get earningsNoRuns => 'No runs this month yet';
+
+  @override
+  String get earningsCounted => 'Counted';
+
+  @override
+  String get earningsNotCounted => 'Not counted';
+
+  @override
+  String get earningsPending => 'Not finished';
+
+  @override
+  String get earningsPast => 'Past settlements';
+
+  @override
+  String earningsPastRuns(String runs) {
+    return '$runs runs';
+  }
+
+  @override
+  String get earningsOwe => 'You owe the office';
 }

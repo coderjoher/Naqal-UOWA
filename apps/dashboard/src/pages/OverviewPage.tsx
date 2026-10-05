@@ -1,11 +1,13 @@
 import { clsx } from 'clsx';
-import { ArrowLeft, Building2, CalendarClock, Check, FileCheck2, Layers, MapPin, Percent, Users, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, Building2, CalendarClock, Check, FileCheck2, Gauge, Layers, MapPin, Percent, Users, Wallet, type LucideIcon } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useState } from 'react';
 import { Link } from 'react-router';
 import { useAuth } from '../lib/auth';
-import { useI18n, type MessageKey } from '../lib/i18n';
-import { usePoints, useRequirements, useTiers, useUniversities, useUsers, useWaves } from '../lib/queries';
-import { AnimatedNumber, Card, PageHeader, Skeleton, Stagger } from '../ui';
+import { useI18n, useMoney, type MessageKey } from '../lib/i18n';
+import { baghdadMonth, usePlatformOverview } from '../lib/money';
+import { usePoints, useRequirements, useTiers, useUsers, useWaves } from '../lib/queries';
+import { AnimatedNumber, Badge, Card, EmptyState, Input, PageHeader, Skeleton, SkeletonRows, Stagger, Table } from '../ui';
 import { itemVariants, spring } from '../ui/motion';
 
 function Kpi({ icon: Icon, label, value, loading, format }: { icon: LucideIcon; label: string; value: number; loading?: boolean; format?: (n: number) => string }) {
@@ -73,19 +75,59 @@ function OfficeOverview() {
   );
 }
 
+/** SA-04: revenue, commission and usage across universities for one month. */
 function AdminOverview() {
   const { t } = useI18n();
   const { session } = useAuth();
-  const unis = useUniversities();
-  const list = unis.data ?? [];
-  const avg = list.length ? list.reduce((s, u) => s + Number(u.commissionPct), 0) / list.length : 0;
+  const money = useMoney();
+  const [month, setMonth] = useState(baghdadMonth());
+  const q = usePlatformOverview(month);
+  const o = q.data?.totals ? q.data : undefined;
+  const tone = { approved: 'success', draft: 'warning', estimate: 'neutral' } as const;
   return (
     <Stagger>
-      <PageHeader title={`${t('overview.welcome')}، ${session?.user.name ?? ''}`} description={t('overview.admin.subtitle')} />
-      <motion.div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" variants={{ show: { transition: { staggerChildren: 0.05 } } }}>
-        <Kpi icon={Building2} label={t('overview.kpi.universities')} value={list.length} loading={unis.isPending} />
-        <Kpi icon={Percent} label={t('overview.kpi.avgCommission')} value={Math.round(avg * 10)} loading={unis.isPending} format={(n) => `${(n / 10).toFixed(1)}%`} />
+      <PageHeader
+        title={`${t('overview.welcome')}، ${session?.user.name ?? ''}`}
+        description={t('overview.admin.subtitle')}
+        actions={<Input id="overview-month" label={t('subs.month')} type="month" dir="ltr" value={month} onChange={(e) => e.target.value && setMonth(e.target.value)} />}
+      />
+      <motion.div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" variants={{ show: { transition: { staggerChildren: 0.05 } } }}>
+        <Kpi icon={Wallet} label={t('overview.kpi.revenue')} value={o?.totals.revenue ?? 0} loading={q.isPending} format={money} />
+        <Kpi icon={Percent} label={t('overview.kpi.commission')} value={o?.totals.commission ?? 0} loading={q.isPending} format={money} />
+        <Kpi icon={Users} label={t('overview.kpi.subscribers')} value={o?.totals.subscribers ?? 0} loading={q.isPending} />
+        <Kpi icon={Gauge} label={t('overview.kpi.fulfilment')} value={Math.round((o?.totals.fulfilment ?? 0) * 10)} loading={q.isPending} format={(n) => `${(n / 10).toFixed(1)}%`} />
       </motion.div>
+      <Card animated title={t('overview.perUniversity')} description={t('overview.perUniversityHint')}>
+        {q.isPending ? (
+          <SkeletonRows />
+        ) : (
+          <Table
+            caption={t('overview.perUniversity')}
+            rows={o?.universities ?? []}
+            rowKey={(u) => u.universityId}
+            empty={<EmptyState icon={Building2} title={t('universities.empty')} />}
+            columns={[
+              { key: 'name', header: t('overview.university'), cell: (u) => <span className="font-medium">{u.name}</span> },
+              { key: 'revenue', header: t('overview.kpi.revenue'), cell: (u) => <span className="tabular">{money(u.revenue.total)}</span> },
+              {
+                key: 'commission',
+                header: t('overview.kpi.commission'),
+                cell: (u) => (
+                  <span className="flex items-center gap-2">
+                    <span className="tabular" data-testid="uni-commission" data-value={u.commission}>
+                      {money(u.commission)}
+                    </span>
+                    <Badge tone={tone[u.settlement]}>{t(`overview.settlement.${u.settlement}` as MessageKey)}</Badge>
+                  </span>
+                ),
+              },
+              { key: 'subs', header: t('overview.kpi.subscribers'), cell: (u) => <span className="tabular">{u.subscribers}</span> },
+              { key: 'runs', header: t('overview.runs'), cell: (u) => <span className="tabular">{u.runs}</span> },
+              { key: 'ful', header: t('overview.kpi.fulfilment'), cell: (u) => <span className="tabular">{u.fulfilment === null ? '—' : `${u.fulfilment}%`}</span> },
+            ]}
+          />
+        )}
+      </Card>
     </Stagger>
   );
 }

@@ -69,6 +69,8 @@ model University {
   runEvents          RunEvent[]
   runPositions       RunPosition[]
   deviceTokens       DeviceToken[]
+  settlements        Settlement[]
+  settlementLines    SettlementLine[]
 
   @@map("universities")
 }
@@ -93,16 +95,17 @@ model User {
   createdAt      DateTime   @default(now()) @map("created_at")
   updatedAt      DateTime   @updatedAt @map("updated_at")
 
-  university    University?          @relation(fields: [universityId], references: [id])
-  defaultPoint  GatheringPoint?      @relation(fields: [defaultPointId], references: [id])
-  driver        DriverProfile?
-  subscriptions Subscription[]
-  payments      Payment[]            @relation("PaymentStudent")
-  availability  DriverAvailability[] @relation("DriverAvailability")
-  rideRequests  RideRequest[]        @relation("RideRequests")
-  runs          Run[]                @relation("DriverRuns")
-  notifications Notification[]       @relation("Notifications")
-  deviceTokens  DeviceToken[]        @relation("DeviceTokens")
+  university      University?          @relation(fields: [universityId], references: [id])
+  defaultPoint    GatheringPoint?      @relation(fields: [defaultPointId], references: [id])
+  driver          DriverProfile?
+  subscriptions   Subscription[]
+  payments        Payment[]            @relation("PaymentStudent")
+  availability    DriverAvailability[] @relation("DriverAvailability")
+  rideRequests    RideRequest[]        @relation("RideRequests")
+  runs            Run[]                @relation("DriverRuns")
+  notifications   Notification[]       @relation("Notifications")
+  deviceTokens    DeviceToken[]        @relation("DeviceTokens")
+  settlementLines SettlementLine[]     @relation("SettlementLines")
 
   @@unique([universityId, studentId])
   @@index([universityId, role])
@@ -497,20 +500,27 @@ enum RunStatus {
 
 /// DS-02: one bus doing one wave on one date.
 model Run {
-  id           String    @id @default(uuid()) @db.Uuid
-  universityId String    @map("university_id") @db.Uuid
-  driverId     String    @map("driver_id") @db.Uuid
-  waveId       String    @map("wave_id") @db.Uuid
-  date         DateTime  @db.Date
-  gender       Gender
+  id            String    @id @default(uuid()) @db.Uuid
+  universityId  String    @map("university_id") @db.Uuid
+  driverId      String    @map("driver_id") @db.Uuid
+  waveId        String    @map("wave_id") @db.Uuid
+  date          DateTime  @db.Date
+  gender        Gender
   /// DS-06: tier of the farthest stop (Q3 default rule), kept so settlement can be recomputed.
-  tierId       String    @map("tier_id") @db.Uuid
-  capacity     Int
-  status       RunStatus @default(planned)
-  startedAt    DateTime? @map("started_at")
-  endedAt      DateTime? @map("ended_at")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
+  tierId        String    @map("tier_id") @db.Uuid
+  capacity      Int
+  status        RunStatus @default(planned)
+  startedAt     DateTime? @map("started_at")
+  endedAt       DateTime? @map("ended_at")
+  /// SE-02: result of the GPS check when the run ended (null until checked).
+  gpsVerified   Boolean?  @map("gps_verified")
+  /// NF-15: anomaly flags, e.g. ["missed_stop:2", "too_fast"].
+  gpsFlags      Json      @default("[]") @map("gps_flags")
+  /// Office review of a flagged run: true counts it, false excludes it, null follows the GPS check.
+  officeVerdict Boolean?  @map("office_verdict")
+  officeNote    String?   @map("office_note")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
 
   university University    @relation(fields: [universityId], references: [id])
   driver     User          @relation("DriverRuns", fields: [driverId], references: [id])
@@ -633,4 +643,68 @@ model DeviceToken {
 
   @@index([userId])
   @@map("device_tokens")
+}
+
+// ── P6: settlement ───────────────────────────────────────────────────────────
+
+enum SettlementStatus {
+  draft
+  approved
+}
+
+/// TO-09: one month of driver payouts for a university. A draft can be recomputed; an approved
+/// settlement is immutable (database trigger), like payments (NF-14). Money is whole IQD.
+model Settlement {
+  id               String           @id @default(uuid()) @db.Uuid
+  universityId     String           @map("university_id") @db.Uuid
+  /// "YYYY-MM"
+  month            String
+  status           SettlementStatus @default(draft)
+  /// Commission c in basis points (10 % = 1000), frozen at computation time.
+  commissionBp     Int              @map("commission_bp")
+  /// [{ tierId, name, pool, runs, commission }]
+  tiers            Json             @default("[]")
+  totalPool        BigInt           @map("total_pool")
+  totalPayout      BigInt           @map("total_payout")
+  totalCommission  BigInt           @map("total_commission")
+  totalCash        BigInt           @map("total_cash")
+  /// Pools of tiers that had no verified run this month (not paid to anyone).
+  unallocated      BigInt
+  /// Σ pools − Σ payouts − commission − unallocated: dinars lost to flooring each payout.
+  roundingResidual BigInt           @map("rounding_residual")
+  /// Runs left out because they failed the GPS check (SE-02).
+  excludedRuns     Int              @map("excluded_runs")
+  computedAt       DateTime         @default(now()) @map("computed_at")
+  approvedAt       DateTime?        @map("approved_at")
+  approvedById     String?          @map("approved_by_id") @db.Uuid
+
+  university University       @relation(fields: [universityId], references: [id])
+  lines      SettlementLine[]
+
+  @@unique([universityId, month])
+  @@map("settlements")
+}
+
+model SettlementLine {
+  id             String @id @default(uuid()) @db.Uuid
+  universityId   String @map("university_id") @db.Uuid
+  settlementId   String @map("settlement_id") @db.Uuid
+  driverId       String @map("driver_id") @db.Uuid
+  /// Verified runs counted, all tiers.
+  runs           Int
+  /// [{ tierId, runs, share }]
+  tiers          Json   @default("[]")
+  /// Cash fares the driver collected (and kept) this month.
+  cash           BigInt
+  /// c × cash, taken out of the payout.
+  cashCommission BigInt @map("cash_commission")
+  /// What the office pays the driver (negative: the driver owes the office).
+  payout         BigInt
+
+  university University @relation(fields: [universityId], references: [id])
+  settlement Settlement @relation(fields: [settlementId], references: [id], onDelete: Cascade)
+  driver     User       @relation("SettlementLines", fields: [driverId], references: [id])
+
+  @@unique([settlementId, driverId])
+  @@map("settlement_lines")
 }

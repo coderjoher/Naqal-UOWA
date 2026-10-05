@@ -90,7 +90,8 @@ describe('P1 configuration (e2e)', () => {
     expect(u.waitlistMinutes).toBe(45);
     await http().patch(`/universities/${uniId}`).set(auth(admin)).send({ commissionPct: 101 }).expect(400);
     await http().patch(`/universities/${uniId}`).set(auth(office)).send({ commissionPct: 0 }).expect(403);
-    const audit = await raw.auditEvent.findFirst({ where: { action: 'PATCH /universities/:id' } });
+    const audit = await raw.auditEvent.findFirst({ where: { action: 'university.update' } });
+    expect(audit?.payload).toMatchObject({ after: { commissionPct: 10, waitlistMinutes: 45 } });
     expect(audit?.universityId).toBe(uniId);
   });
 

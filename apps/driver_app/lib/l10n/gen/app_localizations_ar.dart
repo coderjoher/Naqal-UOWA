@@ -401,4 +401,62 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get endTitleReturn => 'نزل جميع الطلبة';
+
+  @override
+  String earningsTitle(String month) {
+    return 'أرباح $month';
+  }
+
+  @override
+  String get earningsEstimate => 'المبلغ التقديري حتى الآن';
+
+  @override
+  String get earningsApproved => 'المبلغ المعتمد من المكتب';
+
+  @override
+  String get earningsDraft => 'قيد المراجعة في المكتب';
+
+  @override
+  String get earningsHint =>
+      'يُحسب من الرحلات الموثّقة بالـ GPS وحصتك من اشتراكات الفئة بعد العمولة، ناقص عمولة الأجرة النقدية.';
+
+  @override
+  String get earningsRuns => 'رحلات محتسبة';
+
+  @override
+  String get earningsCash => 'نقد استلمته';
+
+  @override
+  String get earningsCashCommission => 'عمولة النقد';
+
+  @override
+  String earningsFlagged(String count) {
+    return '$count رحلات لم يثبت مسارها — يراجعها المكتب';
+  }
+
+  @override
+  String get earningsRunsTitle => 'رحلات هذا الشهر';
+
+  @override
+  String get earningsNoRuns => 'لا رحلات هذا الشهر بعد';
+
+  @override
+  String get earningsCounted => 'محتسبة';
+
+  @override
+  String get earningsNotCounted => 'غير محتسبة';
+
+  @override
+  String get earningsPending => 'لم تنتهِ';
+
+  @override
+  String get earningsPast => 'التسويات السابقة';
+
+  @override
+  String earningsPastRuns(String runs) {
+    return '$runs رحلة';
+  }
+
+  @override
+  String get earningsOwe => 'عليك للمكتب';
 }

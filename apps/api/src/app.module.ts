@@ -3,6 +3,9 @@ import { Global, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuditInterceptor } from './audit/audit.interceptor';
+import { AuditService } from './audit/audit.service';
+import { SettlementController } from './settlement/settlement.controller';
+import { SettlementService } from './settlement/settlement.service';
 import { AuthModule } from './auth/auth.module';
 import { ConfigCache } from './config-cache/config-cache.service';
 import { DriverRequirementsController } from './driver-requirements/requirements.controller';
@@ -90,9 +93,12 @@ class CacheModule {}
     SubscriptionsController,
     RidesController,
     RunsController,
+    SettlementController,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
+    AuditService,
+    SettlementService,
     UniversitiesService,
     TiersService,
     PointsService,
