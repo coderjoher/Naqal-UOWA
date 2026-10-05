@@ -87,6 +87,8 @@ class _NaqlOtpFieldState extends State<NaqlOtpField> {
             Positioned.fill(
               child: Opacity(
                 opacity: 0,
+                // Invisible (the boxes draw the digits) but still reachable by screen readers.
+                alwaysIncludeSemantics: true,
                 child: TextField(
                   controller: _c,
                   focusNode: _focus,

@@ -50,4 +50,16 @@ void main() {
     expect(find.text('عليك للمكتب'), findsOneWidget);
     expect(find.text('لا رحلات هذا الشهر بعد'), findsOneWidget);
   });
+
+  testWidgets('[T9-04] no cash commission reads 0, not −0', (tester) async {
+    usePhone(tester);
+    final api = FakeDriverBackend(status: 'approved')
+      ..earnings = {'month': '2026-10', 'source': 'estimate', 'runs': 0, 'cash': 0, 'cashCommission': 0, 'estimate': 0, 'list': [], 'past': []};
+    await tester.pumpWidget(await api.app(signedIn: true));
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('الأرباح'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('−0'), findsNothing);
+    expect(find.text('0 د.ع'), findsWidgets);
+  });
 }

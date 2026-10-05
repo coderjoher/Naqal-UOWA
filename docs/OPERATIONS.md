@@ -22,6 +22,7 @@ docker compose --profile https --profile backup --profile observability up -d
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | OpenTelemetry traces (e.g. `http://jaeger:4318` with the `observability` profile). |
 | `BACKUP_REMOTE` | rclone destination for off-site copies of the nightly backup (e.g. `s3:naql-backups`). |
 | `TRUST_PROXY_HOPS` | Proxies in front of the API (default 1), so rate limits see the real client IP. |
+| `VITE_MAP_TILES`, `MAP_TILES` | Map tiles for the dashboard and the student app (§8). Empty = OpenStreetMap. |
 
 ## 2. Security (NF-11, NF-13 — T8-03)
 
@@ -116,3 +117,29 @@ Push a tag `v1.2.3` (or run *Release* by hand):
 
 Jobs whose secrets are missing are skipped with a notice. The dashboard is served over HTTPS by the
 `https` profile.
+
+## 8. Maps (NF-16)
+
+Every map takes its tiles from one setting, a raster `{z}/{x}/{y}` URL template:
+
+| App | Setting | Where |
+|-----|---------|-------|
+| Dashboard | `VITE_MAP_TILES`, `VITE_MAP_ATTRIBUTION` | `.env` → compose build args; the image writes the tile host into its CSP |
+| Student app (web) | `MAP_TILES`, `MAP_ATTRIBUTION` | `.env` → compose build args |
+| Student app (stores) | `MAP_TILES`, `MAP_ATTRIBUTION` | repository secrets used by *Release* (`--dart-define`) |
+
+Left empty, maps use **OpenStreetMap** (no key). That is fine for the pilot, but its
+[tile policy](https://operations.osmfoundation.org/policies/tiles/) forbids heavy use, so before
+full launch pick a provider with a key, for example:
+
+```bash
+# MapTiler (free tier; restrict the key to your domains / app ids in its dashboard)
+VITE_MAP_TILES=https://api.maptiler.com/maps/streets-v2/256/{z}/{x}/{y}.png?key=YOUR_KEY
+VITE_MAP_ATTRIBUTION="© MapTiler © OpenStreetMap contributors"
+MAP_TILES=$VITE_MAP_TILES
+MAP_ATTRIBUTION=$VITE_MAP_ATTRIBUTION
+docker compose up -d --build dashboard student-web
+```
+
+The dashboard accepts several comma-separated URLs (e.g. `a.`, `b.`, `c.` subdomains); the apps
+take one. CARTO's free basemaps now require a key and show "API KEY REQUIRED" without one.

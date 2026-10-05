@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 /** Basemap tiles are not needed for the test; answer them with an empty response. */
 async function blockTiles(page: Page) {
-  await page.route(/basemaps\.cartocdn\.com/, (r) => r.fulfill({ status: 204, body: '' }));
+  await page.route(/tile\.openstreetmap\.org/, (r) => r.fulfill({ status: 204, body: '' }));
 }
 
 async function signIn(page: Page) {

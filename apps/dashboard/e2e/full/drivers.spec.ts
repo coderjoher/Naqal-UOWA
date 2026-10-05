@@ -19,7 +19,7 @@ async function applyAsDriver(request: APIRequestContext, phone: string, name: st
 }
 
 test('[T2-10] office reviews a pending driver, opens documents and approves; the driver sees the new status', async ({ page, request }) => {
-  await page.route(/basemaps\.cartocdn\.com/, (r) => r.fulfill({ status: 204, body: '' }));
+  await page.route(/tile\.openstreetmap\.org/, (r) => r.fulfill({ status: 204, body: '' }));
   const driverHeaders = await applyAsDriver(request, '07805556677', 'حيدر كاظم');
 
   await page.goto('/login');

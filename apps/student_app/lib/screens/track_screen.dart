@@ -108,15 +108,12 @@ class _Body extends StatelessWidget {
                       ),
                       children: [
                         if (tiles)
-                          TileLayer(
-                            urlTemplate: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-                            subdomains: const ['a', 'b', 'c', 'd'],
-                            userAgentPackageName: 'iq.edu.uowa.naql.student',
-                          ),
+                          TileLayer(urlTemplate: mapTilesUrl, userAgentPackageName: 'iq.edu.uowa.naql.student'),
                         MarkerLayer(markers: [
                           if (stop != null) Marker(point: stop, width: 44, height: 44, child: _Pin(key: const ValueKey('stop-pin'), icon: LucideIcons.mapPin, label: t.yourStop, color: NaqlColors.ink)),
                         ]),
                         if (bus != null) _AnimatedBus(to: LatLng(bus.lat, bus.lng), label: t.busLabel, stale: stale),
+                        if (tiles) const SimpleAttributionWidget(source: Text(mapAttribution)),
                       ],
                     ),
             ),

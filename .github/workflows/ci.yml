@@ -183,6 +183,8 @@ jobs:
           echo "$h" | grep -qi '^x-content-type-options: nosniff' && echo "$h" | grep -qi '^strict-transport-security:' && ! echo "$h" | grep -qi '^x-powered-by'
           h=$(curl -fsSI http://localhost:8080/)
           echo "$h" | grep -qi "^content-security-policy: default-src 'self'" && echo "$h" | grep -qi '^x-frame-options: DENY'
+          # [T9-05] the CSP allows the map tile host the dashboard was built with (OpenStreetMap by default)
+          echo "$h" | grep -qi "^content-security-policy:.*img-src [^;]*https://tile.openstreetmap.org"
           h=$(curl -fsSI http://localhost:8081/)
           echo "$h" | grep -qi '^x-frame-options: DENY' && echo "$h" | grep -qi '^x-content-type-options: nosniff'
       - name: Metrics of all API workers on :9464

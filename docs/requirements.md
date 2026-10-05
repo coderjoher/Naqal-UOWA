@@ -124,3 +124,5 @@ Priority: **M** = must have for v1, **S** = should have, **C** = could have.
 | NF-13 | Driver documents stored privately; every access logged | M |
 | NF-14 | Money records (payments, cash fares, settlements) are immutable with audit trail | M |
 | NF-15 | GPS anomaly detection (speed, path, stop arrival) flags suspicious runs for the office | S |
+| NF-16 | Map tiles come from a configurable provider (one setting per app); the dashboard CSP allows only that host | M |
+| NF-17 | Every input and action in the apps is reachable by screen readers (TalkBack / VoiceOver) | S |

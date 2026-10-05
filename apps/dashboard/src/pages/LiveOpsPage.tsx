@@ -11,7 +11,7 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import { lazy, Suspense, useMemo, useState } from "react";
 import { useI18n } from "../lib/i18n";
-import { useLiveFeed, useNow } from "../lib/live";
+import { agoParts, useLiveFeed, useNow } from "../lib/live";
 import {
   useCurrentUniversity,
   useDispatch,
@@ -326,6 +326,7 @@ function RunRow({
     ? Math.max(0, Math.round((now - Date.parse(lastAt)) / 1000))
     : null;
   const moving = run.status === "started" || run.status === "at_stop";
+  const updated = ago != null ? agoParts(ago) : null;
   return (
     <button
       type="button"
@@ -361,9 +362,9 @@ function RunRow({
         {run.femaleOnly ? (
           <span className="text-female-only">{t("dispatch.femaleOnly")}</span>
         ) : null}
-        {moving && ago != null ? (
+        {moving && ago != null && updated ? (
           <span className={clsx(ago > 30 && "text-warning")}>
-            {t("live.updatedAgo", { s: ago })}
+            {t(updated.key, { n: updated.n })}
           </span>
         ) : null}
       </span>

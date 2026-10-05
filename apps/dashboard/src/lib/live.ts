@@ -93,3 +93,12 @@ export function useNow(ms = 1000) {
   }, [ms]);
   return now;
 }
+
+/** "Updated … ago" in the largest whole unit, so a bus silent for days does not read "2543081 s". */
+export function agoParts(seconds: number): { key: 'live.updatedAgo' | 'live.updatedAgoMin' | 'live.updatedAgoHour' | 'live.updatedAgoDay'; n: number } {
+  const s = Math.max(0, Math.floor(seconds));
+  if (s < 60) return { key: 'live.updatedAgo', n: s };
+  if (s < 3600) return { key: 'live.updatedAgoMin', n: Math.floor(s / 60) };
+  if (s < 86400) return { key: 'live.updatedAgoHour', n: Math.floor(s / 3600) };
+  return { key: 'live.updatedAgoDay', n: Math.floor(s / 86400) };
+}

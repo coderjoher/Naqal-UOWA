@@ -28,7 +28,7 @@ packages/
   naql_core/      Flutter API client + auth
 docs/
   requirements.md   every PRD requirement with an ID
-  phases/P0…P8      scope, tests, exit gate per phase
+  phases/P0…P9      scope, tests, exit gate per phase
   design-system.md  visual language
 ```
 
@@ -86,8 +86,9 @@ Deployment, security, load tests, monitoring, backups and releases: [docs/OPERAT
 | [P6](docs/phases/P6-settlement-reporting.md) | Settlement & money reporting | SE-01/02, TO-09, DR-08, SA-04/05 | 9 |
 | [P7](docs/phases/P7-should-haves.md) | Should-haves | ST-10/11, TO-08/10/11 | 6 |
 | [P8](docs/phases/P8-hardening-pilot.md) | Hardening & pilot | NF-06, NF-08 | 4 |
+| [P9](docs/phases/P9-pilot-fixes.md) | Pilot fixes | NF-16, NF-17 | 5 |
 
-After P8, rollout follows PRD §10: **Pilot → Full launch → Second university**.
+After P9, rollout follows PRD §10: **Pilot → Full launch → Second university**.
 
 ## How phases are enforced
 

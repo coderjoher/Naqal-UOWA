@@ -20,7 +20,11 @@ COPY apps/student_app apps/student_app
 COPY apps/driver_app apps/driver_app
 RUN flutter pub get
 WORKDIR /repo/apps/${APP}
-RUN flutter build web --release --no-web-resources-cdn --pwa-strategy=none
+# Map tiles for the student app (docs/OPERATIONS.md §8); empty = OpenStreetMap.
+ARG MAP_TILES=
+ARG MAP_ATTRIBUTION=
+RUN flutter build web --release --no-web-resources-cdn --pwa-strategy=none \
+      ${MAP_TILES:+--dart-define=MAP_TILES=$MAP_TILES} ${MAP_ATTRIBUTION:+"--dart-define=MAP_ATTRIBUTION=$MAP_ATTRIBUTION"}
 
 FROM nginx:1.27-alpine
 ARG APP
