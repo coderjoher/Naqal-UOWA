@@ -16,3 +16,4 @@ playwright-report/
 !packages/design-tokens/build/
 dump.rdb
 apps/api/storage/
+backups/

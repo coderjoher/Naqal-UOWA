@@ -18,6 +18,7 @@ dependencies:
     path: ../naql_core
   naql_ui:
     path: ../naql_ui
+  sentry_flutter: ^8.14.2
 
 dev_dependencies:
   flutter_test:

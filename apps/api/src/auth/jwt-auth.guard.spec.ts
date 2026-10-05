@@ -4,6 +4,9 @@ import { JwtService } from '@nestjs/jwt';
 import { tenantStorage, TenantStore } from '../tenancy/tenant-context';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
+// Every case mocks its own user and token: no caching between them.
+process.env.AUTH_CACHE_MS = '0';
+
 const UNI = '00000000-0000-0000-0000-00000000000a';
 
 function setup(dbUser: object | null, isPublic = false) {

@@ -17,6 +17,8 @@ const apiEnv = {
   QUEUE_PREFIX: 'naql-e2e',
   OTP_DEV_ECHO: 'true',
   STORAGE_DIR: '/tmp/naql-e2e-storage',
+  // Every spec signs the office in again; the real limits are tested in the API's T8-03.
+  RATE_LIMIT_FACTOR: '50',
 };
 
 export default defineConfig({

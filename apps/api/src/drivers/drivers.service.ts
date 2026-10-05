@@ -184,9 +184,18 @@ export class DriversService {
   }
 
   /** NF-13: a short-lived link for one document; every issuance is logged with who and when. */
-  async documentLink(driverId: string, key: string, viewerId: string, universityId: string) {
+  async documentLink(driverId: string, key: string, viewerId: string, universityId: string, opts: { reuse?: boolean } = {}) {
     const doc = await this.prisma.db.driverDocument.findFirst({ where: { driverId, key } });
     if (!doc) throw new NotFoundException();
+    // A student's app asks for the bus photo on every refresh: reuse the link already issued (and
+    // logged) to them while it has a few minutes left, instead of logging a new access each time.
+    if (opts.reuse) {
+      const issued = await this.prisma.db.documentAccess.findFirst({ where: { documentId: doc.id, userId: viewerId, expiresAt: { gt: new Date(Date.now() + 120_000) } }, orderBy: { expiresAt: 'desc' } });
+      if (issued) {
+        const { token, expiresAt } = this.storage.signUntil(doc.storageKey, doc.mime, Math.floor(issued.expiresAt.getTime() / 1000));
+        return { url: `/files/${token}`, expiresAt };
+      }
+    }
     const { token, expiresAt } = this.storage.sign(doc.storageKey, doc.mime);
     await this.prisma.db.documentAccess.create({ data: { universityId, documentId: doc.id, userId: viewerId, expiresAt } });
     return { url: `/files/${token}`, expiresAt };

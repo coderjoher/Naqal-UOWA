@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AuthService } from './auth.service';
 import { LoginDto } from './auth.dto';
 import { AuthUser, CurrentUser, Public } from './decorators';
+import { LOGIN_LIMITS, RateLimit } from '../security/rate-limit';
 
 @ApiTags('auth')
 @Controller()
@@ -15,6 +16,7 @@ export class AuthController {
 
   @Public()
   @Post('auth/login')
+  @RateLimit(...LOGIN_LIMITS)
   @HttpCode(200)
   login(@Body() dto: LoginDto) {
     return this.auth.login(dto.email, dto.password);

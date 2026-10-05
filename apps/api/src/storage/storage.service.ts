@@ -45,7 +45,11 @@ export class StorageService implements OnModuleInit {
 
   /** Signed link token valid for `ttlS` seconds (capped at 5 minutes). */
   sign(key: string, mime: string, ttlS = MAX_LINK_TTL_S, now = Date.now()) {
-    const exp = Math.floor(now / 1000) + Math.min(ttlS, MAX_LINK_TTL_S);
+    return this.signUntil(key, mime, Math.floor(now / 1000) + Math.min(ttlS, MAX_LINK_TTL_S));
+  }
+
+  /** The same link again for an expiry already issued (and logged). */
+  signUntil(key: string, mime: string, exp: number) {
     const payload = Buffer.from(JSON.stringify({ k: key, m: mime, e: exp })).toString('base64url');
     return { token: `${payload}.${this.mac(payload)}`, expiresAt: new Date(exp * 1000) };
   }

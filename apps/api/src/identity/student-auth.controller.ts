@@ -6,6 +6,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { runAsSystem } from '../tenancy/tenant-context';
 import { identityConfig } from './identity.factory';
 import { StudentAuthService } from './student-auth.service';
+import { LOGIN_LIMITS, RateLimit } from '../security/rate-limit';
 
 class StudentLoginDto {
   @ApiProperty() @Matches(/^[a-z0-9-]{2,40}$/) university: string;
@@ -35,6 +36,7 @@ export class StudentAuthController {
 
   @Public()
   @Post('auth/student/login')
+  @RateLimit(...LOGIN_LIMITS)
   @HttpCode(200)
   login(@Body() dto: StudentLoginDto) {
     return this.auth.login(dto.university, dto.studentId, dto.password);
@@ -42,6 +44,7 @@ export class StudentAuthController {
 
   @Public()
   @Post('auth/student/activate')
+  @RateLimit(...LOGIN_LIMITS)
   @HttpCode(200)
   activate(@Body() dto: ActivateDto) {
     return this.auth.activate(dto.university, dto.studentId, dto.code, dto.password);
@@ -49,6 +52,7 @@ export class StudentAuthController {
 
   @Public()
   @Post('auth/student/sso')
+  @RateLimit(...LOGIN_LIMITS)
   @HttpCode(200)
   sso(@Body() dto: SsoDto) {
     return this.auth.sso(dto.university, dto.idToken);

@@ -33,6 +33,12 @@ export class LiveHub {
     this.server = server;
   }
 
+  /** Sockets connected to this instance (the gateway's namespace). */
+  socketCount(): number {
+    const sockets = (this.server as unknown as { sockets?: { size?: number } } | null)?.sockets;
+    return typeof sockets?.size === 'number' ? sockets.size : 0;
+  }
+
   bus(universityId: string, pos: BusPosition) {
     this.server?.to(rooms.run(pos.runId)).to(rooms.ops(universityId)).emit('bus', pos);
   }

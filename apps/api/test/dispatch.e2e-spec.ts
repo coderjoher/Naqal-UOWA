@@ -194,9 +194,13 @@ describe('P4 ride requests and dispatch (e2e)', () => {
     const res = await http().post(`/rides/${hasan.id}/cancel`).set(auth(tokens.hasan)).expect(200);
     expect(res.body).toMatchObject({ status: 'cancelled', cancelReason: 'student', assignment: null });
     await waitFor(async () => (await myRide('late'))?.status === 'assigned', 'late seated after cancel');
-    // Bab Baghdad lost its only rider, so the stop is gone from the run.
-    const b = await board();
-    const male = b.runs.find((r: any) => r.gender === 'male');
+    // Bab Baghdad lost its only rider, so the stop is gone from the run. The office board may lag
+    // one refresh behind riders' own actions (it is polled every 5 s), so wait for it.
+    const maleRun = async () => (await board()).runs.find((r: any) => r.gender === 'male');
+    const male = await waitFor(async () => {
+      const r = await maleRun();
+      return r.stops.length === 2 ? r : null;
+    }, 'board shows the shorter run');
     expect(male.stops.map((s: any) => s.point.name)).toEqual(['Hay Al-Hussein', 'Al-Abbas Square']);
     expect(male.booked).toBe(4);
 

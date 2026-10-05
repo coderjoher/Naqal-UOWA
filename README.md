@@ -69,6 +69,10 @@ Demo accounts are listed in [docs/TESTING.md](docs/TESTING.md#2-demo-accounts)
 Design tokens live in `packages/design-tokens/tokens.json`; after editing run `pnpm tokens` and,
 if colours changed, `flutter test --update-goldens` in `packages/naql_ui`.
 
+## Running in production
+
+Deployment, security, load tests, monitoring, backups and releases: [docs/OPERATIONS.md](docs/OPERATIONS.md).
+
 ## Phases
 
 | Phase | Name | Main requirements | Tests |

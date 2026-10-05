@@ -1,0 +1,98 @@
+name: Load test
+
+# NF-06 / NF-08 (T8-01, T8-02): the morning peak at 3× for 30 minutes, then month end.
+# - Manual runs choose scale and duration, and can target staging (API URL + database secrets).
+# - Weekly: the full 3× / 30 min run against a stack started on the runner.
+# - Pull requests that touch the load scripts: a 1-minute check at 0.2× that the scripts still work.
+# For the launch gate run it on hardware like production (a larger runner or staging): on a
+# shared 4-core runner the load generators compete with the API for CPU.
+on:
+  workflow_dispatch:
+    inputs:
+      scale: { description: 'Multiple of the expected morning peak (150 buses, 2 000 students)', default: '3' }
+      duration: { description: 'Morning peak duration', default: '30m' }
+      api_url: { description: 'Staging API URL (empty = start the API on the runner)', default: '' }
+      workers: { description: 'API worker processes when started on the runner', default: '3' }
+  schedule:
+    - cron: '41 22 * * 4' # Friday 01:41 Baghdad
+  pull_request:
+    paths: ['scripts/load/**', 'apps/api/scripts/load/**', '.github/workflows/load.yml']
+
+concurrency:
+  group: load-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  load:
+    name: Morning peak ×${{ inputs.scale || (github.event_name == 'pull_request' && '0.2') || '3' }}
+    runs-on: ${{ vars.LOAD_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 90
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_USER: naql, POSTGRES_PASSWORD: naql, POSTGRES_DB: naql }
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U naql" --health-interval 5s --health-retries 20
+      redis:
+        image: redis:7
+        ports: ['6379:6379']
+    env:
+      SCALE: ${{ inputs.scale || (github.event_name == 'pull_request' && '0.2') || '3' }}
+      DURATION: ${{ inputs.duration || (github.event_name == 'pull_request' && '60s') || '30m' }}
+      STAGING: ${{ inputs.api_url != '' && 'true' || 'false' }}
+      API: ${{ inputs.api_url || 'http://localhost:3000' }}
+      DATABASE_URL: ${{ inputs.api_url != '' && secrets.STAGING_DATABASE_URL || 'postgresql://naql:naql@localhost:5432/naql?connection_limit=25' }}
+      JWT_SECRET: ${{ inputs.api_url != '' && secrets.STAGING_JWT_SECRET || 'load-test-secret-load-test-secret-0123' }}
+      REDIS_URL: redis://localhost:6379
+      OSRM_URL: http://127.0.0.1:5998
+    defaults:
+      run: { working-directory: apps/api }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - uses: grafana/setup-k6-action@v1
+      - run: pnpm install --frozen-lockfile --filter @naql/api
+      - run: pnpm exec prisma generate && pnpm build
+      - name: Start the API on the runner (${{ inputs.workers || '3' }} workers)
+        if: env.STAGING == 'false'
+        run: |
+          pnpm exec prisma migrate deploy
+          npx ts-node test/fake-osrm.ts 5998 > /tmp/osrm.log 2>&1 &
+          API_WORKERS=${{ inputs.workers || '3' }} AUTH_CACHE_MS=10000 node dist/main.js > /tmp/api.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf localhost:3000/public/universities > /dev/null && break; sleep 1; done
+      - name: Prepare the peak (buses on the road, riders, students to request)
+        run: npx ts-node scripts/load/prepare.ts > /tmp/load.json
+      - name: '[T8-01] [T8-02] Morning peak: REST traffic (k6) + student sockets'
+        run: |
+          SECS=$(node -e "const d=process.env.DURATION;console.log(Number(d.replace(/[a-z]+$/,''))*({s:1,m:60,h:3600}[d.match(/[a-z]+$/)[0]]))")
+          npx ts-node scripts/load/sockets.ts /tmp/load.json "$API" $((SECS + 60)) > /tmp/sockets.log 2>&1 &
+          SOCKETS=$!
+          sleep 45
+          k6 run -e DATA=/tmp/load.json -e API="$API" -e DURATION="$DURATION" --summary-export=/tmp/k6-peak.json ../../scripts/load/morning-peak.js
+          wait $SOCKETS
+          tail -3 /tmp/sockets.log
+      - name: '[T8-01] No queue backlog growing after the peak'
+        if: env.STAGING == 'false'
+        run: |
+          # Two minutes after the peak the dispatch queue must have drained (waiting jobs ≤ 5 and falling).
+          prev=999999
+          for i in $(seq 1 8); do
+            n=$(curl -s localhost:9464/metrics | awk '/^naql_queue_jobs\{state="waiting"\}/ {print $2}')
+            n=${n:-0}; echo "waiting jobs: $n"
+            if [ "${n%.*}" -le 5 ]; then exit 0; fi
+            prev=${n%.*}; sleep 15
+          done
+          echo "Queue backlog did not drain after the peak"; exit 1
+      - name: Month end under load (settlement + reports)
+        run: k6 run -e DATA=/tmp/load.json -e API="$API" -e DURATION=${{ github.event_name == 'pull_request' && '45s' || '10m' }} --summary-export=/tmp/k6-month-end.json ../../scripts/load/month-end.js
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: load-test-results
+          path: |
+            /tmp/k6-*.json
+            /tmp/sockets.log
+            /tmp/api.log
+          retention-days: 30

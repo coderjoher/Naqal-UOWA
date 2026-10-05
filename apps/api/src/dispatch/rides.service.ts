@@ -1,7 +1,9 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DriversService } from '../drivers/drivers.service';
+import { officeViews } from '../common/swr-cache';
 import { PrismaService } from '../prisma/prisma.service';
+import { currentTenant, runAsTenant } from '../tenancy/tenant-context';
 import { covers } from '../subscriptions/period-policy';
 import { tierDifference } from '../subscriptions/pricing';
 import { baghdadDate, dbDate, fromDbDate, isDate, runsOn, secondsInto } from './clock';
@@ -72,6 +74,7 @@ export class RidesService {
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') throw new ConflictException('You already have a request for this wave');
       throw e;
     }
+    officeViews.invalidate(`${universityId}:`);
     if (await this.engine.isPlanned(wave.id, date)) await this.engine.enqueueRecheck({ universityId, waveId: wave.id, date });
     return this.view(created.id);
   }
@@ -108,8 +111,7 @@ export class RidesService {
     let assignment = null;
     if (r.run && (r.status === 'assigned' || r.status === 'done')) {
       const stop = r.run.stops.find((s) => s.pointId === r.pointId);
-      const photo = await db.driverDocument.findFirst({ where: { driverId: r.run.driverId, key: 'vehicle_photo' } });
-      const link = photo ? await this.drivers.documentLink(r.run.driverId, 'vehicle_photo', viewerId ?? r.studentId, r.universityId) : null;
+      const link = await this.drivers.documentLink(r.run.driverId, 'vehicle_photo', viewerId ?? r.studentId, r.universityId, { reuse: true }).catch(() => null);
       assignment = {
         runId: r.run.id,
         driverName: r.run.driver.nameAr ?? r.run.driver.name,
@@ -248,8 +250,14 @@ export class RidesService {
   // ── transport office ───────────────────────────────────────────────────────
 
   /** Waves of a day with requests, runs and waitlist (operations view; live map in P5). */
+  /** Office dispatch board (polled every 5 s): served from a short stale-while-revalidate cache. */
   async board(date: string) {
     if (!isDate(date)) throw new BadRequestException('Bad date');
+    const uid = currentTenant()!.universityId!;
+    return officeViews.get(`${uid}:board:${date}`, () => runAsTenant(uid, () => this.loadBoard(date)));
+  }
+
+  private async loadBoard(date: string) {
     const db = this.prisma.db;
     const [waves, plans, requests, runs, tiers] = await Promise.all([
       db.wave.findMany({ where: { active: true }, orderBy: [{ minuteOfDay: 'asc' }] }),

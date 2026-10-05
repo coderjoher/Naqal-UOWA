@@ -177,3 +177,44 @@ jobs:
           mkdir -p /tmp/osrm-volume
           # Files are created by root inside the container; make them readable so actions/cache can archive them.
           docker run --rm -v naql-uowa_osrm:/data -v /tmp/osrm-volume:/backup alpine sh -c 'cp -a /data/. /backup/ && chmod -R a+rX /backup'
+      - name: Security headers on the API and the web apps (T8-03)
+        run: |
+          h=$(curl -fsSI http://localhost:3000/public/universities)
+          echo "$h" | grep -qi '^x-content-type-options: nosniff' && echo "$h" | grep -qi '^strict-transport-security:' && ! echo "$h" | grep -qi '^x-powered-by'
+          h=$(curl -fsSI http://localhost:8080/)
+          echo "$h" | grep -qi "^content-security-policy: default-src 'self'" && echo "$h" | grep -qi '^x-frame-options: DENY'
+          h=$(curl -fsSI http://localhost:8081/)
+          echo "$h" | grep -qi '^x-frame-options: DENY' && echo "$h" | grep -qi '^x-content-type-options: nosniff'
+      - name: Metrics of all API workers on :9464
+        run: curl -fsS http://localhost:9464/metrics | grep -q '^naql_http_request_duration_seconds_bucket'
+      - name: '[T8-04] Full-day smoke: plan → run with GPS → tracking → cash fare → settlement draft'
+        run: node scripts/smoke/full-day.mjs
+      - name: Nightly backup and restore drill (< 1 h)
+        run: |
+          docker compose -p naql-uowa --profile backup build backup
+          docker compose -p naql-uowa --profile backup run --rm backup now
+          docker compose -p naql-uowa --profile backup run --rm backup restore-drill
+      - name: '[T8-03] OWASP ZAP baseline on the dashboard and the API: no high-risk findings'
+        run: |
+          mkdir -p zap && chmod 777 zap
+          for target in http://localhost:8080 http://localhost:3000/docs; do
+            name=$(echo "$target" | sed -E 's#https?://##; s#[^a-z0-9]+#-#g')
+            docker run --rm --network host -v "$PWD/zap:/zap/wrk:rw" ghcr.io/zaproxy/zaproxy:stable \
+              zap-baseline.py -t "$target" -J "$name.json" -r "$name.html" -I -m 3 || true
+          done
+          python3 - <<'PY'
+          import glob, json, sys
+          high = []
+          for f in glob.glob('zap/*.json'):
+              for site in json.load(open(f)).get('site', []):
+                  for a in site.get('alerts', []):
+                      print(f"{f}: [{a['riskdesc']}] {a['name']}")
+                      if a.get('riskcode') == '3':
+                          high.append(a['name'])
+          if not glob.glob('zap/*.json'):
+              sys.exit('ZAP produced no report')
+          sys.exit(f'High-risk findings: {high}' if high else 0)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: zap-reports, path: zap/, if-no-files-found: ignore, retention-days: 14 }
