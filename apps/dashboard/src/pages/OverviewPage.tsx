@@ -17,7 +17,7 @@ function Kpi({ icon: Icon, label, value, loading, format }: { icon: LucideIcon; 
         <Icon className="size-6" />
       </span>
       <div className="min-w-0">
-        <p className="text-title">{loading ? <Skeleton className="h-7 w-12" /> : <AnimatedNumber value={value} format={format} />}</p>
+        <div className="text-title">{loading ? <Skeleton className="h-7 w-12" /> : <AnimatedNumber value={value} format={format} />}</div>
         <p className="truncate text-caption text-text-muted">{label}</p>
       </div>
     </motion.div>

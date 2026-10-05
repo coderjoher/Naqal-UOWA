@@ -48,7 +48,7 @@ jobs:
         run: |
           flutter pub get
           flutter build appbundle --release --build-number=${{ github.run_number }} \
-            --dart-define=API_URL=${{ secrets.API_URL }} --dart-define=SENTRY_DSN=${{ secrets.SENTRY_DSN_APPS }} --dart-define=SENTRY_ENVIRONMENT=production
+            --dart-define=API_URL=${{ secrets.API_URL }} --dart-define=SENTRY_DSN=${{ secrets.SENTRY_DSN_APPS }} --dart-define=MAP_TILES=${{ secrets.MAP_TILES }} --dart-define=MAP_ATTRIBUTION="${{ secrets.MAP_ATTRIBUTION }}" --dart-define=SENTRY_ENVIRONMENT=production
       - uses: r0adkll/upload-google-play@v1
         if: env.HAS_SECRETS == 'true'
         with:
@@ -89,7 +89,7 @@ jobs:
         run: |
           flutter pub get
           flutter build ipa --release --build-number=${{ github.run_number }} \
-            --dart-define=API_URL=${{ secrets.API_URL }} --dart-define=SENTRY_DSN=${{ secrets.SENTRY_DSN_APPS }}
+            --dart-define=API_URL=${{ secrets.API_URL }} --dart-define=SENTRY_DSN=${{ secrets.SENTRY_DSN_APPS }} --dart-define=MAP_TILES=${{ secrets.MAP_TILES }} --dart-define=MAP_ATTRIBUTION="${{ secrets.MAP_ATTRIBUTION }}"
       - uses: apple-actions/upload-testflight-build@v1
         if: env.HAS_SECRETS == 'true'
         with:

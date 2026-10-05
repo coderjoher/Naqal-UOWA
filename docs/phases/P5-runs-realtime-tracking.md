@@ -57,7 +57,7 @@ office sees every bus. This must work on weak Iraqi mobile networks.
   - One big action per state: start, I'm at the stop, board riders, collect cash, wait countdown, leave, finish.
   - Navigation hand-off to Google Maps or Waze (DR-06), live refresh on `run:updated`, and a "waiting to send" indicator.
 - **Student app:**
-  - Track screen (flutter_map, CARTO light tiles) showing the bus gliding, the student's stop, and the ETA ("arrives in 4 min", "the bus is at your stop", "you are on the bus").
+  - Track screen (flutter_map; tiles configurable since P9) showing the bus gliding, the student's stop, and the ETA ("arrives in 4 min", "the bus is at your stop", "you are on the bus").
   - Last known position with "updated X ago" when the connection drops (NF-10).
   - Notifications tab.
 - **Dashboard:** Live operations page (TO-07) with MapLibre bus markers updated live, run list with status, progress and boarded count, waitlist, and connection state.

@@ -31,18 +31,24 @@ function glide(marker: maplibregl.Marker, to: [number, number], ms = 900) {
   requestAnimationFrame(step);
 }
 
-/** Muted light basemap (CARTO Positron raster) so markers stand out; no labels clutter. */
+/**
+ * Raster basemap, set at build time (VITE_MAP_TILES, a `{z}/{x}/{y}` template; several URLs can be
+ * comma-separated). OpenStreetMap needs no key and suits the pilot; set a keyed provider for full
+ * launch (docs/OPERATIONS.md). The dashboard's CSP allows only this host.
+ */
+export const MAP_TILES = (import.meta.env.VITE_MAP_TILES || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png').split(',').map((u) => u.trim());
 const STYLE: maplibregl.StyleSpecification = {
   version: 8,
   sources: {
     base: {
       type: 'raster',
-      tiles: ['a', 'b', 'c', 'd'].map((s) => `https://${s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png`),
+      tiles: MAP_TILES,
       tileSize: 256,
-      attribution: '© OpenStreetMap contributors © CARTO',
+      maxzoom: 19,
+      attribution: import.meta.env.VITE_MAP_ATTRIBUTION || '© OpenStreetMap contributors',
     },
   },
-  layers: [{ id: 'base', type: 'raster', source: 'base' }],
+  layers: [{ id: 'base', type: 'raster', source: 'base', paint: { 'raster-saturation': -0.6 } }],
 };
 
 export function MapView({

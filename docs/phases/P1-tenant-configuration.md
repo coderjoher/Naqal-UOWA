@@ -36,7 +36,7 @@ everything dispatch needs: driver requirements, tiers, gathering points and wave
 - Config reads (tiers, points, waves, requirements) are cached in Redis per university and
   invalidated on every write; a Redis outage falls back to the database.
 - Dashboard: Universities (super admin, slide-over forms), Overview with setup checklist,
-  Tiers editor, Points map (MapLibre, muted CARTO basemap, click to place), Waves, Driver
+  Tiers editor, Points map (MapLibre, muted basemap — tiles configurable since P9, click to place), Waves, Driver
   requirements. Animated page transitions, buttons, lists and toasts.
 - Tests use a deterministic fake OSRM (`apps/api/test/fake-osrm.ts`); the real Iraq extract is
   exercised in the CI `compose` job.

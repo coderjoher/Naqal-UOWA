@@ -87,13 +87,17 @@ services:
       retries: 24
 
   dashboard:
-    build: { context: ., dockerfile: apps/dashboard/Dockerfile }
+    build:
+      context: .
+      dockerfile: apps/dashboard/Dockerfile
+      # Map tiles (docs/OPERATIONS.md §8); empty = OpenStreetMap.
+      args: { VITE_MAP_TILES: '${VITE_MAP_TILES:-}', VITE_MAP_ATTRIBUTION: '${VITE_MAP_ATTRIBUTION:-}' }
     ports: ['8080:80']
     depends_on:
       api: { condition: service_started }
 
   student-web:
-    build: { context: ., dockerfile: infra/flutter-web/Dockerfile, args: { APP: student_app } }
+    build: { context: ., dockerfile: infra/flutter-web/Dockerfile, args: { APP: student_app, MAP_TILES: '${MAP_TILES:-}', MAP_ATTRIBUTION: '${MAP_ATTRIBUTION:-}' } }
     ports: ['8081:80']
     depends_on:
       api: { condition: service_started }

@@ -139,4 +139,14 @@ void main() {
       expect(find.byIcon(icon), findsOneWidget);
     }
   });
+
+  testWidgets('[T9-01] NaqlOtpField stays reachable by screen readers', (tester) async {
+    final semantics = tester.ensureSemantics();
+    await tester.pumpWidget(harness(NaqlOtpField(label: 'Code', onCompleted: (_) {})));
+    await tester.pump();
+    // The visible caption and the (invisible) text field both carry the label; the field must be there.
+    final nodes = find.bySemanticsLabel('Code').evaluate().map((e) => tester.getSemantics(find.byWidget(e.widget)));
+    expect(nodes.where((n) => n.flagsCollection.isTextField), isNotEmpty);
+    semantics.dispose();
+  });
 }

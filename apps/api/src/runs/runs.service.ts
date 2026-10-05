@@ -258,9 +258,12 @@ export class RunsService {
 
   private async loadOps(universityId: string, date: string) {
     return runAsTenant(universityId, async () => {
+      const day = new Date(`${date}T00:00:00Z`);
       const runs = await this.prisma.db.run.findMany({
-        // Today's runs, plus any bus on the road now (a run for a wave just after midnight starts the evening before).
-        where: { OR: [{ date: new Date(`${date}T00:00:00Z`), status: { not: 'cancelled' } }, { status: { in: ['started', 'at_stop'] } }] },
+        // Today's runs, plus buses on the road for yesterday's date (a wave just after midnight starts
+        // the evening before). Older runs a driver never ended are not "on the road": settlement sends
+        // them to the office's review instead.
+        where: { OR: [{ date: day, status: { not: 'cancelled' } }, { date: { gte: new Date(day.getTime() - 86400_000), lt: day }, status: { in: ['started', 'at_stop'] } }] },
         include: { wave: true, driver: { include: { driver: true } }, stops: { orderBy: { seq: 'asc' }, include: { point: true } }, requests: { where: { status: { in: ['assigned', 'done', 'no_show'] } }, select: { status: true, boardedAt: true } } },
         orderBy: { wave: { minuteOfDay: 'asc' } },
       });

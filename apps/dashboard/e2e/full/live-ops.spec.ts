@@ -57,7 +57,7 @@ async function prepare(request: APIRequestContext) {
 
 
 test('[T5-12] live ops map shows a simulated bus moving and its run status updating', async ({ page, request }) => {
-  await page.route(/basemaps\.cartocdn\.com/, (r) => r.fulfill({ status: 204, body: '' }));
+  await page.route(/tile\.openstreetmap\.org/, (r) => r.fulfill({ status: 204, body: '' }));
   const s = await prepare(request);
   // Dispatch the wave through the API, then the driver starts the run.
   await request.post(`${API}/dispatch/plan`, { headers: s.office, data: { waveId: s.waveId, date: s.date } });

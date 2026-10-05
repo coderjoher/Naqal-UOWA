@@ -4,6 +4,7 @@ import { AddressInfo } from 'node:net';
 import { io, Socket } from 'socket.io-client';
 import request from 'supertest';
 import { baghdadDate, secondsInto } from '../src/dispatch/clock';
+import { officeViews } from '../src/common/swr-cache';
 import { DispatchEngine } from '../src/dispatch/dispatch.engine';
 import { auth, createApp, createConfiguredUniversity, createUser, login, raw, resetDb } from './helpers';
 
@@ -284,5 +285,18 @@ describe('P5 runs, live tracking and notifications (e2e)', () => {
     expect(female.bus).toMatchObject({ lat: 32.629 });
     expect(female.femaleOnly).toBe(true);
     await http().get(`/live/runs`).set(auth(tokens.ali)).expect(403);
+  });
+
+  it('[T9-03] a run left open from an earlier day is not shown as on the road', async () => {
+    const date = (await raw.run.findUniqueOrThrow({ where: { id: femaleRun } })).date;
+    await raw.run.update({ where: { id: femaleRun }, data: { date: new Date(date.getTime() - 30 * 86400_000) } });
+    officeViews.invalidate('', true);
+    try {
+      const snap = (await http().get(`/live/runs?date=${wave.date}`).set(auth(tokens.office)).expect(200)).body;
+      expect(snap.map((r: { runId: string }) => r.runId)).not.toContain(femaleRun);
+    } finally {
+      await raw.run.update({ where: { id: femaleRun }, data: { date } });
+      officeViews.invalidate('', true);
+    }
   });
 });

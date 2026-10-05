@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyRunStatus } from './live';
+import { agoParts, applyRunStatus } from './live';
 
 describe('applyRunStatus (TO-07)', () => {
   const run = { runId: 'r', status: 'started', stops: [{ seq: 1, arrived: false, served: false }, { seq: 2, arrived: false, served: false }] };
@@ -15,5 +15,17 @@ describe('applyRunStatus (TO-07)', () => {
 
   it('a status without a stop only changes the status', () => {
     expect(applyRunStatus(run, { runId: 'r', status: 'done' })).toEqual({ ...run, status: 'done' });
+  });
+});
+
+describe('agoParts (T9-02)', () => {
+  it('[T9-02] uses the largest whole unit', () => {
+    expect(agoParts(0)).toEqual({ key: 'live.updatedAgo', n: 0 });
+    expect(agoParts(59)).toEqual({ key: 'live.updatedAgo', n: 59 });
+    expect(agoParts(60)).toEqual({ key: 'live.updatedAgoMin', n: 1 });
+    expect(agoParts(3599)).toEqual({ key: 'live.updatedAgoMin', n: 59 });
+    expect(agoParts(7200)).toEqual({ key: 'live.updatedAgoHour', n: 2 });
+    expect(agoParts(2543081)).toEqual({ key: 'live.updatedAgoDay', n: 29 });
+    expect(agoParts(-5)).toEqual({ key: 'live.updatedAgo', n: 0 });
   });
 });
