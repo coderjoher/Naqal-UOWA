@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, Param, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
-import { ArrayMaxSize, IsArray, IsOptional, IsUUID, Matches } from 'class-validator';
+import { ArrayMaxSize, IsArray, IsIn, IsOptional, IsUUID, Matches } from 'class-validator';
 import { AuthUser, CurrentUser, Roles } from '../auth/decorators';
 import { tenantUniversityId } from '../tiers/tiers.service';
 import { baghdadDate } from './clock';
@@ -23,6 +23,18 @@ export class AvailabilityDto {
 export class PlanDto {
   @ApiProperty() @IsUUID() waveId!: string;
   @ApiProperty({ example: '2026-10-05' }) @Matches(DATE) date!: string;
+}
+
+export class MoveDto {
+  @ApiProperty() @IsUUID() requestId!: string;
+  @ApiProperty({ description: 'The bus (run) to move the student to' }) @IsUUID() runId!: string;
+}
+
+export class ExtraRunDto {
+  @ApiProperty() @IsUUID() waveId!: string;
+  @ApiProperty({ example: '2026-10-05' }) @Matches(DATE) date!: string;
+  @ApiProperty() @IsUUID() driverId!: string;
+  @ApiProperty({ enum: ['male', 'female'] }) @IsIn(['male', 'female']) gender!: 'male' | 'female';
 }
 
 @ApiTags('rides')
@@ -91,5 +103,29 @@ export class RidesController {
   async plan(@Body() dto: PlanDto) {
     await this.engine.enqueuePlan({ universityId: tenantUniversityId(), waveId: dto.waveId, date: dto.date });
     return { queued: true };
+  }
+
+  /** TO-08: move a student to another bus of the same wave (constraints are checked again). */
+  @Roles('office')
+  @Post('dispatch/move')
+  @HttpCode(200)
+  async move(@Body() dto: MoveDto) {
+    const ref = await this.rides.refOf(dto.requestId);
+    return this.engine.move(ref, dto.requestId, dto.runId);
+  }
+
+  /** TO-08: add a bus to a dispatched wave; it takes the waitlist. */
+  @Roles('office')
+  @Post('dispatch/extra-run')
+  @HttpCode(200)
+  extraRun(@Body() dto: ExtraRunDto) {
+    return this.engine.extraRun({ universityId: tenantUniversityId(), waveId: dto.waveId, date: dto.date }, dto.driverId, dto.gender);
+  }
+
+  /** Approved drivers who have no run in this wave yet (for an extra bus). */
+  @Roles('office')
+  @Get('dispatch/free-drivers')
+  freeDrivers(@Query('waveId') waveId: string, @Query('date') date: string) {
+    return this.rides.freeDrivers(waveId, date);
   }
 }

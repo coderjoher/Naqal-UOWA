@@ -71,6 +71,9 @@ model University {
   deviceTokens       DeviceToken[]
   settlements        Settlement[]
   settlementLines    SettlementLine[]
+  ratings            RideRating[]
+  problems           ProblemReport[]
+  announcements      Announcement[]
 
   @@map("universities")
 }
@@ -106,6 +109,9 @@ model User {
   notifications   Notification[]       @relation("Notifications")
   deviceTokens    DeviceToken[]        @relation("DeviceTokens")
   settlementLines SettlementLine[]     @relation("SettlementLines")
+  ratingsGiven    RideRating[]         @relation("RatingsGiven")
+  ratingsReceived RideRating[]         @relation("RatingsReceived")
+  problems        ProblemReport[]      @relation("ProblemsReported")
 
   @@unique([universityId, studentId])
   @@index([universityId, role])
@@ -707,4 +713,77 @@ model SettlementLine {
 
   @@unique([settlementId, driverId])
   @@map("settlement_lines")
+}
+
+// ── P7: feedback and announcements ───────────────────────────────────────────
+
+/// ST-11: one rating per finished ride, 1–5 stars, optional comment.
+model RideRating {
+  id           String   @id @default(uuid()) @db.Uuid
+  universityId String   @map("university_id") @db.Uuid
+  requestId    String   @unique @map("request_id") @db.Uuid
+  studentId    String   @map("student_id") @db.Uuid
+  driverId     String   @map("driver_id") @db.Uuid
+  runId        String   @map("run_id") @db.Uuid
+  stars        Int
+  comment      String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  university University @relation(fields: [universityId], references: [id])
+  student    User       @relation("RatingsGiven", fields: [studentId], references: [id])
+  driver     User       @relation("RatingsReceived", fields: [driverId], references: [id])
+
+  @@index([universityId, createdAt])
+  @@index([driverId])
+  @@map("ride_ratings")
+}
+
+enum ProblemStatus {
+  open
+  resolved
+}
+
+/// ST-11: a problem a student reports; lands in the office inbox.
+model ProblemReport {
+  id           String        @id @default(uuid()) @db.Uuid
+  universityId String        @map("university_id") @db.Uuid
+  studentId    String        @map("student_id") @db.Uuid
+  requestId    String?       @map("request_id") @db.Uuid
+  /// late | driver | vehicle | safety | app | other
+  category     String
+  text         String
+  status       ProblemStatus @default(open)
+  reply        String?
+  resolvedById String?       @map("resolved_by_id") @db.Uuid
+  resolvedAt   DateTime?     @map("resolved_at")
+  createdAt    DateTime      @default(now()) @map("created_at")
+
+  university University @relation(fields: [universityId], references: [id])
+  student    User       @relation("ProblemsReported", fields: [studentId], references: [id])
+
+  @@index([universityId, status, createdAt])
+  @@map("problem_reports")
+}
+
+/// TO-11: a message from the office to all students or to one wave / gathering point.
+model Announcement {
+  id           String    @id @default(uuid()) @db.Uuid
+  universityId String    @map("university_id") @db.Uuid
+  title        String
+  body         String
+  /// all | wave | point
+  target       String
+  waveId       String?   @map("wave_id") @db.Uuid
+  /// For a wave target: the date of that wave.
+  date         DateTime? @db.Date
+  pointId      String?   @map("point_id") @db.Uuid
+  recipients   Int
+  createdById  String    @map("created_by_id") @db.Uuid
+  expiresAt    DateTime  @map("expires_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  university University @relation(fields: [universityId], references: [id])
+
+  @@index([universityId, createdAt])
+  @@map("announcements")
 }

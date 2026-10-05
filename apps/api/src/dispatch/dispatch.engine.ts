@@ -10,7 +10,7 @@ import { PrismaService, Tx } from '../prisma/prisma.service';
 import { CAMPUS_KEY } from '../routing/travel-matrix.processor';
 import { runAsTenant } from '../tenancy/tenant-context';
 import { dbDate, instantAt, secondsInto } from './clock';
-import { cancelRequest, insertRequest, planWave, recheckWaitlist } from './domain/dispatch';
+import { addExtraRun, cancelRequest, insertRequest, MoveError, moveRequest, planWave, recheckWaitlist } from './domain/dispatch';
 import { CAMPUS, Ctx, DEFAULT_CONFIG, DispatchEvent, Passenger, Run, TravelFn, WaitlistEntry } from './domain/types';
 
 export const DISPATCH_QUEUE = 'dispatch';
@@ -20,6 +20,16 @@ export const WAITLIST_EXPIRE = 'waitlist.expire';
 export const WAVE_TICK = 'wave.tick';
 /** Waves are planned this many minutes before the wave time (DS-02). */
 export const PLAN_LEAD_MIN = 60;
+
+const MOVE_ERRORS: Record<MoveError, string> = {
+  'not-found': 'The student or the bus is not in this wave',
+  boarded: 'The student is already on the bus',
+  'same-run': 'The student is already on this bus',
+  passed: 'The bus has already passed the student\'s stop',
+  gender: 'Female-only and male buses cannot be mixed',
+  capacity: 'That bus is full',
+  time: 'That bus cannot pick the student up and still reach campus by the wave time',
+};
 
 export interface WaveRef {
   universityId: string;
@@ -108,6 +118,53 @@ export class DispatchEngine {
     });
     await this.afterCommit(ref, out);
     await this.enqueueRecheck(ref);
+  }
+
+  /** TO-08: the office moves one student to another bus of the same wave. */
+  async move(ref: WaveRef, requestId: string, targetRunId: string) {
+    const out = await this.locked(ref, async (tx) => {
+      const s = await this.load(tx, ref);
+      const req = s.requests.find((r) => r.id === requestId);
+      if (!req || req.status !== 'assigned') throw new ConflictException('Only a student who has a seat can be moved');
+      const r = moveRequest(s.domainRuns, requestId, targetRunId, s.ctx);
+      if ('error' in r) throw new ConflictException(MOVE_ERRORS[r.error]);
+      const saved = await this.save(tx, s, r.runs, [], []);
+      const drivers = new Map(s.dbRuns.map((x) => [x.id, x.driverId]));
+      const stamp = Date.now();
+      await NotificationsService.add(tx, ref.universityId, [
+        { userId: req.studentId, kind: 'ride.moved', dedupeKey: `moved:${requestId}:${targetRunId}:${stamp}`, data: { requestId, runId: targetRunId } },
+        { userId: drivers.get(r.fromRunId)!, kind: 'run.changed', dedupeKey: `run-out:${requestId}:${r.fromRunId}:${stamp}`, data: { runId: r.fromRunId, change: 'removed' } },
+        { userId: drivers.get(targetRunId)!, kind: 'run.changed', dedupeKey: `run-in:${requestId}:${targetRunId}:${stamp}`, data: { runId: targetRunId, change: 'added' } },
+      ]);
+      return { ...saved, summary: { ...saved.summary, fromRunId: r.fromRunId, toRunId: targetRunId } };
+    });
+    await this.afterCommit(ref, out);
+    // The source run has a free seat now.
+    await this.enqueueRecheck(ref);
+    return out.summary;
+  }
+
+  /** TO-08: an extra bus with an available driver takes the wave's waitlist. */
+  async extraRun(ref: WaveRef, driverId: string, gender: 'male' | 'female') {
+    const out = await this.locked(ref, async (tx) => {
+      const done = await tx.wavePlan.findUnique({ where: { waveId_date: { waveId: ref.waveId, date: dbDate(ref.date) } } });
+      if (!done) throw new ConflictException('Dispatch the wave first');
+      const driver = await tx.user.findFirst({ where: { id: driverId, role: 'driver', status: 'active', driver: { status: 'approved', seats: { gt: 0 } } }, include: { driver: true } });
+      if (!driver) throw new ConflictException('Choose an approved driver');
+      if (await tx.run.findUnique({ where: { driverId_waveId_date: { driverId, waveId: ref.waveId, date: dbDate(ref.date) } } })) throw new ConflictException('This driver already has a run in this wave');
+      const s = await this.load(tx, ref);
+      const waiting = s.requests
+        .filter((q) => q.status === 'open' || q.status === 'waitlisted')
+        .map((q) => ({ passenger: s.passenger(q), expiresAt: q.waitlistedUntil ? secondsInto(ref.date, q.waitlistedUntil) : s.waitlistUntil }));
+      const r = addExtraRun(s.domainRuns, { id: `extra-${driverId}`, driverId, gender, capacity: driver.driver!.seats! }, waiting, s.ctx, s.waitlistUntil - s.ctx.now);
+      if (r.placed === 0) throw new ConflictException('Nobody who is waiting can be seated on this bus');
+      const saved = await this.save(tx, s, r.runs, [], r.events);
+      const run = await tx.run.findUniqueOrThrow({ where: { driverId_waveId_date: { driverId, waveId: ref.waveId, date: dbDate(ref.date) } } });
+      await NotificationsService.add(tx, ref.universityId, [{ userId: driverId, kind: 'run.changed', dedupeKey: `run-extra:${run.id}`, data: { runId: run.id, change: 'extra' } }]);
+      return { ...saved, summary: { ...saved.summary, runId: run.id, placed: r.placed } };
+    });
+    await this.afterCommit(ref, out);
+    return out.summary;
   }
 
   async enqueueRecheck(ref: WaveRef, delayMs = 0) {

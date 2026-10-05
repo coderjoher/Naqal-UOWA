@@ -24,4 +24,7 @@ export const TENANT_MODELS: ReadonlySet<string> = new Set([
   'DeviceToken',
   'Settlement',
   'SettlementLine',
+  'RideRating',
+  'ProblemReport',
+  'Announcement',
 ]);

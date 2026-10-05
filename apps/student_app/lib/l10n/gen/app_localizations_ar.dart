@@ -462,4 +462,136 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get nCancelledBody => 'أُلغي طلب رحلتك.';
+
+  @override
+  String get historyRides => 'الرحلات';
+
+  @override
+  String get historyPayments => 'المدفوعات';
+
+  @override
+  String get historyNoRides => 'لا رحلات سابقة';
+
+  @override
+  String get historyNoRidesBody => 'تظهر هنا رحلاتك بعد انتهائها.';
+
+  @override
+  String get historyNoPayments => 'لا مدفوعات بعد';
+
+  @override
+  String get historyNoPaymentsBody =>
+      'يظهر هنا كل ما دفعته للاشتراك أو للسائق.';
+
+  @override
+  String get historyEnd => 'لا شيء أقدم';
+
+  @override
+  String get historyDone => 'تمت';
+
+  @override
+  String get historyNoShow => 'لم تحضر';
+
+  @override
+  String get historyCancelled => 'أُلغيت';
+
+  @override
+  String get historyExpired => 'بلا مقعد';
+
+  @override
+  String get historyMissed => 'لم تتم';
+
+  @override
+  String get rateRide => 'قيّم الرحلة';
+
+  @override
+  String get rateTitle => 'كيف كانت الرحلة؟';
+
+  @override
+  String get rateBody => 'تقييمك يصل إلى مكتب النقل ويساعد في تحسين الخدمة.';
+
+  @override
+  String get rateComment => 'ملاحظة (اختياري)';
+
+  @override
+  String get rateSend => 'أرسل التقييم';
+
+  @override
+  String get rateThanks => 'شكراً لتقييمك';
+
+  @override
+  String get reportProblem => 'أبلغ عن مشكلة';
+
+  @override
+  String get reportProblemHint => 'يصل بلاغك إلى مكتب النقل مباشرة';
+
+  @override
+  String get problemTitle => 'ما المشكلة؟';
+
+  @override
+  String get problemBody =>
+      'اختر نوع المشكلة واكتب ما حدث. سيرد عليك مكتب النقل.';
+
+  @override
+  String get problemLate => 'تأخير';
+
+  @override
+  String get problemDriver => 'السائق';
+
+  @override
+  String get problemVehicle => 'الحافلة';
+
+  @override
+  String get problemSafety => 'السلامة';
+
+  @override
+  String get problemApp => 'التطبيق';
+
+  @override
+  String get problemOther => 'أخرى';
+
+  @override
+  String get problemText => 'ماذا حدث؟';
+
+  @override
+  String get problemSend => 'أرسل البلاغ';
+
+  @override
+  String get problemSent => 'وصل بلاغك إلى مكتب النقل';
+
+  @override
+  String get paySubscription => 'اشتراك شهري';
+
+  @override
+  String paySubscriptionMonth(String month) {
+    return 'اشتراك $month';
+  }
+
+  @override
+  String get payTierDifference => 'فرق الفئة';
+
+  @override
+  String get payCashFare => 'أجرة رحلة نقداً';
+
+  @override
+  String payReversal(String what) {
+    return 'إلغاء: $what';
+  }
+
+  @override
+  String payReceipt(int no) {
+    return 'إيصال $no';
+  }
+
+  @override
+  String get nMovedTitle => 'تغيّرت حافلتك';
+
+  @override
+  String get nMovedBody =>
+      'نقلك مكتب النقل إلى حافلة أخرى. افتح الرئيسية لترى التفاصيل.';
+
+  @override
+  String get nAnsweredTitle => 'ردّ مكتب النقل على بلاغك';
+
+  @override
+  String get dismiss => 'إخفاء';
 }

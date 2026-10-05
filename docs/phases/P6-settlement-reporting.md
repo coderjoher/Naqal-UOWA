@@ -61,6 +61,6 @@ exact, reproducible and based only on GPS-verified runs.
 
 ## Exit gate
 
-- [ ] All P6 tests green in CI
+- [x] All P6 tests green in CI (PR #8)
 - [ ] Settlement for a full simulated month reviewed line by line with the transport office
 - [ ] Commission amounts confirmed by the super admin

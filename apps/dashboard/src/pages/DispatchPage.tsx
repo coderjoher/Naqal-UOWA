@@ -1,10 +1,12 @@
 import { clsx } from 'clsx';
-import { Bus, Clock, Hourglass, Moon, RefreshCw, Sun, Users, Zap } from 'lucide-react';
+import { ArrowLeftRight, Bus, BusFront, ChevronDown, Clock, Hourglass, Moon, Plus, RefreshCw, Sun, Users, Zap } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
+import { ApiError } from '../lib/api';
 import { useI18n, useMoney } from '../lib/i18n';
+import { useExtraRun, useFreeDrivers, useMoveStudent } from '../lib/ops';
 import { usePlanWave, useDispatch, type DispatchRun, type DispatchWave } from '../lib/queries';
-import { AnimatedNumber, Badge, Button, Card, EmptyState, PageHeader, SkeletonRows, Stagger } from '../ui';
+import { AnimatedNumber, Badge, Button, Card, Drawer, EmptyState, IconButton, PageHeader, SkeletonRows, Stagger, useToast } from '../ui';
 import { itemVariants, listVariants, spring } from '../ui/motion';
 
 /** Baghdad civil date, `plus` days from today. */
@@ -65,6 +67,8 @@ function WaveCard({ wave, date }: { wave: DispatchWave; date: string }) {
   const { t } = useI18n();
   const plan = usePlanWave();
   const [queued, setQueued] = useState(false);
+  const [moving, setMoving] = useState<Moving | null>(null);
+  const [adding, setAdding] = useState(false);
   const Icon = wave.type === 'morning' ? Sun : Moon;
 
   async function run() {
@@ -117,14 +121,16 @@ function WaveCard({ wave, date }: { wave: DispatchWave; date: string }) {
           <motion.div className="grid gap-4 lg:grid-cols-2" variants={listVariants} initial="hidden" animate="show">
             {wave.runs.map((r) => (
               <motion.div key={r.id} variants={itemVariants} layout>
-                <RunCard run={r} />
+                <RunCard run={r} onMove={wave.planned ? (p) => setMoving({ ...p, fromRunId: r.id, gender: r.gender }) : undefined} />
               </motion.div>
             ))}
           </motion.div>
         )}
       </div>
 
-      {wave.waitlist.length ? <Waitlist wave={wave} /> : null}
+      {wave.waitlist.length ? <Waitlist wave={wave} onAddBus={wave.planned ? () => setAdding(true) : undefined} /> : null}
+      <MoveDrawer wave={wave} moving={moving} onClose={() => setMoving(null)} />
+      <ExtraRunDrawer wave={wave} date={date} open={adding} onClose={() => setAdding(false)} />
     </Card>
   );
 }
@@ -140,9 +146,17 @@ function Stat({ label, value, tone }: { label: string; value: number; tone?: 'su
   );
 }
 
-function RunCard({ run }: { run: DispatchRun }) {
+type Passenger = DispatchRun['stops'][number]['passengers'][number];
+interface Moving extends Passenger {
+  fromRunId: string;
+  gender: 'male' | 'female';
+}
+
+function RunCard({ run, onMove }: { run: DispatchRun; onMove?: (p: Passenger) => void }) {
   const { t, lang } = useI18n();
   const money = useMoney();
+  const [open, setOpen] = useState<number | null>(null);
+  const movable = !!onMove && run.status === 'planned';
   const share = run.capacity ? run.booked / run.capacity : 0;
   const cash = run.stops.reduce((n, s) => n + s.cashToCollect, 0);
   return (
@@ -170,14 +184,36 @@ function RunCard({ run }: { run: DispatchRun }) {
 
       <ol className="mt-4 flex flex-col">
         {run.stops.map((s, i) => (
-          <li key={s.seq} className="relative flex items-center gap-3 py-2">
-            <span className={clsx('absolute start-[13px] w-0.5 bg-border', i === 0 ? 'top-1/2' : 'top-0', i === run.stops.length - 1 ? 'bottom-1/2' : 'bottom-0')} aria-hidden />
-            <span className="relative grid size-7 shrink-0 place-items-center rounded-pill border-2 border-primary bg-surface text-caption font-semibold text-primary">{s.seq}</span>
-            <span className="min-w-0 flex-1 truncate">{lang === 'ar' && s.point.nameAr ? s.point.nameAr : s.point.name}</span>
-            <span className="text-caption text-text-muted">{s.count}</span>
-            <span className="w-14 text-end text-label tabular-nums" dir="ltr">
-              {clock(s.eta)}
-            </span>
+          <li key={s.seq} className="relative">
+            <button
+              type="button"
+              className="flex w-full items-center gap-3 rounded-md py-2 text-start transition-colors hover:bg-surface-muted"
+              aria-expanded={open === s.seq}
+              onClick={() => setOpen(open === s.seq ? null : s.seq)}
+            >
+              <span className={clsx('absolute start-[13px] w-0.5 bg-border', i === 0 ? 'top-5' : 'top-0', i === run.stops.length - 1 ? 'h-5' : 'bottom-0')} aria-hidden />
+              <span className="relative grid size-7 shrink-0 place-items-center rounded-pill border-2 border-primary bg-surface text-caption font-semibold text-primary">{s.seq}</span>
+              <span className="min-w-0 flex-1 truncate">{lang === 'ar' && s.point.nameAr ? s.point.nameAr : s.point.name}</span>
+              <span className="text-caption text-text-muted">{s.count}</span>
+              <span className="w-14 text-end text-label tabular-nums" dir="ltr">
+                {clock(s.eta)}
+              </span>
+              <ChevronDown size={16} className={clsx('text-text-muted transition-transform', open === s.seq && 'rotate-180')} aria-hidden />
+            </button>
+            <AnimatePresence initial={false}>
+              {open === s.seq ? (
+                <motion.ul initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden ps-10">
+                  {s.passengers.map((p) => (
+                    <li key={p.requestId} className="flex items-center gap-2 py-1 text-caption" data-testid="passenger">
+                      <span className="min-w-0 flex-1 truncate">
+                        {p.name} <span className="text-text-muted">{p.studentId}</span>
+                      </span>
+                      {movable ? <IconButton icon={ArrowLeftRight} label={t('dispatch.move')} onClick={() => onMove!(p)} /> : null}
+                    </li>
+                  ))}
+                </motion.ul>
+              ) : null}
+            </AnimatePresence>
           </li>
         ))}
       </ol>
@@ -196,12 +232,17 @@ function RunCard({ run }: { run: DispatchRun }) {
   );
 }
 
-function Waitlist({ wave }: { wave: DispatchWave }) {
+function Waitlist({ wave, onAddBus }: { wave: DispatchWave; onAddBus?: () => void }) {
   const { t } = useI18n();
   return (
     <section className="mt-6">
       <h3 className="mb-3 flex items-center gap-2 text-label">
-        <Hourglass size={16} className="text-warning" aria-hidden /> {t('dispatch.waitlist')}
+        <Hourglass size={16} className="text-warning" aria-hidden /> <span className="flex-1">{t('dispatch.waitlist')}</span>
+        {onAddBus ? (
+          <Button variant="secondary" icon={Plus} onClick={onAddBus}>
+            {t('dispatch.addBus')}
+          </Button>
+        ) : null}
       </h3>
       <ul className="divide-y divide-border rounded-md border border-border">
         {wave.waitlist.map((w) => (
@@ -222,5 +263,140 @@ function Waitlist({ wave }: { wave: DispatchWave }) {
         ))}
       </ul>
     </section>
+  );
+}
+
+/** TO-08: pick the bus to move a student to. The server checks gender, seats and the wave time again. */
+function MoveDrawer({ wave, moving, onClose }: { wave: DispatchWave; moving: Moving | null; onClose: () => void }) {
+  const { t } = useI18n();
+  const toast = useToast();
+  const move = useMoveStudent();
+  const [target, setTarget] = useState<string | null>(null);
+  const options = wave.runs.filter((r) => r.id !== moving?.fromRunId);
+
+  async function confirm() {
+    if (!moving || !target) return;
+    try {
+      await move.mutateAsync({ requestId: moving.requestId, runId: target });
+      toast('success', t('dispatch.moved'));
+      setTarget(null);
+      onClose();
+    } catch (err) {
+      toast('danger', err instanceof ApiError && err.messages[0] ? err.messages[0] : t('common.saveFailed'));
+    }
+  }
+
+  return (
+    <Drawer
+      open={!!moving}
+      title={t('dispatch.moveTitle')}
+      onClose={() => (setTarget(null), onClose())}
+      footer={
+        <>
+          <Button icon={ArrowLeftRight} disabled={!target} loading={move.isPending} onClick={confirm}>
+            {t('dispatch.moveConfirm')}
+          </Button>
+          <Button variant="secondary" onClick={() => (setTarget(null), onClose())}>
+            {t('common.cancel')}
+          </Button>
+        </>
+      }
+    >
+      {moving ? (
+        <div className="flex flex-col gap-4">
+          <p className="text-headline">
+            {moving.name} <span className="text-caption text-text-muted">{moving.studentId}</span>
+          </p>
+          <p className="text-text-muted">{t('dispatch.moveHint')}</p>
+          <fieldset className="flex flex-col gap-2">
+            <legend className="mb-2 text-label">{t('dispatch.moveTo')}</legend>
+            {options.length === 0 ? <p className="text-caption text-text-muted">{t('dispatch.noOtherBus')}</p> : null}
+            {options.map((r) => {
+              const why = r.gender !== moving.gender ? t('dispatch.whyGender') : r.booked >= r.capacity ? t('dispatch.whyFull') : r.status !== 'planned' ? t('dispatch.whyStarted') : null;
+              return (
+                <label key={r.id} className={clsx('flex items-center gap-3 rounded-md border p-3', target === r.id ? 'border-primary bg-primary-soft' : 'border-border', why && 'opacity-60')}>
+                  <input type="radio" name="move-target" value={r.id} disabled={!!why} checked={target === r.id} onChange={() => setTarget(r.id)} />
+                  <BusFront size={18} className="text-text-muted" aria-hidden />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-label">{r.driverName}</span>
+                    <span className="text-caption text-text-muted">{why ?? `${r.booked}/${r.capacity} ${t('dispatch.seats')}`}</span>
+                  </span>
+                  <Badge tone={r.femaleOnly ? 'female-only' : 'neutral'}>{t(r.femaleOnly ? 'dispatch.femaleOnly' : 'dispatch.male')}</Badge>
+                </label>
+              );
+            })}
+          </fieldset>
+        </div>
+      ) : null}
+    </Drawer>
+  );
+}
+
+/** TO-08: an extra bus for the waitlist. */
+function ExtraRunDrawer({ wave, date, open, onClose }: { wave: DispatchWave; date: string; open: boolean; onClose: () => void }) {
+  const { t } = useI18n();
+  const toast = useToast();
+  const drivers = useFreeDrivers(wave.waveId, date, open);
+  const extra = useExtraRun();
+  const [driverId, setDriverId] = useState('');
+  const [gender, setGender] = useState<'male' | 'female'>(wave.waitlist[0]?.gender ?? 'male');
+
+  async function confirm() {
+    try {
+      const r = await extra.mutateAsync({ waveId: wave.waveId, date, driverId, gender });
+      toast('success', t('dispatch.busAdded', { n: r.placed }));
+      setDriverId('');
+      onClose();
+    } catch (err) {
+      toast('danger', err instanceof ApiError && err.messages[0] ? err.messages[0] : t('common.saveFailed'));
+    }
+  }
+
+  return (
+    <Drawer
+      open={open}
+      title={t('dispatch.addBusTitle')}
+      onClose={onClose}
+      footer={
+        <>
+          <Button icon={Plus} disabled={!driverId} loading={extra.isPending} onClick={confirm}>
+            {t('dispatch.addBus')}
+          </Button>
+          <Button variant="secondary" onClick={onClose}>
+            {t('common.cancel')}
+          </Button>
+        </>
+      }
+    >
+      <div className="flex flex-col gap-5">
+        <p className="text-text-muted">{t('dispatch.addBusHint', { n: wave.waitlist.length })}</p>
+        <fieldset className="flex gap-2">
+          <legend className="mb-2 text-label">{t('dispatch.busFor')}</legend>
+          {(['male', 'female'] as const).map((g) => (
+            <label key={g} className={clsx('flex flex-1 items-center gap-2 rounded-md border p-3', gender === g ? 'border-primary bg-primary-soft' : 'border-border')}>
+              <input type="radio" name="extra-gender" checked={gender === g} onChange={() => setGender(g)} />
+              {t(g === 'female' ? 'dispatch.femaleOnly' : 'dispatch.male')}
+            </label>
+          ))}
+        </fieldset>
+        <fieldset className="flex flex-col gap-2">
+          <legend className="mb-2 text-label">{t('dispatch.driver')}</legend>
+          {drivers.isPending ? <SkeletonRows rows={2} /> : null}
+          {drivers.data?.length === 0 ? <p className="text-caption text-text-muted">{t('dispatch.noFreeDriver')}</p> : null}
+          {drivers.data?.map((d) => (
+            <label key={d.id} className={clsx('flex items-center gap-3 rounded-md border p-3', driverId === d.id ? 'border-primary bg-primary-soft' : 'border-border')}>
+              <input type="radio" name="extra-driver" value={d.id} checked={driverId === d.id} onChange={() => setDriverId(d.id)} />
+              <span className="min-w-0 flex-1">
+                <span className="block text-label">{d.name}</span>
+                <span className="text-caption text-text-muted">
+                  {d.plate ?? '—'} · {d.seats} {t('dispatch.seats')}
+                </span>
+              </span>
+              {d.offered ? <Badge tone="success">{t('dispatch.offered')}</Badge> : null}
+            </label>
+          ))}
+        </fieldset>
+      </div>
+    </Drawer>
   );
 }

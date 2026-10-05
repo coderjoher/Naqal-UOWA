@@ -73,6 +73,9 @@ class _Item extends StatelessWidget {
       'ride.approaching' => (LucideIcons.busFront, NaqlTone.primary, t.nApproachingTitle, t.nApproachingBody(minutes)),
       'ride.arrived' => (LucideIcons.mapPinCheck, NaqlTone.success, t.nArrivedTitle, t.nArrivedBody),
       'ride.expired' => (LucideIcons.circleX, NaqlTone.danger, t.nExpiredTitle, t.nExpiredBody),
+      'ride.moved' => (LucideIcons.arrowLeftRight, NaqlTone.primary, t.nMovedTitle, t.nMovedBody),
+      'announcement' => (LucideIcons.megaphone, NaqlTone.primary, '${n.data['title'] ?? ''}', '${n.data['body'] ?? ''}'),
+      'problem.answered' => (LucideIcons.messageSquareReply, NaqlTone.success, t.nAnsweredTitle, '${n.data['reply'] ?? ''}'),
       _ => (LucideIcons.circleX, NaqlTone.neutral, t.nCancelledTitle, t.nCancelledBody),
     };
     final ago = clock.now().difference(n.createdAt);

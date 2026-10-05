@@ -919,6 +919,252 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'أُلغي طلب رحلتك.'**
   String get nCancelledBody;
+
+  /// No description provided for @historyRides.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرحلات'**
+  String get historyRides;
+
+  /// No description provided for @historyPayments.
+  ///
+  /// In ar, this message translates to:
+  /// **'المدفوعات'**
+  String get historyPayments;
+
+  /// No description provided for @historyNoRides.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا رحلات سابقة'**
+  String get historyNoRides;
+
+  /// No description provided for @historyNoRidesBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'تظهر هنا رحلاتك بعد انتهائها.'**
+  String get historyNoRidesBody;
+
+  /// No description provided for @historyNoPayments.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا مدفوعات بعد'**
+  String get historyNoPayments;
+
+  /// No description provided for @historyNoPaymentsBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'يظهر هنا كل ما دفعته للاشتراك أو للسائق.'**
+  String get historyNoPaymentsBody;
+
+  /// No description provided for @historyEnd.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا شيء أقدم'**
+  String get historyEnd;
+
+  /// No description provided for @historyDone.
+  ///
+  /// In ar, this message translates to:
+  /// **'تمت'**
+  String get historyDone;
+
+  /// No description provided for @historyNoShow.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم تحضر'**
+  String get historyNoShow;
+
+  /// No description provided for @historyCancelled.
+  ///
+  /// In ar, this message translates to:
+  /// **'أُلغيت'**
+  String get historyCancelled;
+
+  /// No description provided for @historyExpired.
+  ///
+  /// In ar, this message translates to:
+  /// **'بلا مقعد'**
+  String get historyExpired;
+
+  /// No description provided for @historyMissed.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم تتم'**
+  String get historyMissed;
+
+  /// No description provided for @rateRide.
+  ///
+  /// In ar, this message translates to:
+  /// **'قيّم الرحلة'**
+  String get rateRide;
+
+  /// No description provided for @rateTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'كيف كانت الرحلة؟'**
+  String get rateTitle;
+
+  /// No description provided for @rateBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'تقييمك يصل إلى مكتب النقل ويساعد في تحسين الخدمة.'**
+  String get rateBody;
+
+  /// No description provided for @rateComment.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملاحظة (اختياري)'**
+  String get rateComment;
+
+  /// No description provided for @rateSend.
+  ///
+  /// In ar, this message translates to:
+  /// **'أرسل التقييم'**
+  String get rateSend;
+
+  /// No description provided for @rateThanks.
+  ///
+  /// In ar, this message translates to:
+  /// **'شكراً لتقييمك'**
+  String get rateThanks;
+
+  /// No description provided for @reportProblem.
+  ///
+  /// In ar, this message translates to:
+  /// **'أبلغ عن مشكلة'**
+  String get reportProblem;
+
+  /// No description provided for @reportProblemHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يصل بلاغك إلى مكتب النقل مباشرة'**
+  String get reportProblemHint;
+
+  /// No description provided for @problemTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'ما المشكلة؟'**
+  String get problemTitle;
+
+  /// No description provided for @problemBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر نوع المشكلة واكتب ما حدث. سيرد عليك مكتب النقل.'**
+  String get problemBody;
+
+  /// No description provided for @problemLate.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأخير'**
+  String get problemLate;
+
+  /// No description provided for @problemDriver.
+  ///
+  /// In ar, this message translates to:
+  /// **'السائق'**
+  String get problemDriver;
+
+  /// No description provided for @problemVehicle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحافلة'**
+  String get problemVehicle;
+
+  /// No description provided for @problemSafety.
+  ///
+  /// In ar, this message translates to:
+  /// **'السلامة'**
+  String get problemSafety;
+
+  /// No description provided for @problemApp.
+  ///
+  /// In ar, this message translates to:
+  /// **'التطبيق'**
+  String get problemApp;
+
+  /// No description provided for @problemOther.
+  ///
+  /// In ar, this message translates to:
+  /// **'أخرى'**
+  String get problemOther;
+
+  /// No description provided for @problemText.
+  ///
+  /// In ar, this message translates to:
+  /// **'ماذا حدث؟'**
+  String get problemText;
+
+  /// No description provided for @problemSend.
+  ///
+  /// In ar, this message translates to:
+  /// **'أرسل البلاغ'**
+  String get problemSend;
+
+  /// No description provided for @problemSent.
+  ///
+  /// In ar, this message translates to:
+  /// **'وصل بلاغك إلى مكتب النقل'**
+  String get problemSent;
+
+  /// No description provided for @paySubscription.
+  ///
+  /// In ar, this message translates to:
+  /// **'اشتراك شهري'**
+  String get paySubscription;
+
+  /// No description provided for @paySubscriptionMonth.
+  ///
+  /// In ar, this message translates to:
+  /// **'اشتراك {month}'**
+  String paySubscriptionMonth(String month);
+
+  /// No description provided for @payTierDifference.
+  ///
+  /// In ar, this message translates to:
+  /// **'فرق الفئة'**
+  String get payTierDifference;
+
+  /// No description provided for @payCashFare.
+  ///
+  /// In ar, this message translates to:
+  /// **'أجرة رحلة نقداً'**
+  String get payCashFare;
+
+  /// No description provided for @payReversal.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء: {what}'**
+  String payReversal(String what);
+
+  /// No description provided for @payReceipt.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيصال {no}'**
+  String payReceipt(int no);
+
+  /// No description provided for @nMovedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تغيّرت حافلتك'**
+  String get nMovedTitle;
+
+  /// No description provided for @nMovedBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'نقلك مكتب النقل إلى حافلة أخرى. افتح الرئيسية لترى التفاصيل.'**
+  String get nMovedBody;
+
+  /// No description provided for @nAnsweredTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'ردّ مكتب النقل على بلاغك'**
+  String get nAnsweredTitle;
+
+  /// No description provided for @dismiss.
+  ///
+  /// In ar, this message translates to:
+  /// **'إخفاء'**
+  String get dismiss;
 }
 
 class _AppLocalizationsDelegate

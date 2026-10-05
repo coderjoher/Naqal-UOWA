@@ -13,6 +13,9 @@ import { DispatchPage } from '../pages/DispatchPage';
 import { SubscriptionsPage } from '../pages/SubscriptionsPage';
 import { SettlementPage } from '../pages/SettlementPage';
 import { AuditPage } from '../pages/AuditPage';
+import { ReportsPage } from '../pages/ReportsPage';
+import { InboxPage } from '../pages/InboxPage';
+import { AnnouncementsPage } from '../pages/AnnouncementsPage';
 import { PointsPage } from '../pages/settings/PointsPage';
 import { RequirementsPage } from '../pages/settings/RequirementsPage';
 import { TiersPage } from '../pages/settings/TiersPage';
@@ -49,6 +52,9 @@ export function AppRoutes() {
         <Route path="dispatch" element={office(<DispatchPage />)} />
         <Route path="subscriptions" element={office(<SubscriptionsPage />)} />
         <Route path="settlement" element={office(<SettlementPage />)} />
+        <Route path="reports" element={office(<ReportsPage />)} />
+        <Route path="inbox" element={office(<InboxPage />)} />
+        <Route path="announcements" element={office(<AnnouncementsPage />)} />
         <Route
           path="audit"
           element={

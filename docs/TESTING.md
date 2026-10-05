@@ -1,9 +1,11 @@
 # Try Naql yourself
 
-Everything up to **P6 (settlement)** works end to end: the office sets up the service, students
+Everything up to **P7** works end to end: the office sets up the service, students
 subscribe and request rides, the dispatcher puts them on buses, drivers run their routes with live
 GPS, students and the office follow the buses on a map, and at month end the office computes,
-approves and exports the driver payouts.
+approves and exports the driver payouts. Students see their ride and payment history, rate rides
+and report problems; the office moves students between buses, reads reports and sends
+announcements.
 
 ## 1. Start everything (one command)
 
@@ -106,7 +108,21 @@ runs of three drivers, subscriptions and cash fares) so it can be settled.
    Sign in as the super admin to see revenue and commission for every university on the overview,
    and change a university's commission to see it in the audit log.
 
-### G. Office: onboarding
+### G. Office: day-to-day tools
+1. **Move a student**: Dispatch → dispatch a wave → open a stop on a bus → ⇄ next to a student →
+   choose another bus. A full bus, a bus of the other gender, or one that could no longer reach
+   campus in time is refused with the reason.
+2. **Extra bus**: when a wave has people waiting, **أضف حافلة** on its waitlist → pick a free driver.
+3. **التقارير (Reports)**: last month shows fulfilment, on-time rate, waitlist expiry, renewals and
+   revenue per tier; filter by tier and download CSV.
+4. **البلاغات والتقييمات (Inbox)**: two problem reports from last month and the drivers' ratings.
+   Answer a report — the student gets a notification.
+5. **الإعلانات (Announcements)**: write to all students, one wave or one gathering point; the
+   student app shows it at the top of Home (and as a notification).
+6. Student app: sign in as `S-<last month>-01` (e.g. `S-202609-01`) / `password123` → **رحلاتي**:
+   last month's rides and payments, rate a ride, report a problem.
+
+### H. Office: onboarding
 - **السائقون (Drivers)**: review the pending application (ياسر كاظم), open documents, approve or reject.
 - **الطلبة (Students)**: import a roster (CSV) and issue activation codes.
 - **الإعدادات (Settings)**: distance tiers and prices, gathering points on the map, waves, driver requirements.
@@ -134,4 +150,4 @@ an FCM service account) from the university; until then notifications show insid
 
 | Coming in | What |
 |-----------|------|
-| P7 | Moving students between buses, extra runs, reports, announcements, ride history and ratings |
+| P8 | Load tests at 3× the morning peak, security scan, monitoring, backups, store releases |

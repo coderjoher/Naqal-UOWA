@@ -223,6 +223,18 @@ async function seedLastMonth(universityId: string) {
   const office = await prisma.user.findFirstOrThrow({ where: { universityId, role: 'office' } });
   const history = await prisma.user.findMany({ where: { universityId, role: 'driver', driver: { status: 'approved' } }, orderBy: { loginPhone: 'asc' }, take: 3 });
   await seedMonth(prisma, universityId, month, { officeUserId: office.id, driverIds: history.map((x) => x.id) });
+
+  // P7: students rated some of those rides and reported two problems.
+  const done = await prisma.rideRequest.findMany({ where: { universityId, status: 'done', date: { gte: from } }, include: { run: true }, orderBy: [{ date: 'asc' }, { id: 'asc' }], take: 60 });
+  const stars = [5, 4, 5, 3, 5, 4, 2, 5, 4, 5, 4, 5, 3, 5, 4];
+  const comments: Record<number, string> = { 2: 'وصل متأخراً عشر دقائق', 3: 'السائق محترم جداً', 6: 'الحافلة كانت مزدحمة' };
+  for (const [i, r] of done.filter((_, k) => k % 4 === 0).slice(0, stars.length).entries()) {
+    await prisma.rideRating.create({ data: { universityId, requestId: r.id, studentId: r.studentId, driverId: r.run!.driverId, runId: r.runId!, stars: stars[i], comment: comments[stars[i] === 2 ? 2 : i] ?? null, createdAt: new Date(r.date.getTime() + 8 * 3600_000) } });
+  }
+  if (done[1]) {
+    await prisma.problemReport.create({ data: { universityId, studentId: done[1].studentId, requestId: done[1].id, category: 'late', text: 'تأخرت الحافلة ربع ساعة عن موعد الصعود ووصلنا متأخرين للمحاضرة.' } });
+    await prisma.problemReport.create({ data: { universityId, studentId: done[5]?.studentId ?? done[1].studentId, category: 'app', text: 'لم يصلني إشعار اقتراب الحافلة هذا الصباح.' } });
+  }
   console.log(`  ${month} is ready to settle (Dashboard → التسوية الشهرية).`);
 }
 

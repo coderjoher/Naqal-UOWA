@@ -16,6 +16,7 @@ class NaqlField extends StatelessWidget {
     this.textDirection,
     this.prefixIcon,
     this.onChanged,
+    this.maxLines = 1,
   });
 
   final String label;
@@ -29,6 +30,9 @@ class NaqlField extends StatelessWidget {
   final TextDirection? textDirection;
   final IconData? prefixIcon;
   final ValueChanged<String>? onChanged;
+
+  /// More than 1 for free text (e.g. a problem report).
+  final int maxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +50,8 @@ class NaqlField extends StatelessWidget {
           obscureText: obscureText,
           textDirection: textDirection,
           onChanged: onChanged,
+          minLines: maxLines > 1 ? 3 : null,
+          maxLines: maxLines,
           style: NaqlText.body,
           decoration: InputDecoration(
             isDense: true,

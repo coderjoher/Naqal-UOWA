@@ -469,4 +469,138 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get nCancelledBody => 'Your ride request was cancelled.';
+
+  @override
+  String get historyRides => 'Rides';
+
+  @override
+  String get historyPayments => 'Payments';
+
+  @override
+  String get historyNoRides => 'No past rides';
+
+  @override
+  String get historyNoRidesBody => 'Your rides appear here once they are over.';
+
+  @override
+  String get historyNoPayments => 'No payments yet';
+
+  @override
+  String get historyNoPaymentsBody =>
+      'Everything you paid for a subscription or to a driver shows here.';
+
+  @override
+  String get historyEnd => 'Nothing older';
+
+  @override
+  String get historyDone => 'Done';
+
+  @override
+  String get historyNoShow => 'Missed the bus';
+
+  @override
+  String get historyCancelled => 'Cancelled';
+
+  @override
+  String get historyExpired => 'No seat';
+
+  @override
+  String get historyMissed => 'Did not happen';
+
+  @override
+  String get rateRide => 'Rate the ride';
+
+  @override
+  String get rateTitle => 'How was the ride?';
+
+  @override
+  String get rateBody =>
+      'Your rating goes to the transport office and helps improve the service.';
+
+  @override
+  String get rateComment => 'Comment (optional)';
+
+  @override
+  String get rateSend => 'Send rating';
+
+  @override
+  String get rateThanks => 'Thanks for your rating';
+
+  @override
+  String get reportProblem => 'Report a problem';
+
+  @override
+  String get reportProblemHint =>
+      'Your report goes straight to the transport office';
+
+  @override
+  String get problemTitle => 'What went wrong?';
+
+  @override
+  String get problemBody =>
+      'Pick the kind of problem and tell us what happened. The transport office will answer.';
+
+  @override
+  String get problemLate => 'Late';
+
+  @override
+  String get problemDriver => 'Driver';
+
+  @override
+  String get problemVehicle => 'Vehicle';
+
+  @override
+  String get problemSafety => 'Safety';
+
+  @override
+  String get problemApp => 'App';
+
+  @override
+  String get problemOther => 'Other';
+
+  @override
+  String get problemText => 'What happened?';
+
+  @override
+  String get problemSend => 'Send report';
+
+  @override
+  String get problemSent => 'Your report reached the transport office';
+
+  @override
+  String get paySubscription => 'Monthly subscription';
+
+  @override
+  String paySubscriptionMonth(String month) {
+    return 'Subscription $month';
+  }
+
+  @override
+  String get payTierDifference => 'Tier difference';
+
+  @override
+  String get payCashFare => 'Ride fare (cash)';
+
+  @override
+  String payReversal(String what) {
+    return 'Reversed: $what';
+  }
+
+  @override
+  String payReceipt(int no) {
+    return 'Receipt $no';
+  }
+
+  @override
+  String get nMovedTitle => 'Your bus changed';
+
+  @override
+  String get nMovedBody =>
+      'The transport office moved you to another bus. Open Home for details.';
+
+  @override
+  String get nAnsweredTitle => 'The transport office answered your report';
+
+  @override
+  String get dismiss => 'Dismiss';
 }
