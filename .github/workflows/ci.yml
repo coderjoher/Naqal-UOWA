@@ -218,6 +218,7 @@ jobs:
               sys.exit('ZAP produced no report')
           sys.exit(f'High-risk findings: {high}' if high else 0)
           PY
+      # Reports only when the scan fails (saves artifact quota on green runs).
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: failure()
         with: { name: zap-reports, path: zap/, if-no-files-found: ignore, retention-days: 14 }

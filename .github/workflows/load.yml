@@ -87,8 +87,9 @@ jobs:
           echo "Queue backlog did not drain after the peak"; exit 1
       - name: Month end under load (settlement + reports)
         run: k6 run -e DATA=/tmp/load.json -e API="$API" -e DURATION=${{ github.event_name == 'pull_request' && '45s' || '10m' }} --summary-export=/tmp/k6-month-end.json ../../scripts/load/month-end.js
+      # Results are kept for real runs and for failures; green PR self-checks save artifact quota.
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: failure() || github.event_name != 'pull_request'
         with:
           name: load-test-results
           path: |
