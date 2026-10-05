@@ -79,8 +79,9 @@ jobs:
           # Two minutes after the peak the dispatch queue must have drained (waiting jobs ≤ 5 and falling).
           prev=999999
           for i in $(seq 1 8); do
-            n=$(curl -s localhost:9464/metrics | awk '/^naql_queue_jobs\{state="waiting"\}/ {print $2}')
-            n=${n:-0}; echo "waiting jobs: $n"
+            n=$(curl -fsS localhost:9464/metrics | awk '/^naql_queue_jobs\{state="waiting"\}/ {print $2}')
+            [ -n "$n" ] || { echo "No queue metric from :9464"; exit 1; }
+            echo "waiting jobs: $n"
             if [ "${n%.*}" -le 5 ]; then exit 0; fi
             prev=${n%.*}; sleep 15
           done

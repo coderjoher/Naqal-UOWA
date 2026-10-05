@@ -58,6 +58,9 @@ if (WORKERS > 1 && cluster.isPrimary) {
   const aggregator = new AggregatorRegistry();
   serveMetrics(() => aggregator.clusterMetrics(), aggregator.contentType);
 } else {
+  // prom-client answers the primary's metrics requests only once a worker has created an
+  // AggregatorRegistry (that is what installs its IPC listener).
+  if (cluster.isWorker) new AggregatorRegistry();
   if (WORKERS === 1) serveMetrics(() => register.metrics(), register.contentType);
   bootstrap();
 }
