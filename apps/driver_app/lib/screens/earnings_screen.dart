@@ -130,7 +130,7 @@ class _Summary extends StatelessWidget {
         const SizedBox(height: NaqlSpace.s4),
         _Figure(icon: LucideIcons.route, label: t.earningsRuns, value: '${e.runs}', valueKey: 'runs'),
         _Figure(icon: LucideIcons.banknote, label: t.earningsCash, value: formatIqd(e.cash, lang)),
-        _Figure(icon: LucideIcons.percent, label: t.earningsCashCommission, value: '−${formatIqd(e.cashCommission, lang)}'),
+        _Figure(icon: LucideIcons.percent, label: t.earningsCashCommission, value: e.cashCommission == 0 ? formatIqd(0, lang) : '−${formatIqd(e.cashCommission, lang)}'),
         const SizedBox(height: NaqlSpace.s3),
         Text(t.earningsHint, style: NaqlText.caption),
       ]),
