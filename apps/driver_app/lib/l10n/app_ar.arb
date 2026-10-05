@@ -219,5 +219,43 @@
   },
   "dropOff": "نزول",
   "endTitleMorning": "توجّه إلى الجامعة",
-  "endTitleReturn": "نزل جميع الطلبة"
+  "endTitleReturn": "نزل جميع الطلبة",
+  "earningsTitle": "أرباح {month}",
+  "@earningsTitle": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "earningsEstimate": "المبلغ التقديري حتى الآن",
+  "earningsApproved": "المبلغ المعتمد من المكتب",
+  "earningsDraft": "قيد المراجعة في المكتب",
+  "earningsHint": "يُحسب من الرحلات الموثّقة بالـ GPS وحصتك من اشتراكات الفئة بعد العمولة، ناقص عمولة الأجرة النقدية.",
+  "earningsRuns": "رحلات محتسبة",
+  "earningsCash": "نقد استلمته",
+  "earningsCashCommission": "عمولة النقد",
+  "earningsFlagged": "{count} رحلات لم يثبت مسارها — يراجعها المكتب",
+  "@earningsFlagged": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "earningsRunsTitle": "رحلات هذا الشهر",
+  "earningsNoRuns": "لا رحلات هذا الشهر بعد",
+  "earningsCounted": "محتسبة",
+  "earningsNotCounted": "غير محتسبة",
+  "earningsPending": "لم تنتهِ",
+  "earningsPast": "التسويات السابقة",
+  "earningsPastRuns": "{runs} رحلة",
+  "@earningsPastRuns": {
+    "placeholders": {
+      "runs": {
+        "type": "String"
+      }
+    }
+  },
+  "earningsOwe": "عليك للمكتب"
 }

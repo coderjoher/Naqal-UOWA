@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AuditedByHandler } from '../audit/audit.interceptor';
 import { AuthUser, CurrentUser, Roles } from '../auth/decorators';
 import { CreateUniversityDto, UpdateUniversityDto } from './universities.dto';
 import { UniversitiesService } from './universities.service';
@@ -37,7 +38,8 @@ export class UniversitiesController {
 
   @Roles('super_admin')
   @Patch(':id')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateUniversityDto) {
-    return this.universities.update(id, dto);
+  @AuditedByHandler()
+  update(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateUniversityDto) {
+    return this.universities.update(id, dto, user.id);
   }
 }

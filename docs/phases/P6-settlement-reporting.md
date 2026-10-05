@@ -1,6 +1,6 @@
 # P6 — Settlement and money reporting
 
-Status: planned
+Status: in-progress
 Depends on: P5
 
 ## Goal
@@ -28,6 +28,22 @@ exact, reproducible and based only on GPS-verified runs.
 - Driver app Earnings screen: verified runs this month, estimated payout, past settlements.
 - Super admin Overview: revenue, commission, active subscribers, fulfilment per university.
 - Audit log viewer with filters (actor, entity, date).
+
+## Built
+
+- `src/settlement/payout.ts` — SE-01 in exact BigInt arithmetic; floor per driver, residual reported.
+  Pool = the month's active subscriptions per tier; cash = cash fares on the driver's runs (net of
+  reversals). A tier with no verified run is reported as `unallocated`. Negative payout = the
+  driver owes the office.
+- `src/settlement/verify.ts` — SE-02 / NF-15: every stop within 150 m, end on campus (400 m) or at
+  the last stop, no teleport (≥ 3 km within 90 s) or speed > 140 km/h. `off_path` (> 2.5 km from
+  the planned legs) is a flag only. Runs are checked when they end and again at settlement; the
+  office can count or exclude a flagged run with a note (audited).
+- Live tracking stores the first point near every stop and on campus in addition to one per minute,
+  so short stops are always proven.
+- `settlements` / `settlement_lines` tables; a trigger makes approved months immutable.
+- Dashboard: Monthly settlement (compute, review, approve, PDF/XLSX), Audit log, super-admin
+  overview by university. Driver app: Earnings tab.
 
 ## Tests
 

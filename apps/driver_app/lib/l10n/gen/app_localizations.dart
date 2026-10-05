@@ -817,6 +817,108 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'نزل جميع الطلبة'**
   String get endTitleReturn;
+
+  /// No description provided for @earningsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أرباح {month}'**
+  String earningsTitle(String month);
+
+  /// No description provided for @earningsEstimate.
+  ///
+  /// In ar, this message translates to:
+  /// **'المبلغ التقديري حتى الآن'**
+  String get earningsEstimate;
+
+  /// No description provided for @earningsApproved.
+  ///
+  /// In ar, this message translates to:
+  /// **'المبلغ المعتمد من المكتب'**
+  String get earningsApproved;
+
+  /// No description provided for @earningsDraft.
+  ///
+  /// In ar, this message translates to:
+  /// **'قيد المراجعة في المكتب'**
+  String get earningsDraft;
+
+  /// No description provided for @earningsHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُحسب من الرحلات الموثّقة بالـ GPS وحصتك من اشتراكات الفئة بعد العمولة، ناقص عمولة الأجرة النقدية.'**
+  String get earningsHint;
+
+  /// No description provided for @earningsRuns.
+  ///
+  /// In ar, this message translates to:
+  /// **'رحلات محتسبة'**
+  String get earningsRuns;
+
+  /// No description provided for @earningsCash.
+  ///
+  /// In ar, this message translates to:
+  /// **'نقد استلمته'**
+  String get earningsCash;
+
+  /// No description provided for @earningsCashCommission.
+  ///
+  /// In ar, this message translates to:
+  /// **'عمولة النقد'**
+  String get earningsCashCommission;
+
+  /// No description provided for @earningsFlagged.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} رحلات لم يثبت مسارها — يراجعها المكتب'**
+  String earningsFlagged(String count);
+
+  /// No description provided for @earningsRunsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'رحلات هذا الشهر'**
+  String get earningsRunsTitle;
+
+  /// No description provided for @earningsNoRuns.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا رحلات هذا الشهر بعد'**
+  String get earningsNoRuns;
+
+  /// No description provided for @earningsCounted.
+  ///
+  /// In ar, this message translates to:
+  /// **'محتسبة'**
+  String get earningsCounted;
+
+  /// No description provided for @earningsNotCounted.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير محتسبة'**
+  String get earningsNotCounted;
+
+  /// No description provided for @earningsPending.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم تنتهِ'**
+  String get earningsPending;
+
+  /// No description provided for @earningsPast.
+  ///
+  /// In ar, this message translates to:
+  /// **'التسويات السابقة'**
+  String get earningsPast;
+
+  /// No description provided for @earningsPastRuns.
+  ///
+  /// In ar, this message translates to:
+  /// **'{runs} رحلة'**
+  String earningsPastRuns(String runs);
+
+  /// No description provided for @earningsOwe.
+  ///
+  /// In ar, this message translates to:
+  /// **'عليك للمكتب'**
+  String get earningsOwe;
 }
 
 class _AppLocalizationsDelegate

@@ -78,6 +78,24 @@ class FakeDriverBackend {
   /// GET /drivers/me/runs (P4).
   List<Map<String, Object?>> runs = [];
 
+  /// GET /drivers/me/earnings (P6): what the server's settlement draft says for this driver.
+  Map<String, Object?> earnings = {
+    'month': '2026-10',
+    'source': 'draft',
+    'runs': 18,
+    'cash': 42000,
+    'cashCommission': 4200,
+    'estimate': 631550,
+    'list': [
+      {'id': 'e1', 'date': '2026-10-05', 'waveType': 'morning', 'waveMinute': 480, 'status': 'done', 'counted': true, 'flagged': false},
+      {'id': 'e2', 'date': '2026-10-04', 'waveType': 'return', 'waveMinute': 840, 'status': 'done', 'counted': false, 'flagged': true},
+      {'id': 'e3', 'date': '2026-10-04', 'waveType': 'morning', 'waveMinute': 480, 'status': 'planned', 'counted': false, 'flagged': false},
+    ],
+    'past': [
+      {'month': '2026-09', 'approvedAt': '2026-10-02T09:00:00Z', 'runs': 21, 'cash': 30000, 'payout': 702300},
+    ],
+  };
+
   /// GET /drivers/me/availability: three days, two waves each; the first morning is already planned.
   late List<Map<String, Object?>> days = [
     for (var i = 0; i < 3; i++)
@@ -230,6 +248,8 @@ class FakeDriverBackend {
       final body = jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>;
       if (!faresReceived.any((f) => f['requestId'] == body['requestId'])) faresReceived.add(body);
       res = _json({'duplicate': false});
+    } else if (path == 'GET /drivers/me/earnings') {
+      res = _json(earnings);
     } else if (path == 'GET /drivers/me/runs') {
       res = _json(runs);
     } else if (path == 'GET /drivers/me/availability') {

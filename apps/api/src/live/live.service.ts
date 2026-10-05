@@ -5,6 +5,7 @@ import { notificationsFor, RiderAtStop } from '../notifications/rules';
 import { PrismaService } from '../prisma/prisma.service';
 import { REDIS } from '../redis/redis.module';
 import { runAsTenant } from '../tenancy/tenant-context';
+import { haversineKm } from '../geo/geo';
 import { etas, RouteStop } from './eta';
 import { BusPosition, LiveHub } from './live.hub';
 
@@ -24,6 +25,7 @@ interface Route {
   stops: RouteStop[];
   riders: RiderAtStop[];
   legs: Map<string, number>;
+  campus: { lat: number; lng: number };
   until: number;
 }
 
@@ -35,7 +37,12 @@ const key = {
   last: (runId: string) => `live:last:${runId}`,
   geo: (universityId: string) => `live:geo:${universityId}`,
   bucket: (runId: string, minute: number) => `live:pos:${runId}:${minute}`,
+  near: (runId: string, place: string) => `live:near:${runId}:${place}`,
 };
+
+/** SE-02: the first point within this distance of a stop (or campus) is always stored as proof. */
+const NEAR_STOP_M = 120;
+const NEAR_CAMPUS_M = 300;
 
 /**
  * NF-01: live GPS goes to Redis (GEO set + last point) and out over WebSocket; only one point per
@@ -71,10 +78,24 @@ export class LiveService {
     await this.ready();
 
     // One stored row per minute of driving, also for points that were buffered offline.
+    // Plus the first point at each stop and on campus, so the run's track proves every visit.
     const pipe = this.redis.pipeline();
-    for (const p of points) pipe.set(key.bucket(runId, Math.floor(p.at.getTime() / 60_000)), '1', 'EX', BUCKET_TTL_S, 'NX');
+    const slots: number[][] = points.map((p) => {
+      const mine = [pipe.length];
+      pipe.set(key.bucket(runId, Math.floor(p.at.getTime() / 60_000)), '1', 'EX', BUCKET_TTL_S, 'NX');
+      for (const s of route.stops) {
+        if (haversineKm(p, s) * 1000 > NEAR_STOP_M) continue;
+        mine.push(pipe.length);
+        pipe.set(key.near(runId, String(s.seq)), '1', 'EX', BUCKET_TTL_S, 'NX');
+      }
+      if (haversineKm(p, route.campus) * 1000 <= NEAR_CAMPUS_M) {
+        mine.push(pipe.length);
+        pipe.set(key.near(runId, 'campus'), '1', 'EX', BUCKET_TTL_S, 'NX');
+      }
+      return mine;
+    });
     const results = (await pipe.exec()) ?? [];
-    const rows = points.filter((_, i) => results[i]?.[1] === 'OK');
+    const rows = points.filter((_, i) => slots[i].some((k) => results[k]?.[1] === 'OK'));
 
     const latest = points[points.length - 1];
     const prevAt = Number((await this.redis.hget(key.last(runId), 'at')) ?? 0);
@@ -129,7 +150,7 @@ export class LiveService {
     const route = await runAsTenant(universityId, async () => {
       const run = await this.prisma.db.run.findUnique({
         where: { id: runId },
-        include: { stops: { orderBy: { seq: 'asc' }, include: { point: true } }, requests: { where: { status: 'assigned', boardedAt: null }, select: { id: true, studentId: true, pointId: true } } },
+        include: { university: { select: { campusLat: true, campusLng: true } }, stops: { orderBy: { seq: 'asc' }, include: { point: true } }, requests: { where: { status: 'assigned', boardedAt: null }, select: { id: true, studentId: true, pointId: true } } },
       });
       if (!run) throw new NotFoundException('Run not found');
       const ids = run.stops.map((s) => s.pointId);
@@ -142,6 +163,7 @@ export class LiveService {
         stops: run.stops.map((s) => ({ seq: s.seq + 1, pointId: s.pointId, lat: s.point.lat, lng: s.point.lng, served: !!s.servedAt })),
         riders: run.requests.map((r) => ({ requestId: r.id, studentId: r.studentId, seq: seqOf.get(r.pointId) ?? 0 })),
         legs: new Map(legs.map((l) => [`${l.fromKey}|${l.toKey}`, l.durationS])),
+        campus: { lat: run.university.campusLat, lng: run.university.campusLng },
         until: Date.now() + ROUTE_TTL_MS,
       };
     });

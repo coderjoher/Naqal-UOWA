@@ -1,9 +1,9 @@
 # Try Naql yourself
 
-Everything up to **P5 (runs and live tracking)** works end to end: the office sets up the
-service, students subscribe and request rides, the dispatcher puts them on buses, drivers run
-their routes with live GPS, and students and the office follow the buses on a map. Driver
-settlement and reports come in P6–P7.
+Everything up to **P6 (settlement)** works end to end: the office sets up the service, students
+subscribe and request rides, the dispatcher puts them on buses, drivers run their routes with live
+GPS, students and the office follow the buses on a map, and at month end the office computes,
+approves and exports the driver payouts.
 
 ## 1. Start everything (one command)
 
@@ -33,8 +33,9 @@ two Flutter apps. Later starts take seconds.
 
 Demo data is loaded automatically on the first start: Warith Al-Anbiyaa University, tiers A/B/C,
 8 gathering points in Karbala, waves 08:00 / 10:00 (to campus) and 14:00 / 16:00 (home) every day,
-6 approved drivers available all week, 40 students (half of the activated ones subscribed) and
-22 ride requests waiting for the next morning wave.
+6 approved drivers available all week, 40 students (half of the activated ones subscribed),
+22 ride requests waiting for the next morning wave, and **last month already driven** (GPS-tracked
+runs of three drivers, subscriptions and cash fares) so it can be settled.
 
 | Role | Where | Sign in |
 |------|-------|---------|
@@ -90,7 +91,22 @@ Demo data is loaded automatically on the first start: Warith Al-Anbiyaa Universi
 5. Turn off Wi-Fi on a phone running the driver APK during a run, keep going, turn it back on: all
    points and actions arrive, nothing twice.
 
-### F. Office: onboarding
+### F. Month end: settle the drivers
+1. Dashboard → **التسوية الشهرية (Monthly settlement)**. Last month is selected.
+2. **احسب التسوية (Compute settlement)**: subscription money per tier, commission, and one line per
+   driver: runs counted, cash they collected, payout. Payout = share of the tier's subscriptions by
+   GPS-verified runs after commission − commission on the cash they kept.
+3. **رحلات تحتاج مراجعة (Runs to review)**: one run has a GPS jump and one was never finished, so
+   neither counts. Press **قرّر** to count or exclude it with a reason, then recompute.
+4. **اعتمد (Approve)**: the month is locked for good (even the database refuses changes). Download
+   the Arabic **PDF** and the **Excel** file; their totals match the screen.
+5. Driver app → sign in as `07800000001` → **الأرباح (Earnings)**: this month's estimate, the runs
+   behind it, and last month once approved.
+6. **سجل التغييرات (Audit log)**: the approval and every review decision, with before/after.
+   Sign in as the super admin to see revenue and commission for every university on the overview,
+   and change a university's commission to see it in the audit log.
+
+### G. Office: onboarding
 - **السائقون (Drivers)**: review the pending application (ياسر كاظم), open documents, approve or reject.
 - **الطلبة (Students)**: import a roster (CSV) and issue activation codes.
 - **الإعدادات (Settings)**: distance tiers and prices, gathering points on the map, waves, driver requirements.
@@ -118,5 +134,4 @@ an FCM service account) from the university; until then notifications show insid
 
 | Coming in | What |
 |-----------|------|
-| P6 | Driver earnings and monthly settlement, money reports, super-admin revenue |
-| P7 | Moving students between buses, extra runs, reports, announcements |
+| P7 | Moving students between buses, extra runs, reports, announcements, ride history and ratings |

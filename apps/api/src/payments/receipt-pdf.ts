@@ -15,7 +15,7 @@ export interface ReceiptData {
   reversal?: boolean;
 }
 
-const FONT_DIR = process.env.FONT_DIR ?? join(__dirname, '../../assets/fonts');
+export const FONT_DIR = process.env.FONT_DIR ?? join(__dirname, '../../assets/fonts');
 const ARABIC = /[؀-ۿ]/;
 const LATIN = /[A-Za-z]/;
 
@@ -27,7 +27,7 @@ export const isArabicRun = (text: string) => ARABIC.test(text) && !LATIN.test(te
  * spaces to the wrong side. Arabic runs are therefore placed word by word from the right edge.
  * Numbers and Latin text always go in their own cells, so they never mix with Arabic runs.
  */
-function drawText(doc: PDFKit.PDFDocument, text: string, x: number, y: number, width: number, align: 'left' | 'right' | 'center') {
+export function drawText(doc: PDFKit.PDFDocument, text: string, x: number, y: number, width: number, align: 'left' | 'right' | 'center') {
   if (!isArabicRun(text)) {
     doc.text(text, x, y, { width, align, lineBreak: false });
     return;

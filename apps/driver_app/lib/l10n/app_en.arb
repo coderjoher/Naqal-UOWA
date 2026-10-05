@@ -119,5 +119,22 @@
   "pendingSync": "{n} waiting to send",
   "dropOff": "Drop-off",
   "endTitleMorning": "Head to campus",
-  "endTitleReturn": "Everyone is dropped off"
+  "endTitleReturn": "Everyone is dropped off",
+  "earningsTitle": "Earnings for {month}",
+  "earningsEstimate": "Estimated payout so far",
+  "earningsApproved": "Amount approved by the office",
+  "earningsDraft": "Being reviewed by the office",
+  "earningsHint": "Based on your GPS-verified runs and your share of the tier's subscriptions after commission, minus the commission on cash fares.",
+  "earningsRuns": "Runs counted",
+  "earningsCash": "Cash you collected",
+  "earningsCashCommission": "Commission on cash",
+  "earningsFlagged": "{count} runs whose track did not verify — the office will review them",
+  "earningsRunsTitle": "This month's runs",
+  "earningsNoRuns": "No runs this month yet",
+  "earningsCounted": "Counted",
+  "earningsNotCounted": "Not counted",
+  "earningsPending": "Not finished",
+  "earningsPast": "Past settlements",
+  "earningsPastRuns": "{runs} runs",
+  "earningsOwe": "You owe the office"
 }

@@ -11,6 +11,8 @@ import { StudentsPage } from '../pages/StudentsPage';
 import { LiveOpsPage } from '../pages/LiveOpsPage';
 import { DispatchPage } from '../pages/DispatchPage';
 import { SubscriptionsPage } from '../pages/SubscriptionsPage';
+import { SettlementPage } from '../pages/SettlementPage';
+import { AuditPage } from '../pages/AuditPage';
 import { PointsPage } from '../pages/settings/PointsPage';
 import { RequirementsPage } from '../pages/settings/RequirementsPage';
 import { TiersPage } from '../pages/settings/TiersPage';
@@ -46,6 +48,15 @@ export function AppRoutes() {
         <Route path="live" element={office(<LiveOpsPage />)} />
         <Route path="dispatch" element={office(<DispatchPage />)} />
         <Route path="subscriptions" element={office(<SubscriptionsPage />)} />
+        <Route path="settlement" element={office(<SettlementPage />)} />
+        <Route
+          path="audit"
+          element={
+            <RequireRole roles={['office', 'super_admin']}>
+              <AuditPage />
+            </RequireRole>
+          }
+        />
         <Route path="drivers" element={office(<DriversPage />)} />
         <Route path="students" element={office(<StudentsPage />)} />
         <Route path="users" element={office(<UsersPage />)} />

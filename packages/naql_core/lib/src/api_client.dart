@@ -5,6 +5,7 @@ import 'package:http_parser/http_parser.dart';
 
 import 'models.dart';
 import 'live.dart';
+import 'money.dart';
 import 'rides.dart';
 import 'session.dart';
 
@@ -116,6 +117,10 @@ class ApiClient {
 
   Future<List<DriverRun>> driverRuns({String? date}) async =>
       [for (final r in await get(date == null ? '/drivers/me/runs' : '/drivers/me/runs?date=$date') as List) DriverRun.fromJson(r as Map<String, dynamic>)];
+
+  /// DR-08: this month's runs and estimated payout, and past settlements.
+  Future<DriverEarnings> driverEarnings({String? month}) async =>
+      DriverEarnings.fromJson(await get(month == null ? '/drivers/me/earnings' : '/drivers/me/earnings?month=$month') as Map<String, dynamic>);
 
   // ---------------- Runs, live tracking, notifications (P5) ----------------
 

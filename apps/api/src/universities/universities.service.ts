@@ -1,6 +1,7 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import { AuditService, diff } from '../audit/audit.service';
 import { isPolygon } from '../geo/geo';
 import { PrismaService } from '../prisma/prisma.service';
 import { RoutingService } from '../routing/routing.service';
@@ -11,6 +12,7 @@ export class UniversitiesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly routing: RoutingService,
+    private readonly audit: AuditService,
   ) {}
 
   private checkCoverage(coverage: unknown) {
@@ -55,10 +57,15 @@ export class UniversitiesService {
   }
 
   /** SA-02 / SA-03 and campus/coverage edits. */
-  async update(id: string, dto: UpdateUniversityDto) {
+  async update(id: string, dto: UpdateUniversityDto, actorId?: string) {
     this.checkCoverage(dto.coverage);
     const before = await this.get(id);
     const uni = await this.prisma.db.university.update({ where: { id }, data: dto });
+    // SA-05: commission, waitlist and other settings changes, with before/after.
+    if (actorId) {
+      const d = diff(before, uni, Object.keys(dto));
+      await this.audit.record({ universityId: id, actorId, action: 'university.update', entity: 'Universities', entityId: id, before: d.before, after: d.after });
+    }
     if (before.campusLat !== uni.campusLat || before.campusLng !== uni.campusLng) await this.routing.scheduleMatrixRebuild(id);
     return uni;
   }
