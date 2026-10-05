@@ -199,8 +199,11 @@ jobs:
           mkdir -p zap && chmod 777 zap
           for target in http://localhost:8080 http://localhost:3000/docs; do
             name=$(echo "$target" | sed -E 's#https?://##; s#[^a-z0-9]+#-#g')
+            # Exit 1/2 = findings (judged by risk below); 3 or more = ZAP itself failed.
+            rc=0
             docker run --rm --network host -v "$PWD/zap:/zap/wrk:rw" ghcr.io/zaproxy/zaproxy:stable \
-              zap-baseline.py -t "$target" -J "$name.json" -r "$name.html" -I -m 3 || true
+              zap-baseline.py -t "$target" -J "$name.json" -r "$name.html" -I -m 3 || rc=$?
+            if [ "$rc" -ge 3 ]; then echo "ZAP failed on $target (exit $rc)"; exit "$rc"; fi
           done
           python3 - <<'PY'
           import glob, json, sys
