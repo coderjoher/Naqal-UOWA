@@ -130,8 +130,8 @@ runs of three drivers, subscriptions and cash fares) so it can be settled.
 
 ## 4. Android APKs (optional)
 
-GitHub → **Actions** → **Android test builds** → latest run → **Artifacts**:
-`naql-student_app-apk`, `naql-driver_app-apk`. Install on a phone (allow "unknown sources").
+GitHub → **Releases** → **Demo APKs**: `naql-student.apk`, `naql-driver.apk` (rebuilt on every
+change to `main`). Install on a phone (allow "unknown sources").
 On the welcome screen, tap the **server** button (top corner) and enter the computer's IP, e.g.
 `192.168.1.20` — the apps then talk to your `docker compose` stack.
 

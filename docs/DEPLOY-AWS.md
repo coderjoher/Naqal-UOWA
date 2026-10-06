@@ -113,8 +113,9 @@ apps). When it returns, open `https://YOUR-OFFICE-NAME.duckdns.org`.
 
 Same accounts as [DEPLOY-ORACLE.md §7](DEPLOY-ORACLE.md#7-sign-in-and-test): office
 `office@uowa.edu.iq` / `password123`, students `W-1001`… / `student123`, drivers
-`07800000001`… with the code shown on screen. Android: demo APKs from GitHub → *Actions* → *Apps*,
-then enter the student or driver address as the server.
+`07800000001`… with the code shown on screen. Android: GitHub → *Releases* → **Demo APKs** →
+`naql-student.apk` / `naql-driver.apk`; on first start tap the server icon and enter
+`https://YOUR-STUDENT-NAME.duckdns.org/api` (the same address works for both apps).
 
 ## Day-to-day
 
