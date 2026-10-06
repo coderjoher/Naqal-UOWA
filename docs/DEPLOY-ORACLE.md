@@ -131,8 +131,9 @@ builds the dashboard and both web apps. Later starts take seconds. When the comm
 | Drivers | driver address | `07800000001` … `07800000006`, then the code shown on screen |
 
 **Phones:** the web addresses work in any phone browser (and can be added to the home screen). For
-the Android apps, download the demo APKs from GitHub → *Actions* → *Apps* → latest run on `main` →
-*Artifacts*; on first start tap the server icon and enter the student (or driver) address.
+the Android apps, open GitHub → *Releases* → **Demo APKs** on the phone and download
+`naql-student.apk` / `naql-driver.apk` (allow installing from this source). On first start tap the
+server icon and enter `https://YOUR-STUDENT-NAME.duckdns.org/api` (the same address works for both apps).
 
 Change the demo passwords before giving access to real people.
 

@@ -31,6 +31,7 @@ docs/
   phases/P0…P9      scope, tests, exit gate per phase
   design-system.md  visual language
   DEPLOY-ORACLE.md  free test server (Oracle Cloud ARM)
+  DEPLOY-AWS.md     test server on the AWS free plan
 ```
 
 ## Getting started
@@ -39,7 +40,8 @@ docs/
 starts the dashboard (:8080), the student app (:8081) and the driver app (:8082) with demo data.
 
 **Want it online for free?** [docs/DEPLOY-ORACLE.md](docs/DEPLOY-ORACLE.md) puts the whole system on
-an Oracle Cloud *Always Free* ARM server with HTTPS, step by step.
+an Oracle Cloud *Always Free* ARM server with HTTPS, step by step; [docs/DEPLOY-AWS.md](docs/DEPLOY-AWS.md)
+does the same on AWS's free plan (credits, 6 months).
 
 Requirements: Node 22 + pnpm 10, Flutter 3.47, Docker (or local PostgreSQL 16 and Redis 7).
 
