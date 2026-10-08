@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import { Queue } from 'bullmq';
 import request from 'supertest';
 import { baghdadDate, secondsInto } from '../src/dispatch/clock';
-import { DISPATCH_QUEUE, WAITLIST_EXPIRE, WAVE_TICK } from '../src/dispatch/dispatch.engine';
+import { DISPATCH_QUEUE, DispatchEngine, WAITLIST_EXPIRE, WAVE_TICK } from '../src/dispatch/dispatch.engine';
 import { auth, createApp, createConfiguredUniversity, createUser, login, raw, resetDb } from './helpers';
 
 /** Polls until `fn` returns a truthy value (workers run asynchronously). */
@@ -211,5 +211,21 @@ describe('P4 ride requests and dispatch (e2e)', () => {
     // Someone else's request is not found; a closed one cannot be cancelled twice.
     await http().post(`/rides/${omar.id}/cancel`).set(auth(tokens.ali)).expect(404);
     await http().post(`/rides/${hasan.id}/cancel`).set(auth(tokens.hasan)).expect(409);
+  });
+
+  it('a ride finished while a waitlist re-check is running is never flipped back to assigned', async () => {
+    const engine = app.get(DispatchEngine);
+    const omar = await myRide('omar');
+    expect(omar.status).toBe('assigned');
+    // The re-check loads the plan, then the ride ends (driver finished it) before the plan is saved.
+    const load = (engine as any).load.bind(engine);
+    const spy = jest.spyOn(engine as any, 'load').mockImplementationOnce(async (...args: unknown[]) => {
+      const state = await load(...args);
+      await raw.rideRequest.update({ where: { id: omar.id }, data: { status: 'done' } });
+      return state;
+    });
+    await engine.recheck({ universityId: uniId, waveId: wave.id, date: wave.date });
+    spy.mockRestore();
+    expect((await raw.rideRequest.findUniqueOrThrow({ where: { id: omar.id } })).status).toBe('done');
   });
 });
