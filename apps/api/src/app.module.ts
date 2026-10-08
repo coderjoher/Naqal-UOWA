@@ -17,6 +17,9 @@ import { DriverRequirementsController } from './driver-requirements/requirements
 import { DriverRequirementsService } from './driver-requirements/requirements.service';
 import { DISPATCH_QUEUE, DispatchEngine } from './dispatch/dispatch.engine';
 import { DispatchProcessor } from './dispatch/dispatch.processor';
+import { TaxiController } from './taxi/taxi.controller';
+import { TAXI_QUEUE, TaxiProcessor } from './taxi/taxi.processor';
+import { TaxiService } from './taxi/taxi.service';
 import { LiveGateway } from './live/live.gateway';
 import { LiveHub } from './live/live.hub';
 import { LiveService } from './live/live.service';
@@ -77,6 +80,7 @@ class CacheModule {}
       },
     }),
     BullModule.registerQueue({ name: DISPATCH_QUEUE }),
+    BullModule.registerQueue({ name: TAXI_QUEUE }),
     PrismaModule,
     RedisModule,
     CacheModule,
@@ -100,6 +104,7 @@ class CacheModule {}
     RunsController,
     SettlementController,
     FeedbackController,
+    TaxiController,
     MetricsController,
   ],
   providers: [
@@ -132,6 +137,8 @@ class CacheModule {}
     RunsService,
     PaymentsService,
     SubscriptionsService,
+    TaxiService,
+    TaxiProcessor,
   ],
 })
 export class AppModule implements NestModule {

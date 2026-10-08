@@ -9,11 +9,15 @@ export interface MapMarker {
   label: string;
   /** Short text inside the pin (e.g. tier letter). */
   badge?: string;
-  kind?: 'campus' | 'point' | 'draft' | 'inactive' | 'bus' | 'bus-female' | 'stop' | 'stop-done';
+  kind?: 'campus' | 'point' | 'draft' | 'inactive' | 'bus' | 'bus-female' | 'stop' | 'stop-done' | 'taxi' | 'taxi-busy' | 'rider';
 }
 
 const BUS_SVG =
   '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 2 7"/><path d="M10 6h4"/><path d="m22 7-2-1"/><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M8 15h.01"/><path d="M16 15h.01"/><path d="M6 19v2"/><path d="M18 21v-2"/></svg>';
+
+// lucide "car-taxi-front"
+const TAXI_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4"/><path d="m21 8-2 2-1.5-3.7A2 2 0 0 0 15.646 5H8.4a2 2 0 0 0-1.903 1.257L5 10 3 8"/><path d="M7 14h.01"/><path d="M17 14h.01"/><rect width="18" height="8" x="3" y="10" rx="2"/><path d="M5 18v2"/><path d="M19 18v2"/></svg>';
 
 /** Moves a marker to a new position over `ms` (buses glide instead of jumping every ping). */
 function glide(marker: maplibregl.Marker, to: [number, number], ms = 900) {
@@ -99,7 +103,8 @@ export function MapView({
     const seen = new Set<string>();
     for (const mk of markers) {
       seen.add(mk.id);
-      const isBus = mk.kind === 'bus' || mk.kind === 'bus-female';
+      const isTaxi = mk.kind === 'taxi' || mk.kind === 'taxi-busy';
+      const isBus = mk.kind === 'bus' || mk.kind === 'bus-female' || isTaxi;
       const cls = `naql-pin naql-pin--${mk.kind ?? 'point'}${mk.id === selectedId ? ' is-selected' : ''}`;
       const existing = live.current.get(mk.id);
       if (existing) {
@@ -118,7 +123,7 @@ export function MapView({
       node.className = cls;
       node.setAttribute('aria-label', mk.label);
       node.title = mk.label;
-      if (isBus) node.innerHTML = BUS_SVG;
+      if (isBus) node.innerHTML = isTaxi ? TAXI_SVG : BUS_SVG;
       else node.textContent = mk.badge ?? '';
       node.dataset.markerId = mk.id;
       node.addEventListener('click', (ev) => {

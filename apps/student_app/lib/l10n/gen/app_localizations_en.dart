@@ -603,4 +603,209 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dismiss => 'Dismiss';
+
+  @override
+  String get taxiTitle => 'Campus taxi';
+
+  @override
+  String get taxiCardTitle => 'Taxi to or from campus';
+
+  @override
+  String get taxiCardBody =>
+      'See the fare before you book. Pay the driver in cash.';
+
+  @override
+  String get taxiDirection => 'Trip direction';
+
+  @override
+  String get taxiToCampus => 'To campus';
+
+  @override
+  String get taxiFromCampus => 'Home from campus';
+
+  @override
+  String get taxiPickupHint => 'Move or tap the map to set your pickup spot';
+
+  @override
+  String get taxiDropoffHint => 'Move or tap the map to set your drop-off spot';
+
+  @override
+  String get taxiMyLocation => 'Use my location';
+
+  @override
+  String get taxiLocationFailed =>
+      'Couldn\'t find your location. Turn on location or move the map.';
+
+  @override
+  String get taxiLabel => 'Landmark (optional)';
+
+  @override
+  String get taxiLabelHint => 'e.g. near the mosque gate';
+
+  @override
+  String get taxiFare => 'Fare';
+
+  @override
+  String get taxiCash => 'Paid in cash to the driver';
+
+  @override
+  String taxiKm(String km) {
+    return '$km km';
+  }
+
+  @override
+  String taxiMinutes(int n) {
+    return '$n min';
+  }
+
+  @override
+  String taxiNearby(int n) {
+    return 'Taxis nearby: $n';
+  }
+
+  @override
+  String get taxiNoneNearby => 'No taxis nearby right now. You can still ask.';
+
+  @override
+  String taxiPickupIn(int n) {
+    return 'Pickup in about $n min';
+  }
+
+  @override
+  String get taxiRequest => 'Request taxi';
+
+  @override
+  String get taxiUnavailableHere => 'Taxis aren\'t available at this spot';
+
+  @override
+  String get taxiSearching => 'Looking for a taxi near you';
+
+  @override
+  String get taxiSearchingBody =>
+      'Nearby drivers can see your request. The first to accept comes to you.';
+
+  @override
+  String get taxiTimeLeft => 'Time left';
+
+  @override
+  String get taxiCancel => 'Cancel request';
+
+  @override
+  String get taxiCancelTitle => 'Cancel the taxi?';
+
+  @override
+  String get taxiCancelBody => 'We\'ll let the driver know.';
+
+  @override
+  String get taxiCancelYes => 'Yes, cancel';
+
+  @override
+  String get taxiKeep => 'No, keep it';
+
+  @override
+  String get taxiAccepted => 'Your taxi is on the way';
+
+  @override
+  String get taxiArrived => 'Your taxi is here';
+
+  @override
+  String get taxiArrivedBody => 'The driver is waiting at the pickup spot.';
+
+  @override
+  String get taxiOnTripToCampus => 'On the way to campus';
+
+  @override
+  String get taxiOnTripHome => 'On the way home';
+
+  @override
+  String taxiAway(int n) {
+    return '$n min away';
+  }
+
+  @override
+  String get taxiCall => 'Call the driver';
+
+  @override
+  String taxiPlate(String plate) {
+    return 'Plate $plate';
+  }
+
+  @override
+  String get taxiStepAccepted => 'Accepted';
+
+  @override
+  String get taxiStepArrived => 'Arrived';
+
+  @override
+  String get taxiStepOnTrip => 'On trip';
+
+  @override
+  String get taxiStepDone => 'Done';
+
+  @override
+  String taxiStepOf(int n, String name) {
+    return 'Step $n of 4: $name';
+  }
+
+  @override
+  String get taxiDone => 'You\'ve arrived';
+
+  @override
+  String taxiPayCash(String amount) {
+    return 'Pay the driver $amount in cash';
+  }
+
+  @override
+  String get taxiSummary => 'Trip summary';
+
+  @override
+  String get taxiRoute => 'Route';
+
+  @override
+  String get taxiCampus => 'Campus';
+
+  @override
+  String get taxiYourSpot => 'Your spot';
+
+  @override
+  String get taxiDriver => 'Driver';
+
+  @override
+  String get taxiDistance => 'Distance';
+
+  @override
+  String get taxiBackHome => 'Back to home';
+
+  @override
+  String get taxiExpired => 'No driver took it this time';
+
+  @override
+  String get taxiExpiredBody => 'Drivers may be busy. Try again in a moment.';
+
+  @override
+  String get taxiCancelledByYou => 'You cancelled the request';
+
+  @override
+  String get taxiCancelledOther => 'The request was cancelled';
+
+  @override
+  String get taxiCancelledBody => 'You can book a new taxi any time.';
+
+  @override
+  String get taxiTryAgain => 'Try again';
+
+  @override
+  String get taxiPickupPin => 'Pickup spot';
+
+  @override
+  String get taxiDropoffPin => 'Drop-off spot';
+
+  @override
+  String get taxiCarPin => 'Taxi';
+
+  @override
+  String get taxiFollow => 'Follow your ride';
+
+  @override
+  String get taxiPlateLabel => 'Plate';
 }

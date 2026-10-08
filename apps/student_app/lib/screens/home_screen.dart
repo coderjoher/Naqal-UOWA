@@ -10,6 +10,7 @@ import '../data/subscription.dart';
 import '../l10n/gen/app_localizations.dart';
 import 'ride_section.dart';
 import 'subscription_card.dart';
+import 'taxi_card.dart';
 
 /// Home leads with the day's answer: is there a ride? (design principle 1).
 /// The ride comes first (P4), then the subscription (P3) and the gathering point.
@@ -41,6 +42,8 @@ class HomeScreen extends ConsumerWidget {
           const _Announcements(),
           const NaqlEntrance(index: 1, child: RideSection()),
           const SizedBox(height: NaqlSpace.s4),
+          // P10: only where the office runs campus taxis (adds its own bottom gap when shown).
+          const NaqlEntrance(index: 2, child: TaxiHomeCard()),
           NaqlEntrance(
             index: 2,
             child: sub.when(

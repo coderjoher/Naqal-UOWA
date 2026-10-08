@@ -594,4 +594,209 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get dismiss => 'إخفاء';
+
+  @override
+  String get taxiTitle => 'تكسي الجامعة';
+
+  @override
+  String get taxiCardTitle => 'تكسي من الجامعة وإليها';
+
+  @override
+  String get taxiCardBody => 'تعرف الأجرة قبل الطلب، وتدفعها نقداً للسائق.';
+
+  @override
+  String get taxiDirection => 'وجهة الرحلة';
+
+  @override
+  String get taxiToCampus => 'إلى الجامعة';
+
+  @override
+  String get taxiFromCampus => 'من الجامعة للبيت';
+
+  @override
+  String get taxiPickupHint => 'حرّك الخريطة أو المسها لتحديد مكان الركوب';
+
+  @override
+  String get taxiDropoffHint => 'حرّك الخريطة أو المسها لتحديد مكان النزول';
+
+  @override
+  String get taxiMyLocation => 'استخدم موقعي الحالي';
+
+  @override
+  String get taxiLocationFailed =>
+      'تعذّر تحديد موقعك. فعّل خدمة الموقع أو حرّك الخريطة.';
+
+  @override
+  String get taxiLabel => 'علامة دالّة (اختياري)';
+
+  @override
+  String get taxiLabelHint => 'مثلاً: قرب باب الجامع';
+
+  @override
+  String get taxiFare => 'الأجرة';
+
+  @override
+  String get taxiCash => 'تُدفع نقداً للسائق';
+
+  @override
+  String taxiKm(String km) {
+    return '$km كم';
+  }
+
+  @override
+  String taxiMinutes(int n) {
+    return '$n د';
+  }
+
+  @override
+  String taxiNearby(int n) {
+    return 'سيارات قريبة: $n';
+  }
+
+  @override
+  String get taxiNoneNearby => 'لا توجد سيارة قريبة الآن، ويمكنك الطلب مع ذلك.';
+
+  @override
+  String taxiPickupIn(int n) {
+    return 'يصلك خلال $n د تقريباً';
+  }
+
+  @override
+  String get taxiRequest => 'اطلب تكسي';
+
+  @override
+  String get taxiUnavailableHere => 'خدمة التكسي غير متاحة في هذا المكان';
+
+  @override
+  String get taxiSearching => 'نبحث عن تكسي قريب';
+
+  @override
+  String get taxiSearchingBody =>
+      'وصل طلبك إلى السائقين القريبين، وأول من يقبل يأتي إليك.';
+
+  @override
+  String get taxiTimeLeft => 'الوقت المتبقي';
+
+  @override
+  String get taxiCancel => 'إلغاء الطلب';
+
+  @override
+  String get taxiCancelTitle => 'إلغاء التكسي؟';
+
+  @override
+  String get taxiCancelBody => 'سنُبلغ السائق بالإلغاء.';
+
+  @override
+  String get taxiCancelYes => 'نعم، ألغِ';
+
+  @override
+  String get taxiKeep => 'لا، أبقِه';
+
+  @override
+  String get taxiAccepted => 'التكسي في الطريق إليك';
+
+  @override
+  String get taxiArrived => 'وصل التكسي';
+
+  @override
+  String get taxiArrivedBody => 'السائق ينتظرك في مكان الركوب.';
+
+  @override
+  String get taxiOnTripToCampus => 'في الطريق إلى الجامعة';
+
+  @override
+  String get taxiOnTripHome => 'في الطريق إلى البيت';
+
+  @override
+  String taxiAway(int n) {
+    return 'يصل خلال $n د';
+  }
+
+  @override
+  String get taxiCall => 'اتصل بالسائق';
+
+  @override
+  String taxiPlate(String plate) {
+    return 'اللوحة $plate';
+  }
+
+  @override
+  String get taxiStepAccepted => 'قُبل';
+
+  @override
+  String get taxiStepArrived => 'وصل';
+
+  @override
+  String get taxiStepOnTrip => 'في الطريق';
+
+  @override
+  String get taxiStepDone => 'انتهت';
+
+  @override
+  String taxiStepOf(int n, String name) {
+    return 'الخطوة $n من 4: $name';
+  }
+
+  @override
+  String get taxiDone => 'وصلت بالسلامة';
+
+  @override
+  String taxiPayCash(String amount) {
+    return 'ادفع للسائق $amount نقداً';
+  }
+
+  @override
+  String get taxiSummary => 'ملخص الرحلة';
+
+  @override
+  String get taxiRoute => 'المسار';
+
+  @override
+  String get taxiCampus => 'الجامعة';
+
+  @override
+  String get taxiYourSpot => 'موقعك';
+
+  @override
+  String get taxiDriver => 'السائق';
+
+  @override
+  String get taxiDistance => 'المسافة';
+
+  @override
+  String get taxiBackHome => 'العودة للرئيسية';
+
+  @override
+  String get taxiExpired => 'لم يقبل أي سائق هذه المرة';
+
+  @override
+  String get taxiExpiredBody =>
+      'قد يكون السائقون مشغولين. جرّب مرة أخرى بعد قليل.';
+
+  @override
+  String get taxiCancelledByYou => 'ألغيت الطلب';
+
+  @override
+  String get taxiCancelledOther => 'أُلغي الطلب';
+
+  @override
+  String get taxiCancelledBody => 'يمكنك طلب تكسي جديد متى شئت.';
+
+  @override
+  String get taxiTryAgain => 'حاول مرة أخرى';
+
+  @override
+  String get taxiPickupPin => 'مكان الركوب';
+
+  @override
+  String get taxiDropoffPin => 'مكان النزول';
+
+  @override
+  String get taxiCarPin => 'التكسي';
+
+  @override
+  String get taxiFollow => 'تابِع رحلتك';
+
+  @override
+  String get taxiPlateLabel => 'اللوحة';
 }

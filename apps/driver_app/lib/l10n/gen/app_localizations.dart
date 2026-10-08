@@ -919,6 +919,366 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'عليك للمكتب'**
   String get earningsOwe;
+
+  /// No description provided for @taxi.
+  ///
+  /// In ar, this message translates to:
+  /// **'تكسي'**
+  String get taxi;
+
+  /// No description provided for @taxiTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تكسي الجامعة'**
+  String get taxiTitle;
+
+  /// No description provided for @taxiOnline.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنت متصل'**
+  String get taxiOnline;
+
+  /// No description provided for @taxiOffline.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنت غير متصل'**
+  String get taxiOffline;
+
+  /// No description provided for @taxiOnlineHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'تصلك طلبات الطلبة القريبين'**
+  String get taxiOnlineHint;
+
+  /// No description provided for @taxiOfflineHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اضغط لتبدأ باستلام الطلبات'**
+  String get taxiOfflineHint;
+
+  /// No description provided for @taxiGoOnline.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ العمل'**
+  String get taxiGoOnline;
+
+  /// No description provided for @taxiGoOffline.
+  ///
+  /// In ar, this message translates to:
+  /// **'توقّف عن العمل'**
+  String get taxiGoOffline;
+
+  /// No description provided for @taxiConnecting.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ الاتصال…'**
+  String get taxiConnecting;
+
+  /// No description provided for @taxiWaitingTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'بانتظار الطلبات'**
+  String get taxiWaitingTitle;
+
+  /// No description provided for @taxiWaitingBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'أبقِ التطبيق مفتوحاً. تظهر الطلبات الجديدة هنا.'**
+  String get taxiWaitingBody;
+
+  /// No description provided for @taxiOfflineTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تصلك طلبات الآن'**
+  String get taxiOfflineTitle;
+
+  /// No description provided for @taxiOfflineBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ العمل لتصلك طلبات الطلبة القريبين منك.'**
+  String get taxiOfflineBody;
+
+  /// No description provided for @taxiToCampus.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلى الجامعة'**
+  String get taxiToCampus;
+
+  /// No description provided for @taxiFromCampus.
+  ///
+  /// In ar, this message translates to:
+  /// **'من الجامعة'**
+  String get taxiFromCampus;
+
+  /// No description provided for @taxiTripKm.
+  ///
+  /// In ar, this message translates to:
+  /// **'رحلة {km} كم'**
+  String taxiTripKm(String km);
+
+  /// No description provided for @taxiAwayKm.
+  ///
+  /// In ar, this message translates to:
+  /// **'يبعد {km} كم'**
+  String taxiAwayKm(String km);
+
+  /// No description provided for @taxiAccept.
+  ///
+  /// In ar, this message translates to:
+  /// **'اقبل الطلب'**
+  String get taxiAccept;
+
+  /// No description provided for @taxiSecondsLeft.
+  ///
+  /// In ar, this message translates to:
+  /// **'باقي {seconds} ثانية'**
+  String taxiSecondsLeft(int seconds);
+
+  /// No description provided for @taxiNewRequest.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلب جديد'**
+  String get taxiNewRequest;
+
+  /// No description provided for @taxiTaken.
+  ///
+  /// In ar, this message translates to:
+  /// **'سبقك سائق آخر لهذا الطلب.'**
+  String get taxiTaken;
+
+  /// No description provided for @taxiNoLocation.
+  ///
+  /// In ar, this message translates to:
+  /// **'شغّل الموقع لتبدأ العمل.'**
+  String get taxiNoLocation;
+
+  /// No description provided for @taxisOff.
+  ///
+  /// In ar, this message translates to:
+  /// **'خدمة التكسي متوقفة الآن من المكتب.'**
+  String get taxisOff;
+
+  /// No description provided for @taxiStudentCancelled.
+  ///
+  /// In ar, this message translates to:
+  /// **'ألغى الطالب الرحلة.'**
+  String get taxiStudentCancelled;
+
+  /// No description provided for @taxiFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر الاتصال. حاول مرة أخرى.'**
+  String get taxiFailed;
+
+  /// No description provided for @taxiDismiss.
+  ///
+  /// In ar, this message translates to:
+  /// **'إغلاق'**
+  String get taxiDismiss;
+
+  /// No description provided for @taxiGoToStudent.
+  ///
+  /// In ar, this message translates to:
+  /// **'اذهب إلى الطالب'**
+  String get taxiGoToStudent;
+
+  /// No description provided for @taxiGoToGate.
+  ///
+  /// In ar, this message translates to:
+  /// **'اذهب إلى باب الجامعة'**
+  String get taxiGoToGate;
+
+  /// No description provided for @taxiWaitingStudent.
+  ///
+  /// In ar, this message translates to:
+  /// **'بانتظار صعود الطالب'**
+  String get taxiWaitingStudent;
+
+  /// No description provided for @taxiOnTripCampus.
+  ///
+  /// In ar, this message translates to:
+  /// **'في الطريق إلى الجامعة'**
+  String get taxiOnTripCampus;
+
+  /// No description provided for @taxiOnTripHome.
+  ///
+  /// In ar, this message translates to:
+  /// **'في الطريق إلى مكان الطالب'**
+  String get taxiOnTripHome;
+
+  /// No description provided for @taxiStep.
+  ///
+  /// In ar, this message translates to:
+  /// **'الخطوة {n} من 3'**
+  String taxiStep(int n);
+
+  /// No description provided for @taxiCall.
+  ///
+  /// In ar, this message translates to:
+  /// **'اتصال'**
+  String get taxiCall;
+
+  /// No description provided for @taxiCallStudent.
+  ///
+  /// In ar, this message translates to:
+  /// **'اتصل بـ {name}'**
+  String taxiCallStudent(String name);
+
+  /// No description provided for @taxiArrived.
+  ///
+  /// In ar, this message translates to:
+  /// **'وصلت'**
+  String get taxiArrived;
+
+  /// No description provided for @taxiStartTrip.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ الرحلة'**
+  String get taxiStartTrip;
+
+  /// No description provided for @taxiEndTrip.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنهِ الرحلة واستلم {amount}'**
+  String taxiEndTrip(String amount);
+
+  /// No description provided for @taxiEndConfirmTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'هل استلمت {amount} نقداً؟'**
+  String taxiEndConfirmTitle(String amount);
+
+  /// No description provided for @taxiEndConfirmBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'تُسجَّل الأجرة باسمك عند إنهاء الرحلة.'**
+  String get taxiEndConfirmBody;
+
+  /// No description provided for @taxiEndConfirmYes.
+  ///
+  /// In ar, this message translates to:
+  /// **'نعم، استلمتها'**
+  String get taxiEndConfirmYes;
+
+  /// No description provided for @taxiNotYet.
+  ///
+  /// In ar, this message translates to:
+  /// **'ليس بعد'**
+  String get taxiNotYet;
+
+  /// No description provided for @taxiCancelRide.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء الرحلة'**
+  String get taxiCancelRide;
+
+  /// No description provided for @taxiCancelConfirmTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء هذه الرحلة؟'**
+  String get taxiCancelConfirmTitle;
+
+  /// No description provided for @taxiCancelConfirmBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'سيعود الطلب إلى السائقين الآخرين.'**
+  String get taxiCancelConfirmBody;
+
+  /// No description provided for @taxiCancelYes.
+  ///
+  /// In ar, this message translates to:
+  /// **'نعم، ألغِ الرحلة'**
+  String get taxiCancelYes;
+
+  /// No description provided for @taxiKeepRide.
+  ///
+  /// In ar, this message translates to:
+  /// **'أكمل الرحلة'**
+  String get taxiKeepRide;
+
+  /// No description provided for @taxiFare.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأجرة نقداً'**
+  String get taxiFare;
+
+  /// No description provided for @taxiDistance.
+  ///
+  /// In ar, this message translates to:
+  /// **'المسافة'**
+  String get taxiDistance;
+
+  /// No description provided for @taxiKm.
+  ///
+  /// In ar, this message translates to:
+  /// **'{km} كم'**
+  String taxiKm(String km);
+
+  /// No description provided for @taxiDoneTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتهت الرحلة'**
+  String get taxiDoneTitle;
+
+  /// No description provided for @taxiDoneBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'سُجّل المبلغ النقدي باسمك.'**
+  String get taxiDoneBody;
+
+  /// No description provided for @taxiBackToRequests.
+  ///
+  /// In ar, this message translates to:
+  /// **'العودة إلى الطلبات'**
+  String get taxiBackToRequests;
+
+  /// No description provided for @taxiMonthTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'رحلات التكسي هذا الشهر'**
+  String get taxiMonthTitle;
+
+  /// No description provided for @taxiMonthSummary.
+  ///
+  /// In ar, this message translates to:
+  /// **'{trips} رحلة · {amount}'**
+  String taxiMonthSummary(int trips, String amount);
+
+  /// No description provided for @taxiRecent.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر رحلات التكسي'**
+  String get taxiRecent;
+
+  /// No description provided for @taxiNoTrips.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا رحلات تكسي بعد'**
+  String get taxiNoTrips;
+
+  /// No description provided for @taxiStatusDone.
+  ///
+  /// In ar, this message translates to:
+  /// **'منتهية'**
+  String get taxiStatusDone;
+
+  /// No description provided for @taxiStatusCancelled.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملغاة'**
+  String get taxiStatusCancelled;
+
+  /// No description provided for @taxiStatusActive.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارية'**
+  String get taxiStatusActive;
+
+  /// No description provided for @taxiCashCollected.
+  ///
+  /// In ar, this message translates to:
+  /// **'النقد المستلم'**
+  String get taxiCashCollected;
 }
 
 class _AppLocalizationsDelegate

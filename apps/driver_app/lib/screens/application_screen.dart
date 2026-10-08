@@ -107,7 +107,7 @@ class _ApplicationScreenState extends ConsumerState<ApplicationScreen> {
     if (a == null) return const SizedBox.shrink();
     final required = a.form.where((f) => f.required).length;
     final done = required - a.missing.length;
-    String vehicleLabel(String v) => switch (v) { 'coaster' => t.coaster, 'minibus' => t.minibus, 'bus' => t.bus, 'van' => t.van, _ => v };
+    String vehicleLabel(String v) => switch (v) { 'coaster' => t.coaster, 'minibus' => t.minibus, 'bus' => t.bus, 'van' => t.van, 'taxi' => t.taxi, _ => v };
 
     Widget field(FormFieldSpec f, int i) {
       if (f.key == 'phone') return const SizedBox.shrink();

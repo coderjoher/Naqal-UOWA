@@ -257,5 +257,131 @@
       }
     }
   },
-  "earningsOwe": "عليك للمكتب"
+  "earningsOwe": "عليك للمكتب",
+  "taxi": "تكسي",
+  "taxiTitle": "تكسي الجامعة",
+  "taxiOnline": "أنت متصل",
+  "taxiOffline": "أنت غير متصل",
+  "taxiOnlineHint": "تصلك طلبات الطلبة القريبين",
+  "taxiOfflineHint": "اضغط لتبدأ باستلام الطلبات",
+  "taxiGoOnline": "ابدأ العمل",
+  "taxiGoOffline": "توقّف عن العمل",
+  "taxiConnecting": "جارٍ الاتصال…",
+  "taxiWaitingTitle": "بانتظار الطلبات",
+  "taxiWaitingBody": "أبقِ التطبيق مفتوحاً. تظهر الطلبات الجديدة هنا.",
+  "taxiOfflineTitle": "لا تصلك طلبات الآن",
+  "taxiOfflineBody": "ابدأ العمل لتصلك طلبات الطلبة القريبين منك.",
+  "taxiToCampus": "إلى الجامعة",
+  "taxiFromCampus": "من الجامعة",
+  "taxiTripKm": "رحلة {km} كم",
+  "@taxiTripKm": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "taxiAwayKm": "يبعد {km} كم",
+  "@taxiAwayKm": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "taxiAccept": "اقبل الطلب",
+  "taxiSecondsLeft": "باقي {seconds} ثانية",
+  "@taxiSecondsLeft": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "taxiNewRequest": "طلب جديد",
+  "taxiTaken": "سبقك سائق آخر لهذا الطلب.",
+  "taxiNoLocation": "شغّل الموقع لتبدأ العمل.",
+  "taxisOff": "خدمة التكسي متوقفة الآن من المكتب.",
+  "taxiStudentCancelled": "ألغى الطالب الرحلة.",
+  "taxiFailed": "تعذّر الاتصال. حاول مرة أخرى.",
+  "taxiDismiss": "إغلاق",
+  "taxiGoToStudent": "اذهب إلى الطالب",
+  "taxiGoToGate": "اذهب إلى باب الجامعة",
+  "taxiWaitingStudent": "بانتظار صعود الطالب",
+  "taxiOnTripCampus": "في الطريق إلى الجامعة",
+  "taxiOnTripHome": "في الطريق إلى مكان الطالب",
+  "taxiStep": "الخطوة {n} من 3",
+  "@taxiStep": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "taxiCall": "اتصال",
+  "taxiCallStudent": "اتصل بـ {name}",
+  "@taxiCallStudent": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "taxiArrived": "وصلت",
+  "taxiStartTrip": "ابدأ الرحلة",
+  "taxiEndTrip": "أنهِ الرحلة واستلم {amount}",
+  "@taxiEndTrip": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "taxiEndConfirmTitle": "هل استلمت {amount} نقداً؟",
+  "@taxiEndConfirmTitle": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "taxiEndConfirmBody": "تُسجَّل الأجرة باسمك عند إنهاء الرحلة.",
+  "taxiEndConfirmYes": "نعم، استلمتها",
+  "taxiNotYet": "ليس بعد",
+  "taxiCancelRide": "إلغاء الرحلة",
+  "taxiCancelConfirmTitle": "إلغاء هذه الرحلة؟",
+  "taxiCancelConfirmBody": "سيعود الطلب إلى السائقين الآخرين.",
+  "taxiCancelYes": "نعم، ألغِ الرحلة",
+  "taxiKeepRide": "أكمل الرحلة",
+  "taxiFare": "الأجرة نقداً",
+  "taxiDistance": "المسافة",
+  "taxiKm": "{km} كم",
+  "@taxiKm": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "taxiDoneTitle": "انتهت الرحلة",
+  "taxiDoneBody": "سُجّل المبلغ النقدي باسمك.",
+  "taxiBackToRequests": "العودة إلى الطلبات",
+  "taxiMonthTitle": "رحلات التكسي هذا الشهر",
+  "taxiMonthSummary": "{trips} رحلة · {amount}",
+  "@taxiMonthSummary": {
+    "placeholders": {
+      "trips": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "taxiRecent": "آخر رحلات التكسي",
+  "taxiNoTrips": "لا رحلات تكسي بعد",
+  "taxiStatusDone": "منتهية",
+  "taxiStatusCancelled": "ملغاة",
+  "taxiStatusActive": "جارية",
+  "taxiCashCollected": "النقد المستلم"
 }

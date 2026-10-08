@@ -15,6 +15,8 @@ export interface RecordInput {
   note?: string;
   runId?: string;
   rideRequestId?: string;
+  /** P10: the campus taxi ride this cash fare was collected on. */
+  taxiRideId?: string;
   idempotencyKey?: string;
 }
 
@@ -59,6 +61,7 @@ export class PaymentsService {
         note: input.note,
         runId: input.runId ?? null,
         rideRequestId: input.rideRequestId ?? null,
+        taxiRideId: input.taxiRideId ?? null,
         idempotencyKey: input.idempotencyKey ?? null,
       },
     });

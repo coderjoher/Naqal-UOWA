@@ -95,6 +95,19 @@ export class SettlementService {
       const d = driverOf.get(f.runId ?? f.reverses?.runId ?? '');
       if (d) cash.set(d, (cash.get(d) ?? 0n) + BigInt(f.amount));
     }
+    // P10: campus taxi fares the driver kept in cash, by the month the trip ended, net of reversals.
+    const taxiFares = await db.payment.findMany({
+      where: {
+        universityId,
+        method: 'cash_driver',
+        OR: [{ taxiRide: { endedAt: { gte: r.from, lt: r.to } } }, { reverses: { taxiRide: { endedAt: { gte: r.from, lt: r.to } } } }],
+      },
+      select: { amount: true, taxiRide: { select: { driverId: true } }, reverses: { select: { taxiRide: { select: { driverId: true } } } } },
+    });
+    for (const f of taxiFares) {
+      const d = f.taxiRide?.driverId ?? f.reverses?.taxiRide?.driverId;
+      if (d) cash.set(d, (cash.get(d) ?? 0n) + BigInt(f.amount));
+    }
 
     const drivers = new Map<string, Record<string, number>>();
     for (const run of counted) {

@@ -5,6 +5,7 @@ import 'package:naql_core/naql_core.dart';
 import 'package:naql_ui/naql_ui.dart';
 
 import '../data/earnings.dart';
+import '../data/taxi.dart';
 import '../l10n/gen/app_localizations.dart';
 import 'runs/today_screen.dart';
 
@@ -18,6 +19,7 @@ class EarningsScreen extends ConsumerWidget {
     final t = AppLocalizations.of(context);
     final lang = ref.watch(localeProvider).languageCode;
     final earnings = ref.watch(earningsProvider);
+    final taxi = ref.watch(isTaxiDriverProvider);
     return Column(children: [
       NaqlTopBar(title: t.tabEarnings),
       Expanded(
@@ -31,7 +33,10 @@ class EarningsScreen extends ConsumerWidget {
             ),
           ),
           data: (e) => RefreshIndicator(
-            onRefresh: () => ref.refresh(earningsProvider.future),
+            onRefresh: () {
+              if (taxi) ref.invalidate(taxiHistoryProvider);
+              return ref.refresh(earningsProvider.future);
+            },
             child: ListView(
               padding: const EdgeInsets.fromLTRB(NaqlSpace.s5, NaqlSpace.s2, NaqlSpace.s5, 120),
               children: [
@@ -50,6 +55,10 @@ class EarningsScreen extends ConsumerWidget {
                       ]),
                     ),
                   ),
+                ],
+                if (taxi) ...[
+                  const SizedBox(height: NaqlSpace.s6),
+                  NaqlEntrance(index: 2, child: _TaxiMonth(lang: lang)),
                 ],
                 const SizedBox(height: NaqlSpace.s6),
                 Text(t.earningsRunsTitle, style: NaqlText.headline),
@@ -185,6 +194,94 @@ class _RunRow extends StatelessWidget {
           ]),
         ),
         StatusPill(label: label, tone: tone, icon: icon),
+      ]),
+    );
+  }
+}
+
+/// P10: this month's taxi trips and cash, and the last few trips (taxi drivers only).
+class _TaxiMonth extends ConsumerWidget {
+  const _TaxiMonth({required this.lang});
+  final String lang;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = AppLocalizations.of(context);
+    final history = ref.watch(taxiHistoryProvider);
+    return history.when(
+      loading: () => const NaqlSkeleton(height: 96, radius: NaqlRadius.lg),
+      error: (_, _) => NaqlCard(
+        child: Row(children: [
+          Expanded(child: Text(t.loadFailed, style: NaqlText.body.copyWith(color: NaqlColors.textMuted))),
+          NaqlButton(label: t.retry, variant: NaqlButtonVariant.ghost, onPressed: () => ref.invalidate(taxiHistoryProvider)),
+        ]),
+      ),
+      data: (h) {
+        final recent = h.rides.take(5).toList();
+        return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          NaqlCard(
+            key: const ValueKey('taxi-month'),
+            child: Row(children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: const BoxDecoration(color: NaqlColors.primarySoft, shape: BoxShape.circle),
+                child: const Icon(LucideIcons.carTaxiFront, color: NaqlColors.primary),
+              ),
+              const SizedBox(width: NaqlSpace.s3),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(t.taxiMonthTitle, style: NaqlText.label.copyWith(color: NaqlColors.textMuted)),
+                  Text(t.taxiMonthSummary(h.trips, formatIqd(h.cash, lang)), key: const ValueKey('taxi-month-summary'), style: NaqlText.headline),
+                ]),
+              ),
+            ]),
+          ),
+          const SizedBox(height: NaqlSpace.s6),
+          Text(t.taxiRecent, style: NaqlText.headline),
+          const SizedBox(height: NaqlSpace.s3),
+          if (recent.isEmpty)
+            NaqlCard(child: Text(t.taxiNoTrips, style: NaqlText.body.copyWith(color: NaqlColors.textMuted)))
+          else
+            NaqlCard(
+              padding: const EdgeInsets.symmetric(vertical: NaqlSpace.s2),
+              child: Column(children: [for (final r in recent) _TaxiRow(ride: r, lang: lang)]),
+            ),
+        ]);
+      },
+    );
+  }
+}
+
+class _TaxiRow extends StatelessWidget {
+  const _TaxiRow({required this.ride, required this.lang});
+  final TaxiRide ride;
+  final String lang;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final toCampus = ride.direction == TaxiDirection.toCampus;
+    final done = ride.status == 'done';
+    return Padding(
+      key: ValueKey('taxi-ride-${ride.id}'),
+      padding: const EdgeInsets.symmetric(horizontal: NaqlSpace.s4, vertical: NaqlSpace.s2),
+      child: Row(children: [
+        Icon(toCampus ? LucideIcons.school : LucideIcons.house, color: NaqlColors.textMuted),
+        const SizedBox(width: NaqlSpace.s3),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(toCampus ? t.taxiToCampus : t.taxiFromCampus, style: NaqlText.label),
+            Text('${formatDayMonth(ride.endedAt ?? ride.createdAt, lang)} · ${ride.studentName}', style: NaqlText.caption, maxLines: 1, overflow: TextOverflow.ellipsis),
+          ]),
+        ),
+        if (done)
+          Text(formatIqd(ride.fare, lang), style: NaqlText.label.copyWith(color: NaqlColors.success), textDirection: TextDirection.ltr)
+        else
+          StatusPill(
+            label: ride.active ? t.taxiStatusActive : t.taxiStatusCancelled,
+            tone: ride.active ? NaqlTone.primary : NaqlTone.neutral,
+          ),
       ]),
     );
   }

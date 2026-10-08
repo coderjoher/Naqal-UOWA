@@ -126,3 +126,18 @@ Priority: **M** = must have for v1, **S** = should have, **C** = could have.
 | NF-15 | GPS anomaly detection (speed, path, stop arrival) flags suspicious runs for the office | S |
 | NF-16 | Map tiles come from a configurable provider (one setting per app); the dashboard CSP allows only that host | M |
 | NF-17 | Every input and action in the apps is reachable by screen readers (TalkBack / VoiceOver) | S |
+
+## 8. Campus taxis
+
+Added after the pilot plan (P10): on-demand taxi trips between a student's location and campus,
+for students who miss a wave or live off the bus routes. Same apps, same cash model.
+
+| ID | Requirement | Pri. |
+|----|-------------|------|
+| TX-01 | Student books a taxi between their location and campus (either direction); one active ride at a time; cancel before the trip starts | M |
+| TX-02 | The request goes to the nearest online taxi drivers, showing only the area (≈500 m); the first to accept takes it, never two | M |
+| TX-03 | Distance fare (base + per km, a minimum, rounded up to 250 IQD) set by the office and shown before booking | M |
+| TX-04 | Taxi drivers register in the driver app with vehicle type taxi (3–7 seats), are approved by the office, go online/offline, and stay out of bus dispatch | M |
+| TX-05 | Driver steps arrived → trip started → ended; ending records the cash fare once (immutable, receipted) and it counts as driver cash in the monthly settlement | M |
+| TX-06 | Office switches the service on/off, sets the tariff, and sees online taxis on a map, today's rides and the key numbers | M |
+| TX-07 | After acceptance the student sees the driver, plate, live position and ETA; a request nobody accepts in time expires and the student is told | M |

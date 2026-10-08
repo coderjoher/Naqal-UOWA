@@ -459,4 +459,203 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get earningsOwe => 'عليك للمكتب';
+
+  @override
+  String get taxi => 'تكسي';
+
+  @override
+  String get taxiTitle => 'تكسي الجامعة';
+
+  @override
+  String get taxiOnline => 'أنت متصل';
+
+  @override
+  String get taxiOffline => 'أنت غير متصل';
+
+  @override
+  String get taxiOnlineHint => 'تصلك طلبات الطلبة القريبين';
+
+  @override
+  String get taxiOfflineHint => 'اضغط لتبدأ باستلام الطلبات';
+
+  @override
+  String get taxiGoOnline => 'ابدأ العمل';
+
+  @override
+  String get taxiGoOffline => 'توقّف عن العمل';
+
+  @override
+  String get taxiConnecting => 'جارٍ الاتصال…';
+
+  @override
+  String get taxiWaitingTitle => 'بانتظار الطلبات';
+
+  @override
+  String get taxiWaitingBody =>
+      'أبقِ التطبيق مفتوحاً. تظهر الطلبات الجديدة هنا.';
+
+  @override
+  String get taxiOfflineTitle => 'لا تصلك طلبات الآن';
+
+  @override
+  String get taxiOfflineBody => 'ابدأ العمل لتصلك طلبات الطلبة القريبين منك.';
+
+  @override
+  String get taxiToCampus => 'إلى الجامعة';
+
+  @override
+  String get taxiFromCampus => 'من الجامعة';
+
+  @override
+  String taxiTripKm(String km) {
+    return 'رحلة $km كم';
+  }
+
+  @override
+  String taxiAwayKm(String km) {
+    return 'يبعد $km كم';
+  }
+
+  @override
+  String get taxiAccept => 'اقبل الطلب';
+
+  @override
+  String taxiSecondsLeft(int seconds) {
+    return 'باقي $seconds ثانية';
+  }
+
+  @override
+  String get taxiNewRequest => 'طلب جديد';
+
+  @override
+  String get taxiTaken => 'سبقك سائق آخر لهذا الطلب.';
+
+  @override
+  String get taxiNoLocation => 'شغّل الموقع لتبدأ العمل.';
+
+  @override
+  String get taxisOff => 'خدمة التكسي متوقفة الآن من المكتب.';
+
+  @override
+  String get taxiStudentCancelled => 'ألغى الطالب الرحلة.';
+
+  @override
+  String get taxiFailed => 'تعذّر الاتصال. حاول مرة أخرى.';
+
+  @override
+  String get taxiDismiss => 'إغلاق';
+
+  @override
+  String get taxiGoToStudent => 'اذهب إلى الطالب';
+
+  @override
+  String get taxiGoToGate => 'اذهب إلى باب الجامعة';
+
+  @override
+  String get taxiWaitingStudent => 'بانتظار صعود الطالب';
+
+  @override
+  String get taxiOnTripCampus => 'في الطريق إلى الجامعة';
+
+  @override
+  String get taxiOnTripHome => 'في الطريق إلى مكان الطالب';
+
+  @override
+  String taxiStep(int n) {
+    return 'الخطوة $n من 3';
+  }
+
+  @override
+  String get taxiCall => 'اتصال';
+
+  @override
+  String taxiCallStudent(String name) {
+    return 'اتصل بـ $name';
+  }
+
+  @override
+  String get taxiArrived => 'وصلت';
+
+  @override
+  String get taxiStartTrip => 'ابدأ الرحلة';
+
+  @override
+  String taxiEndTrip(String amount) {
+    return 'أنهِ الرحلة واستلم $amount';
+  }
+
+  @override
+  String taxiEndConfirmTitle(String amount) {
+    return 'هل استلمت $amount نقداً؟';
+  }
+
+  @override
+  String get taxiEndConfirmBody => 'تُسجَّل الأجرة باسمك عند إنهاء الرحلة.';
+
+  @override
+  String get taxiEndConfirmYes => 'نعم، استلمتها';
+
+  @override
+  String get taxiNotYet => 'ليس بعد';
+
+  @override
+  String get taxiCancelRide => 'إلغاء الرحلة';
+
+  @override
+  String get taxiCancelConfirmTitle => 'إلغاء هذه الرحلة؟';
+
+  @override
+  String get taxiCancelConfirmBody => 'سيعود الطلب إلى السائقين الآخرين.';
+
+  @override
+  String get taxiCancelYes => 'نعم، ألغِ الرحلة';
+
+  @override
+  String get taxiKeepRide => 'أكمل الرحلة';
+
+  @override
+  String get taxiFare => 'الأجرة نقداً';
+
+  @override
+  String get taxiDistance => 'المسافة';
+
+  @override
+  String taxiKm(String km) {
+    return '$km كم';
+  }
+
+  @override
+  String get taxiDoneTitle => 'انتهت الرحلة';
+
+  @override
+  String get taxiDoneBody => 'سُجّل المبلغ النقدي باسمك.';
+
+  @override
+  String get taxiBackToRequests => 'العودة إلى الطلبات';
+
+  @override
+  String get taxiMonthTitle => 'رحلات التكسي هذا الشهر';
+
+  @override
+  String taxiMonthSummary(int trips, String amount) {
+    return '$trips رحلة · $amount';
+  }
+
+  @override
+  String get taxiRecent => 'آخر رحلات التكسي';
+
+  @override
+  String get taxiNoTrips => 'لا رحلات تكسي بعد';
+
+  @override
+  String get taxiStatusDone => 'منتهية';
+
+  @override
+  String get taxiStatusCancelled => 'ملغاة';
+
+  @override
+  String get taxiStatusActive => 'جارية';
+
+  @override
+  String get taxiCashCollected => 'النقد المستلم';
 }

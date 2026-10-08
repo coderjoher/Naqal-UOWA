@@ -17,7 +17,12 @@ export interface NotificationDraft {
     | 'ride.moved'
     | 'run.changed'
     | 'announcement'
-    | 'problem.answered';
+    | 'problem.answered'
+    | 'taxi.offer'
+    | 'taxi.accepted'
+    | 'taxi.arrived'
+    | 'taxi.cancelled'
+    | 'taxi.expired';
   dedupeKey: string;
   data: Record<string, unknown>;
 }
@@ -90,5 +95,20 @@ export function messageFor(n: Pick<NotificationDraft, 'kind' | 'data'>, lang: 'a
       return { title: String(n.data.title ?? (ar ? 'إعلان' : 'Announcement')), body: String(n.data.body ?? '') };
     case 'problem.answered':
       return ar ? { title: 'ردّ مكتب النقل على بلاغك', body: String(n.data.reply ?? '') } : { title: 'The transport office answered your report', body: String(n.data.reply ?? '') };
+    case 'taxi.offer': {
+      const fare = Number(n.data.fare ?? 0).toLocaleString('en-US');
+      const toCampus = n.data.direction === 'to_campus';
+      return ar
+        ? { title: 'طلب تكسي جديد', body: `${toCampus ? 'إلى الجامعة' : 'من الجامعة'} · ${fare} د.ع · اقبله قبل غيرك.` }
+        : { title: 'New taxi request', body: `${toCampus ? 'To campus' : 'From campus'} · ${fare} IQD · first to accept takes it.` };
+    }
+    case 'taxi.accepted':
+      return ar ? { title: 'التكسي في الطريق إليك', body: `${String(n.data.driverName ?? 'السائق')} قبل طلبك. افتح التطبيق لترى السيارة.` } : { title: 'Your taxi is on its way', body: `${String(n.data.driverName ?? 'A driver')} accepted. Open the app to see the car.` };
+    case 'taxi.arrived':
+      return ar ? { title: 'التكسي وصل', body: 'السائق في نقطة الالتقاء الآن.' } : { title: 'Your taxi is here', body: 'The driver is at the pickup point now.' };
+    case 'taxi.cancelled':
+      return ar ? { title: 'أُلغي طلب التكسي', body: 'أُلغيت الرحلة.' } : { title: 'Taxi cancelled', body: 'The taxi ride was cancelled.' };
+    case 'taxi.expired':
+      return ar ? { title: 'لم يقبل أي سائق', body: 'لا يوجد تكسي متاح الآن. حاول بعد قليل.' } : { title: 'No driver accepted', body: 'No taxi is free right now. Try again in a few minutes.' };
   }
 }

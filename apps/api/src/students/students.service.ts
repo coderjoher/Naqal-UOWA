@@ -67,10 +67,12 @@ export class StudentsService {
   async profile(userId: string) {
     const u = await this.prisma.db.user.findUnique({
       where: { id: userId },
-      select: { id: true, studentId: true, name: true, nameAr: true, gender: true, phone: true, defaultPoint: { select: { id: true, name: true, nameAr: true, tierId: true, active: true } } },
+      select: { id: true, studentId: true, name: true, nameAr: true, gender: true, phone: true, defaultPoint: { select: { id: true, name: true, nameAr: true, tierId: true, active: true } }, university: { select: { taxiEnabled: true } } },
     });
     if (!u) throw new NotFoundException();
-    return u;
+    const { university, ...rest } = u;
+    // P10: the app shows the campus taxi entry only where the office has switched it on.
+    return { ...rest, taxiEnabled: !!university?.taxiEnabled };
   }
 
   async updateProfile(userId: string, dto: UpdateStudentProfileDto) {

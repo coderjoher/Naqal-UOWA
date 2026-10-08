@@ -43,6 +43,13 @@ model University {
   coverage          Json     @default("[]")
   /// Where and when students pay (shown in the student app), e.g. "Building B, room 12, 9–1".
   officeNote        String?  @map("office_note")
+  /// P10 campus taxis: on/off and the distance tariff (IQD, whole dinars).
+  taxiEnabled       Boolean  @default(false) @map("taxi_enabled")
+  taxiBaseFare      Int      @default(2000) @map("taxi_base_fare")
+  taxiPerKm         Int      @default(500) @map("taxi_per_km")
+  taxiMinFare       Int      @default(3000) @map("taxi_min_fare")
+  /// How long a request is offered to drivers before it expires.
+  taxiOfferSeconds  Int      @default(180) @map("taxi_offer_seconds")
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
@@ -74,6 +81,7 @@ model University {
   ratings            RideRating[]
   problems           ProblemReport[]
   announcements      Announcement[]
+  taxiRides          TaxiRide[]
 
   @@map("universities")
 }
@@ -112,6 +120,8 @@ model User {
   ratingsGiven    RideRating[]         @relation("RatingsGiven")
   ratingsReceived RideRating[]         @relation("RatingsReceived")
   problems        ProblemReport[]      @relation("ProblemsReported")
+  taxiRides       TaxiRide[]           @relation("TaxiRider")
+  taxiDrives      TaxiRide[]           @relation("TaxiDriver")
 
   @@unique([universityId, studentId])
   @@index([universityId, role])
@@ -376,6 +386,8 @@ model Payment {
   /// Cash fares (DR-07): the run and ride they were collected on; one fare per ride.
   runId             String?       @map("run_id") @db.Uuid
   rideRequestId     String?       @unique @map("ride_request_id") @db.Uuid
+  /// P10: the taxi ride a cash fare was collected on; one fare per ride.
+  taxiRideId        String?       @unique @map("taxi_ride_id") @db.Uuid
   /// Client-generated key so a retried request never records a second payment.
   idempotencyKey    String?       @unique @map("idempotency_key")
   note              String?
@@ -386,6 +398,7 @@ model Payment {
   reverses     Payment?      @relation("Reversal", fields: [reversesPaymentId], references: [id])
   reversedBy   Payment?      @relation("Reversal")
   run          Run?          @relation(fields: [runId], references: [id])
+  taxiRide     TaxiRide?     @relation(fields: [taxiRideId], references: [id])
   subscription Subscription?
 
   @@unique([universityId, receiptNo])
@@ -786,4 +799,58 @@ model Announcement {
 
   @@index([universityId, createdAt])
   @@map("announcements")
+}
+
+// ── P10: campus taxis ────────────────────────────────────────────────────────
+
+enum TaxiDirection {
+  to_campus
+  from_campus
+}
+
+enum TaxiRideStatus {
+  requested
+  accepted
+  arrived
+  on_trip
+  done
+  cancelled
+  expired
+}
+
+/// TX-01..07: one taxi trip between a student's location and the campus, offered to nearby
+/// online taxi drivers; the first to accept takes it. The fare is fixed when requested.
+model TaxiRide {
+  id           String         @id @default(uuid()) @db.Uuid
+  universityId String         @map("university_id") @db.Uuid
+  studentId    String         @map("student_id") @db.Uuid
+  driverId     String?        @map("driver_id") @db.Uuid
+  direction    TaxiDirection
+  /// The student's end of the trip (pickup for to_campus, drop-off for from_campus).
+  lat          Float
+  lng          Float
+  label        String?
+  distanceKm   Float          @map("distance_km")
+  fare         Int
+  status       TaxiRideStatus @default(requested)
+  /// Client-generated key so a retried request never books twice.
+  clientId     String         @unique @map("client_id")
+  expiresAt    DateTime       @map("expires_at")
+  acceptedAt   DateTime?      @map("accepted_at")
+  arrivedAt    DateTime?      @map("arrived_at")
+  startedAt    DateTime?      @map("started_at")
+  endedAt      DateTime?      @map("ended_at")
+  cancelledAt  DateTime?      @map("cancelled_at")
+  cancelledBy  String?        @map("cancelled_by")
+  createdAt    DateTime       @default(now()) @map("created_at")
+
+  university University @relation(fields: [universityId], references: [id])
+  student    User       @relation("TaxiRider", fields: [studentId], references: [id])
+  driver     User?      @relation("TaxiDriver", fields: [driverId], references: [id])
+  payment    Payment?
+
+  @@index([universityId, status, createdAt])
+  @@index([studentId, createdAt])
+  @@index([driverId, createdAt])
+  @@map("taxi_rides")
 }

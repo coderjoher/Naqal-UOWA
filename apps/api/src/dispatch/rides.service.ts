@@ -7,7 +7,8 @@ import { currentTenant, runAsTenant } from '../tenancy/tenant-context';
 import { covers } from '../subscriptions/period-policy';
 import { tierDifference } from '../subscriptions/pricing';
 import { baghdadDate, dbDate, fromDbDate, isDate, runsOn, secondsInto } from './clock';
-import { DispatchEngine } from './dispatch.engine';
+import { TAXI } from '../drivers/driver-rules';
+import { BUS_ONLY, DispatchEngine } from './dispatch.engine';
 
 /** How far ahead drivers may set availability (DR-02). */
 export const AVAILABILITY_DAYS = 7;
@@ -171,6 +172,8 @@ export class RidesService {
 
   async setAvailability(driverId: string, universityId: string, date: string, waveIds: string[]) {
     await this.drivers.assertApproved(driverId);
+    const profile = await this.prisma.db.driverProfile.findUnique({ where: { userId: driverId }, select: { vehicleType: true } });
+    if (profile?.vehicleType === TAXI) throw new ForbiddenException('Taxi drivers take campus taxi trips, not bus waves');
     const days = await this.availability(driverId);
     const day = days.find((d) => d.date === date);
     if (!day) throw new BadRequestException(`Availability can be set for the next ${AVAILABILITY_DAYS} days`);
@@ -304,7 +307,7 @@ export class RidesService {
     const busy = await db.run.findMany({ where: { waveId, date: dbDate(date) }, select: { driverId: true } });
     const offered = await db.driverAvailability.findMany({ where: { waveId, date: dbDate(date) }, select: { driverId: true } });
     const drivers = await db.user.findMany({
-      where: { role: 'driver', status: 'active', id: { notIn: busy.map((b) => b.driverId) }, driver: { status: 'approved', seats: { gt: 0 } } },
+      where: { role: 'driver', status: 'active', id: { notIn: busy.map((b) => b.driverId) }, driver: { status: 'approved', seats: { gt: 0 }, ...BUS_ONLY } },
       include: { driver: true },
       orderBy: { name: 'asc' },
     });

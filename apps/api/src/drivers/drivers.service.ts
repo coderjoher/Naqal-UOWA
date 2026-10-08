@@ -74,7 +74,7 @@ export class DriversService {
       reviewNote: p.reviewNote,
       application: { name: p.user.name || null, phone: p.user.phone, vehicleType: p.vehicleType, plate: p.plate, seats: p.seats, modelYear: p.modelYear },
       documents: p.documents.map((d) => ({ key: d.key, mime: d.mime, sizeBytes: d.sizeBytes, uploadedAt: d.uploadedAt })),
-      missing: missingRequirements(this.application(p), req),
+      missing: missingRequirements(this.application(p), req, { taxi: await this.requirements.taxiEnabled(universityId) }),
       form: await this.requirements.registrationForm(universityId),
     };
   }
@@ -169,7 +169,7 @@ export class DriversService {
         const doc = p.documents.find((x) => x.key === d.key);
         return { key: d.key, label: d.label, labelAr: d.labelAr, required: d.required, uploaded: !!doc, mime: doc?.mime ?? null, uploadedAt: doc?.uploadedAt ?? null };
       }),
-      missing: missingRequirements(this.application(p), req),
+      missing: missingRequirements(this.application(p), req, { taxi: await this.requirements.taxiEnabled(p.universityId) }),
     };
   }
 

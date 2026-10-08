@@ -73,6 +73,7 @@ async function main() {
   if ((await prisma.distanceTier.count({ where: { universityId: uni.id } })) > 0) {
     // Stacks created before P6 get last month's history once (skipped when it already has runs).
     await seedLastMonth(uni.id);
+    await seedTaxis(uni.id);
     console.log('Demo data already present — nothing else to do.');
     return;
   }
@@ -200,6 +201,7 @@ async function main() {
   }
 
   await seedLastMonth(universityId);
+  await seedTaxis(universityId);
 
   await queueMatrixRebuild(universityId);
 
@@ -207,7 +209,28 @@ async function main() {
   Dashboard:  office@uowa.edu.iq / ${OFFICE_PASSWORD}   (super admin: admin@naql.app / ${OFFICE_PASSWORD})
   Students:   W-1001 … W-1030 / ${STUDENT_PASSWORD}       (W-1031 … W-1040 activate with code ${ACTIVATION_CODE})
   Drivers:    07800000001 … 07800000006 (sign-in code is shown in the app in demo mode)
+  Taxis:      07800000011 … 07800000013 (campus taxi drivers; go online in the driver app)
   22 open requests for ${String(wave.minuteOfDay / 60).padStart(2, '0')}:00 on ${date} are waiting for dispatch.`);
+}
+
+/** P10: campus taxis switched on, with three approved taxi drivers (added once, also to older stacks). */
+const TAXIS = [
+  ['Ali Kareem', 'علي كريم', '07800000011'],
+  ['Hassan Jabbar', 'حسن جبار', '07800000012'],
+  ['Abbas Muhsin', 'عباس محسن', '07800000013'],
+] as const;
+
+async function seedTaxis(universityId: string) {
+  await prisma.university.update({ where: { id: universityId }, data: { taxiEnabled: true } });
+  const office = await prisma.user.findFirst({ where: { universityId, role: 'office' } });
+  for (const [i, [name, nameAr, phone]] of TAXIS.entries()) {
+    const loginPhone = `+964${phone.slice(1)}`;
+    if (await prisma.user.findUnique({ where: { loginPhone } })) continue;
+    const user = await prisma.user.create({ data: { universityId, role: 'driver', name, nameAr, loginPhone, phone: loginPhone, gender: 'male' } });
+    await prisma.driverProfile.create({
+      data: { userId: user.id, universityId, status: 'approved', vehicleType: 'taxi', plate: `${45670 + i} كربلاء أجرة`, seats: 4, modelYear: 2019 + i, submittedAt: new Date(), reviewedAt: new Date(), reviewedById: office?.id },
+    });
+  }
 }
 
 /**

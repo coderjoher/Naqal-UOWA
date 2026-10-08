@@ -28,6 +28,9 @@ class GpsFix {
 abstract class LocationSource {
   Future<bool> ensurePermission();
   Stream<GpsFix> positions();
+
+  /// One fix now, or null if the phone cannot get one (P10 taxi heartbeat).
+  Future<GpsFix?> current();
 }
 
 class GeolocatorSource implements LocationSource {
@@ -49,6 +52,18 @@ class GeolocatorSource implements LocationSource {
           foregroundNotificationConfig: const ForegroundNotificationConfig(notificationTitle: 'نقل وارث', notificationText: 'الرحلة جارية — تتم مشاركة موقع الحافلة', enableWakeLock: true),
         ),
       ).map((p) => GpsFix(lat: p.latitude, lng: p.longitude, at: p.timestamp, speed: p.speed, heading: p.heading));
+
+  @override
+  Future<GpsFix?> current() async {
+    try {
+      final p = await Geolocator.getCurrentPosition(locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, timeLimit: Duration(seconds: 10)));
+      return GpsFix(lat: p.latitude, lng: p.longitude, at: p.timestamp, speed: p.speed, heading: p.heading);
+    } catch (_) {
+      // Timed out or no fix yet: the last known position is good enough for a heartbeat.
+      final p = await Geolocator.getLastKnownPosition().catchError((_) => null);
+      return p == null ? null : GpsFix(lat: p.latitude, lng: p.longitude, at: p.timestamp, speed: p.speed, heading: p.heading);
+    }
+  }
 }
 
 final locationSourceProvider = Provider<LocationSource>((ref) => GeolocatorSource());

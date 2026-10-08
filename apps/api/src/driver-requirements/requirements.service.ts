@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigCache } from '../config-cache/config-cache.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { TAXI, TAXI_SEATS } from '../drivers/driver-rules';
 import { DriverRequirementsDto } from './requirements.dto';
 
 export const DEFAULT_REQUIREMENTS: DriverRequirementsDto = {
@@ -56,6 +57,12 @@ export class DriverRequirementsService {
     return this.get(universityId);
   }
 
+  /** P10: whether the university runs campus taxis (the taxi vehicle type is then accepted). */
+  async taxiEnabled(universityId: string): Promise<boolean> {
+    const u = await this.prisma.db.university.findUnique({ where: { id: universityId }, select: { taxiEnabled: true } });
+    return !!u?.taxiEnabled;
+  }
+
   /**
    * The driver registration form, derived from the office's requirements (TO-01 → DR-01).
    * The driver app renders exactly these fields.
@@ -63,12 +70,14 @@ export class DriverRequirementsService {
   async registrationForm(universityId: string, now = new Date()): Promise<RegistrationField[]> {
     const r = await this.get(universityId);
     const year = now.getFullYear();
+    // P10: with campus taxis on, "taxi" is offered too (3–7 seats instead of the bus minimum).
+    const taxi = await this.taxiEnabled(universityId);
     return [
       { key: 'name', kind: 'text', label: 'Full name', labelAr: 'الاسم الكامل', required: true },
       { key: 'phone', kind: 'phone', label: 'Phone', labelAr: 'رقم الهاتف', required: true },
-      { key: 'vehicle_type', kind: 'select', label: 'Vehicle type', labelAr: 'نوع المركبة', required: true, options: r.vehicleTypes },
+      { key: 'vehicle_type', kind: 'select', label: 'Vehicle type', labelAr: 'نوع المركبة', required: true, options: taxi ? [...r.vehicleTypes.filter((v) => v !== TAXI), TAXI] : r.vehicleTypes },
       { key: 'plate', kind: 'text', label: 'Plate number', labelAr: 'رقم اللوحة', required: true },
-      { key: 'seats', kind: 'number', label: 'Passenger seats', labelAr: 'عدد المقاعد', required: true, min: r.minSeats, max: 80 },
+      { key: 'seats', kind: 'number', label: 'Passenger seats', labelAr: 'عدد المقاعد', required: true, min: taxi ? Math.min(r.minSeats, TAXI_SEATS.min) : r.minSeats, max: 80 },
       { key: 'model_year', kind: 'year', label: 'Model year', labelAr: 'سنة الصنع', required: true, min: year - r.maxVehicleAgeYears, max: year + 1 },
       ...r.documents.map<RegistrationField>((d) => ({ key: `doc_${d.key}`, kind: 'document', label: d.label, labelAr: d.labelAr, required: d.required })),
     ];

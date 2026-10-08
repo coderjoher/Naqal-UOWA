@@ -8,7 +8,9 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:naql_app/naql_app.dart';
 import 'package:naql_core/naql_core.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:student_app/app.dart';
+import 'package:student_app/data/taxi.dart';
 import 'package:student_app/data/track.dart';
 
 /// Socket stand-in: tests push bus positions, connection changes and notifications.
@@ -33,6 +35,18 @@ class FakeLiveFeed implements LiveFeed {
     return null;
   }
 
+  @override
+  void dispose() {}
+}
+
+/// Taxi socket stand-in (P10): tests push 'taxi:ride' and 'taxi:position' events.
+class FakeTaxiLive implements TaxiLive {
+  final ridesCtl = StreamController<String>.broadcast();
+  final positionsCtl = StreamController<TaxiPosition>.broadcast();
+  @override
+  Stream<String> get rides => ridesCtl.stream;
+  @override
+  Stream<TaxiPosition> get positions => positionsCtl.stream;
   @override
   void dispose() {}
 }
@@ -88,6 +102,63 @@ class FakeBackend {
 
   /// GET /announcements/active (TO-11).
   List<Map<String, Object?>> announcements = [];
+
+  /// P10 campus taxis: the quote, the student's active ride and past rides; tests change the
+  /// active ride to simulate a driver accepting, arriving and finishing.
+  final taxiLive = FakeTaxiLive();
+  Map<String, Object?> taxiQuote = {
+    'direction': 'to_campus',
+    'distanceKm': 6.4,
+    'durationMin': 14,
+    'fare': 4500,
+    'tariff': {'baseFare': 1500, 'perKm': 500, 'minFare': 2000},
+    'taxisNearby': 3,
+    'pickupMin': 4,
+    'campus': {'lat': 32.6086, 'lng': 44.0322},
+  };
+  Map<String, Object?>? taxiActive;
+  List<Map<String, Object?>> taxiHistory = [];
+
+  /// What "use my location" returns (null = location off) and the numbers the app dialled.
+  LatLng? myLocation;
+  final dialed = <Uri>[];
+
+  bool get _taxiGoing => const ['requested', 'accepted', 'arrived', 'on_trip'].contains(taxiActive?['status']);
+
+  static Map<String, Object?> taxiRide({
+    String id = 'tx1',
+    String status = 'requested',
+    String direction = 'to_campus',
+    int fare = 4500,
+    String? label,
+    DateTime? expiresAt,
+    bool driver = false,
+    Map<String, Object?>? taxi,
+    int? etaMin,
+    String? cancelledBy,
+  }) =>
+      {
+        'id': id,
+        'status': status,
+        'direction': direction,
+        'lat': 32.6086,
+        'lng': 44.0322,
+        'label': label,
+        'distanceKm': 6.4,
+        'fare': fare,
+        'expiresAt': (expiresAt ?? DateTime.now().add(const Duration(seconds: 90))).toUtc().toIso8601String(),
+        'createdAt': DateTime.now().toUtc().toIso8601String(),
+        'acceptedAt': null,
+        'arrivedAt': null,
+        'startedAt': null,
+        'endedAt': null,
+        'cancelledBy': cancelledBy,
+        'pickup': {'lat': 32.6086, 'lng': 44.0322},
+        'dropoff': {'lat': 32.6160, 'lng': 44.0250},
+        'driver': driver ? {'id': 'd11', 'name': 'علي حسين', 'phone': '07800000011', 'plate': '45678 كربلاء', 'seats': 4} : null,
+        'taxi': taxi,
+        'etaMin': etaMin,
+      };
 
   static Map<String, Object?> pastRide(int i, {String status = 'done', bool canRate = true, int? rating}) => {
         'id': 'h$i',
@@ -229,6 +300,15 @@ class FakeBackend {
         return _json({'slots': slots, 'defaultPointId': (profile['defaultPoint'] as Map?)?['id'], 'gender': profile['gender']});
       case 'GET /rides/me':
         return _json(rides);
+      case 'GET /taxi/quote':
+        return _json({...taxiQuote, 'direction': req.url.queryParameters['direction']});
+      case 'GET /taxi/rides/me':
+        return _json({'active': _taxiGoing ? taxiActive : null, 'history': taxiHistory});
+      case 'POST /taxi/rides':
+        if (_taxiGoing) return _json({'message': 'You already have a taxi ride in progress'}, 409);
+        final r = taxiRide(direction: body['direction'] as String, fare: taxiQuote['fare'] as int, label: body['label'] as String?);
+        taxiActive = r;
+        return _json(r, 201);
       case 'POST /rides':
         final slot = slots.firstWhere((x) => x['waveId'] == body['waveId'] && x['date'] == body['date']);
         final r = ride(id: 'r${rides.length + 1}', date: slot['date'] as String, time: slot['time'] as String, type: slot['type'] as String);
@@ -250,6 +330,13 @@ class FakeBackend {
       return _json({'id': 'pr${problems.length}', 'status': 'open', ...body}, 201);
     }
     if (req.url.path == '/announcements/active') return _json(announcements);
+    final taxi = RegExp(r'^/taxi/rides/([^/]+)(/cancel)?$').firstMatch(req.url.path);
+    if (taxi != null) {
+      final r = taxiActive;
+      if (r == null || r['id'] != taxi.group(1)) return _json({'message': 'not found'}, 404);
+      if (req.method == 'POST' && taxi.group(2) != null) taxiActive = {...r, 'status': 'cancelled', 'cancelledBy': 'student'};
+      return _json(taxiActive!);
+    }
     if (RegExp(r'^/rides/[^/]+/track$').hasMatch(req.url.path)) return _json(track);
     final cancel = RegExp(r'^/rides/([^/]+)/cancel$').firstMatch(req.url.path);
     if (req.method == 'POST' && cancel != null) {
@@ -275,6 +362,12 @@ class FakeBackend {
         apiProvider.overrideWithValue(ApiClient(baseUrl: Uri.parse('http://api.test/'), tokens: tokens, httpClient: client)),
         liveFeedProvider.overrideWith((ref) async => feed),
         mapTilesProvider.overrideWithValue(false),
+        taxiLiveProvider.overrideWith((ref) async => taxiLive),
+        taxiLocatorProvider.overrideWithValue(() async => myLocation),
+        taxiDialerProvider.overrideWithValue((uri) async {
+          dialed.add(uri);
+          return true;
+        }),
       ],
       child: const StudentApp(),
     );
