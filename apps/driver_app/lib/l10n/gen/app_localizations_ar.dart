@@ -658,4 +658,49 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get taxiCashCollected => 'النقد المستلم';
+
+  @override
+  String get accountApproved => 'معتمد';
+
+  @override
+  String get accountVehicle => 'مركبتك';
+
+  @override
+  String get accountFromOffice => 'اعتمدها مكتب النقل';
+
+  @override
+  String get accountChangeHint => 'لتغيير بيانات المركبة راجع مكتب النقل.';
+
+  @override
+  String get accountNotSet => 'غير محدد';
+
+  @override
+  String get accountDocuments => 'المستمسكات';
+
+  @override
+  String accountDocumentsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count مستمسكاً مرفوعاً',
+      few: '$count مستمسكات مرفوعة',
+      two: 'مستمسكان مرفوعان',
+      one: 'مستمسك واحد مرفوع',
+      zero: 'لم تُرفع مستمسكات',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get accountLanguage => 'اللغة';
+
+  @override
+  String get accountSignOutTitle => 'تسجيل الخروج؟';
+
+  @override
+  String get accountSignOutBody =>
+      'ستحتاج رمزاً جديداً يصل إلى هاتفك لتدخل مرة أخرى.';
+
+  @override
+  String get accountStay => 'البقاء مسجّلاً';
 }

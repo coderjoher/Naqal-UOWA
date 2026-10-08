@@ -1279,6 +1279,72 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'النقد المستلم'**
   String get taxiCashCollected;
+
+  /// No description provided for @accountApproved.
+  ///
+  /// In ar, this message translates to:
+  /// **'معتمد'**
+  String get accountApproved;
+
+  /// No description provided for @accountVehicle.
+  ///
+  /// In ar, this message translates to:
+  /// **'مركبتك'**
+  String get accountVehicle;
+
+  /// No description provided for @accountFromOffice.
+  ///
+  /// In ar, this message translates to:
+  /// **'اعتمدها مكتب النقل'**
+  String get accountFromOffice;
+
+  /// No description provided for @accountChangeHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'لتغيير بيانات المركبة راجع مكتب النقل.'**
+  String get accountChangeHint;
+
+  /// No description provided for @accountNotSet.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير محدد'**
+  String get accountNotSet;
+
+  /// No description provided for @accountDocuments.
+  ///
+  /// In ar, this message translates to:
+  /// **'المستمسكات'**
+  String get accountDocuments;
+
+  /// No description provided for @accountDocumentsCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count, plural, =0{لم تُرفع مستمسكات} =1{مستمسك واحد مرفوع} =2{مستمسكان مرفوعان} few{{count} مستمسكات مرفوعة} other{{count} مستمسكاً مرفوعاً}}'**
+  String accountDocumentsCount(int count);
+
+  /// No description provided for @accountLanguage.
+  ///
+  /// In ar, this message translates to:
+  /// **'اللغة'**
+  String get accountLanguage;
+
+  /// No description provided for @accountSignOutTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الخروج؟'**
+  String get accountSignOutTitle;
+
+  /// No description provided for @accountSignOutBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'ستحتاج رمزاً جديداً يصل إلى هاتفك لتدخل مرة أخرى.'**
+  String get accountSignOutBody;
+
+  /// No description provided for @accountStay.
+  ///
+  /// In ar, this message translates to:
+  /// **'البقاء مسجّلاً'**
+  String get accountStay;
 }
 
 class _AppLocalizationsDelegate

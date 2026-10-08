@@ -196,5 +196,16 @@
   "taxiStatusDone": "Done",
   "taxiStatusCancelled": "Cancelled",
   "taxiStatusActive": "In progress",
-  "taxiCashCollected": "Cash collected"
+  "taxiCashCollected": "Cash collected",
+  "accountApproved": "Approved",
+  "accountVehicle": "Your vehicle",
+  "accountFromOffice": "Approved by the transport office",
+  "accountChangeHint": "To change your vehicle details, contact the transport office.",
+  "accountNotSet": "Not set",
+  "accountDocuments": "Documents",
+  "accountDocumentsCount": "{count, plural, =0{No documents uploaded} =1{1 document uploaded} other{{count} documents uploaded}}",
+  "accountLanguage": "Language",
+  "accountSignOutTitle": "Sign out?",
+  "accountSignOutBody": "You will need a new code sent to your phone to sign in again.",
+  "accountStay": "Stay signed in"
 }

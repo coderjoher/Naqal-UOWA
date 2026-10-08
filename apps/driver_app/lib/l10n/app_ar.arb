@@ -383,5 +383,23 @@
   "taxiStatusDone": "منتهية",
   "taxiStatusCancelled": "ملغاة",
   "taxiStatusActive": "جارية",
-  "taxiCashCollected": "النقد المستلم"
+  "taxiCashCollected": "النقد المستلم",
+  "accountApproved": "معتمد",
+  "accountVehicle": "مركبتك",
+  "accountFromOffice": "اعتمدها مكتب النقل",
+  "accountChangeHint": "لتغيير بيانات المركبة راجع مكتب النقل.",
+  "accountNotSet": "غير محدد",
+  "accountDocuments": "المستمسكات",
+  "accountDocumentsCount": "{count, plural, =0{لم تُرفع مستمسكات} =1{مستمسك واحد مرفوع} =2{مستمسكان مرفوعان} few{{count} مستمسكات مرفوعة} other{{count} مستمسكاً مرفوعاً}}",
+  "accountLanguage": "اللغة",
+  "accountSignOutTitle": "تسجيل الخروج؟",
+  "accountSignOutBody": "ستحتاج رمزاً جديداً يصل إلى هاتفك لتدخل مرة أخرى.",
+  "accountStay": "البقاء مسجّلاً",
+  "@accountDocumentsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }
