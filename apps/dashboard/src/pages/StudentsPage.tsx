@@ -1,7 +1,8 @@
 import { clsx } from 'clsx';
 import { GraduationCap, KeyRound, Search, Upload } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router';
 import { parseRoster, type RosterRow } from '../lib/csv';
 import { useI18n } from '../lib/i18n';
 import { errorMessages, useImportRoster, useIssueCode, useStudents, type RosterStudent } from '../lib/queries';
@@ -18,7 +19,13 @@ export function StudentsPage() {
   const file = useRef<HTMLInputElement>(null);
   const [pending, setPending] = useState<{ rows: RosterRow[]; badLines: number[] } | null>(null);
   const [code, setCode] = useState<{ student: RosterStudent; code: string; expiresAt: string } | null>(null);
-  const [query, setQuery] = useState('');
+  const [params] = useSearchParams();
+  const [query, setQuery] = useState(() => params.get('q') ?? '');
+  // The global search links here with ?q=<student number>.
+  useEffect(() => {
+    const q = params.get('q');
+    if (q !== null) setQuery(q);
+  }, [params]);
 
   const rows = useMemo(() => {
     const qn = query.trim().toLowerCase();
@@ -104,7 +111,7 @@ export function StudentsPage() {
             placeholder={t('students.search')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="h-11 w-full rounded-pill border border-border bg-surface ps-11 pe-4 text-body focus:border-primary focus:outline-none"
+            className="h-12 w-full rounded-pill border border-border bg-surface ps-11 pe-5 text-body transition-[border-color,box-shadow] duration-200 hover:border-text-muted focus:border-primary focus:shadow-[0_0_0_4px_var(--color-primary-soft)] focus:outline-none"
           />
         </div>
         {q.isPending ? (

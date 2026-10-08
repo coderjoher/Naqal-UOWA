@@ -6,3 +6,4 @@ export * from './Table';
 export * from './Feedback';
 export * from './Drawer';
 export * from './Layout';
+export * from './Kpi';

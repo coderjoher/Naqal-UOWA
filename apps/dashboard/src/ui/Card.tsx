@@ -17,10 +17,10 @@ export function Card({ title, description, actions, nested, animated, className,
   const body = (
     <>
       {title || actions ? (
-        <header className="mb-5 flex flex-wrap items-start justify-between gap-4">
+        <header className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0">
             {title ? <h2 className="text-headline">{title}</h2> : null}
-            {description ? <p className="mt-1 text-caption text-text-muted">{description}</p> : null}
+            {description ? <p className="mt-1 text-label font-normal text-text-muted">{description}</p> : null}
           </div>
           {actions}
         </header>
@@ -28,7 +28,8 @@ export function Card({ title, description, actions, nested, animated, className,
       {children}
     </>
   );
-  const classes = clsx('rounded-lg bg-surface p-6', nested ? 'border border-border' : 'shadow-card dark:border dark:border-border dark:shadow-none', className);
+  // 24 px radius, hairline border; top-level cards add the single soft card shadow (none in dark).
+  const classes = clsx('min-w-0 rounded-lg border border-border bg-surface p-5 md:p-6', nested ? undefined : 'shadow-card dark:shadow-none', className);
   if (animated) {
     return (
       <motion.section variants={itemVariants} className={classes} {...(rest as object)}>

@@ -26,7 +26,7 @@ export function DispatchPage() {
         title={t('dispatch.title')}
         description={t('dispatch.desc')}
         actions={
-          <div role="tablist" className="relative flex rounded-pill bg-surface p-1 shadow-sm">
+          <div role="tablist" className="relative flex rounded-pill border border-border bg-surface p-1">
             {[0, 1].map((p) => (
               <button
                 key={p}
@@ -333,7 +333,7 @@ function MoveDrawer({ wave, moving, onClose }: { wave: DispatchWave; moving: Mov
 }
 
 /** TO-08: an extra bus for the waitlist. */
-function ExtraRunDrawer({ wave, date, open, onClose }: { wave: DispatchWave; date: string; open: boolean; onClose: () => void }) {
+export function ExtraRunDrawer({ wave, date, open, onClose }: { wave: DispatchWave; date: string; open: boolean; onClose: () => void }) {
   const { t } = useI18n();
   const toast = useToast();
   const drivers = useFreeDrivers(wave.waveId, date, open);

@@ -20,10 +20,11 @@ import {
   type RunStatus,
 } from "../lib/queries";
 import {
-  AnimatedNumber,
   Badge,
   Card,
   EmptyState,
+  Kpi,
+  KpiGrid,
   PageHeader,
   SkeletonRows,
 } from "../ui";
@@ -147,43 +148,30 @@ export function LiveOpsPage() {
         }
       />
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Kpi
-          icon={Bus}
-          label={t("live.onRoad")}
-          value={active.length}
-          tone="primary"
-        />
-        <Kpi
-          icon={MapPin}
-          label={t("live.atStop")}
-          value={list.filter((r) => r.status === "at_stop").length}
-          tone="warning"
-        />
-        <Kpi
-          icon={CircleCheck}
-          label={t("live.done")}
-          value={list.filter((r) => r.status === "done").length}
-          tone="success"
-        />
+      <KpiGrid>
+        <Kpi tone="brand" icon={Bus} label={t("live.onRoad")} value={active.length} loading={runs.isPending} sub={t("overview.runsToday", { n: list.filter((r) => r.status !== "cancelled").length })} />
+        <Kpi icon={MapPin} label={t("live.atStop")} value={list.filter((r) => r.status === "at_stop").length} loading={runs.isPending} />
+        <Kpi icon={CircleCheck} label={t("live.done")} value={list.filter((r) => r.status === "done").length} loading={runs.isPending} />
         <Kpi
           icon={Hourglass}
           label={t("live.waitlist")}
           value={waitlist.length}
-          tone="warning"
+          loading={board.isPending}
+          sub={waitlist.length ? t("overview.wave.waiting", { n: waitlist.length }) : t("overview.nobodyWaiting")}
+          subTone={waitlist.length ? "warning" : "success"}
         />
-      </div>
+      </KpiGrid>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
         <Card className="overflow-hidden p-0">
           {uni.data ? (
             <Suspense
               fallback={
-                <div className="h-[560px] animate-pulse bg-surface-muted" />
+                <div className="h-[420px] animate-pulse bg-surface-muted md:h-[600px]" />
               }
             >
               <MapView
-                className="h-[560px]"
+                className="h-[420px] md:h-[600px]"
                 label={t("live.map")}
                 center={{ lat: uni.data.campusLat, lng: uni.data.campusLng }}
                 markers={markers}
@@ -196,11 +184,11 @@ export function LiveOpsPage() {
               />
             </Suspense>
           ) : (
-            <div className="h-[560px] animate-pulse bg-surface-muted" />
+            <div className="h-[420px] animate-pulse bg-surface-muted md:h-[600px]" />
           )}
         </Card>
 
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
           <Card title={t("live.runs")} description={t("live.runsHint")}>
             {runs.isLoading ? (
               <SkeletonRows rows={4} />
@@ -249,7 +237,7 @@ export function LiveOpsPage() {
                       initial={{ opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
-                      className="flex items-center justify-between gap-3 rounded-md bg-surface-muted px-3 py-2"
+                      className="flex min-h-12 items-center justify-between gap-3 rounded-md bg-surface-muted px-4 py-2"
                     >
                       <span className="min-w-0">
                         <span className="block truncate text-label">
@@ -270,39 +258,6 @@ export function LiveOpsPage() {
           </Card>
         </div>
       </div>
-    </div>
-  );
-}
-
-function Kpi({
-  icon: Icon,
-  label,
-  value,
-  tone,
-}: {
-  icon: typeof Bus;
-  label: string;
-  value: number;
-  tone: "primary" | "warning" | "success";
-}) {
-  return (
-    <div className="flex items-center gap-3 rounded-lg bg-surface p-4 shadow-sm dark:border dark:border-border dark:shadow-none">
-      <span
-        className={clsx(
-          "grid size-10 place-items-center rounded-pill",
-          tone === "primary" && "bg-primary-soft text-primary",
-          tone === "warning" && "bg-warning-soft text-warning",
-          tone === "success" && "bg-success-soft text-success",
-        )}
-      >
-        <Icon size={20} aria-hidden />
-      </span>
-      <span>
-        <span className="block text-caption text-text-muted">{label}</span>
-        <span className="text-title tabular-nums">
-          <AnimatedNumber value={value} />
-        </span>
-      </span>
     </div>
   );
 }
@@ -334,7 +289,7 @@ function RunRow({
       aria-pressed={selected}
       data-testid="live-run"
       className={clsx(
-        "w-full rounded-md px-3 py-3 text-start transition-colors",
+        "w-full rounded-md px-3 py-3.5 text-start transition-colors",
         selected ? "bg-primary-soft" : "hover:bg-surface-muted",
       )}
     >

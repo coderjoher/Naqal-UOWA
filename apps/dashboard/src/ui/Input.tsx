@@ -12,7 +12,8 @@ interface FieldProps {
 
 const control = (error?: string) =>
   clsx(
-    'h-12 w-full rounded-md border bg-surface px-4 text-body text-text placeholder:text-text-muted transition-[border-color,box-shadow] duration-200',
+    // Pill fields, 48 px tall (textareas override the radius).
+    'h-12 w-full rounded-pill border bg-surface px-5 text-body text-text placeholder:text-text-muted transition-[border-color,box-shadow] duration-200',
     'focus:border-primary focus:outline-none focus:shadow-[0_0_0_4px_var(--color-primary-soft)]',
     error ? 'border-danger' : 'border-border hover:border-text-muted',
   );
@@ -21,12 +22,12 @@ function FieldShell({ id, label, error, hint, className, children }: FieldProps 
   const msg = error ?? hint;
   return (
     <div className={clsx('flex min-w-0 flex-col gap-2', className)}>
-      <label htmlFor={id} className="text-label text-text">
+      <label htmlFor={id} className="ps-1 text-label text-text">
         {label}
       </label>
       {children}
       {msg ? (
-        <p id={`${id}-msg`} className={clsx('text-caption', error ? 'text-danger' : 'text-text-muted')} role={error ? 'alert' : undefined}>
+        <p id={`${id}-msg`} className={clsx('ps-1 text-caption', error ? 'text-danger' : 'text-text-muted')} role={error ? 'alert' : undefined}>
           {msg}
         </p>
       ) : null}
@@ -42,16 +43,17 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ l
   const inputId = id ?? autoId;
   return (
     <FieldShell id={inputId} label={label} error={error} hint={hint} className={className}>
-      <div className="relative">
+      {/* Same direction as the field, so the suffix sits at the field's own end (e.g. LTR numbers in RTL). */}
+      <div className="relative" dir={rest.dir}>
         <input
           ref={ref}
           id={inputId}
           aria-invalid={error ? true : undefined}
           aria-describedby={error || hint ? `${inputId}-msg` : undefined}
-          className={clsx(control(error), suffix ? 'pe-14' : undefined)}
+          className={clsx(control(error), suffix ? 'pe-16' : undefined)}
           {...rest}
         />
-        {suffix ? <span className="pointer-events-none absolute inset-y-0 end-4 grid place-items-center text-caption text-text-muted">{suffix}</span> : null}
+        {suffix ? <span className="pointer-events-none absolute inset-y-0 end-5 grid place-items-center text-caption text-text-muted">{suffix}</span> : null}
       </div>
     </FieldShell>
   );
@@ -78,7 +80,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
   const tid = id ?? autoId;
   return (
     <FieldShell id={tid} label={label} error={error} hint={hint} className={className}>
-      <textarea ref={ref} id={tid} rows={3} aria-invalid={error ? true : undefined} className={clsx(control(error), 'h-auto py-3')} {...rest} />
+      <textarea ref={ref} id={tid} rows={3} aria-invalid={error ? true : undefined} className={clsx(control(error), 'h-auto rounded-lg py-3')} {...rest} />
     </FieldShell>
   );
 });

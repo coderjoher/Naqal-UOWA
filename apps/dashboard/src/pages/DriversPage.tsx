@@ -1,7 +1,8 @@
 import { clsx } from 'clsx';
 import { Ban, Bus, CircleCheck, ExternalLink, FileText, RotateCcw, ShieldCheck, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router';
 import { API_URL } from '../lib/api';
 import { useI18n, type MessageKey } from '../lib/i18n';
 import { documentLink, errorMessages, useDriver, useDrivers, useReviewDriver, type DriverStatus } from '../lib/queries';
@@ -178,6 +179,16 @@ export function DriversPage() {
   const q = useDrivers();
   const [tab, setTab] = useState<DriverStatus>('pending');
   const [open, setOpen] = useState<string | null>(null);
+  // The global search links here with ?open=<driver id>: show that driver's tab and details.
+  const [params, setParams] = useSearchParams();
+  const wanted = params.get('open');
+  useEffect(() => {
+    const d = wanted ? q.data?.find((x) => x.id === wanted) : undefined;
+    if (!d) return;
+    if (TABS.includes(d.status)) setTab(d.status);
+    setOpen(d.id);
+    setParams({}, { replace: true });
+  }, [wanted, q.data, setParams]);
   const counts = useMemo(() => Object.fromEntries(TABS.map((s) => [s, q.data?.filter((d) => d.status === s).length ?? 0])), [q.data]);
   const rows = q.data?.filter((d) => d.status === tab) ?? [];
   const date = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString(lang === 'ar' ? 'ar-IQ-u-nu-latn' : 'en-GB', { day: 'numeric', month: 'short' }) : '—');
@@ -192,7 +203,7 @@ export function DriversPage() {
             role="tab"
             aria-selected={tab === s}
             onClick={() => setTab(s)}
-            className={clsx('relative flex h-11 items-center gap-2 rounded-pill px-5 text-label transition-colors duration-200', tab === s ? 'text-on-primary' : 'bg-surface text-text hover:bg-surface-muted')}
+            className={clsx('relative flex h-12 items-center gap-2 rounded-pill px-5 text-label transition-colors duration-200', tab === s ? 'text-on-primary' : 'border border-border bg-surface text-text hover:bg-surface-muted')}
           >
             {tab === s ? <motion.span layoutId="driver-tab" className="absolute inset-0 rounded-pill bg-primary" transition={spring} /> : null}
             <span className="relative">{t(`drivers.tab.${s}` as MessageKey)}</span>
@@ -209,7 +220,7 @@ export function DriversPage() {
           <motion.ul key={tab} variants={listVariants} initial="hidden" animate="show" className="flex flex-col gap-2">
             {rows.map((d) => (
               <motion.li key={d.id} variants={itemVariants}>
-                <button type="button" onClick={() => setOpen(d.id)} className="flex w-full items-center gap-4 rounded-md border border-border p-4 text-start transition-colors duration-200 hover:border-primary hover:bg-primary-soft">
+                <button type="button" onClick={() => setOpen(d.id)} className="flex min-h-[72px] w-full items-center gap-4 rounded-lg border border-border p-4 text-start transition-colors duration-200 hover:border-primary hover:bg-primary-soft">
                   <span className="grid size-11 shrink-0 place-items-center rounded-pill bg-primary-soft text-headline text-primary" aria-hidden>
                     {d.name.slice(0, 1) || '?'}
                   </span>
@@ -222,7 +233,10 @@ export function DriversPage() {
                   <span className="hidden text-caption text-text-muted sm:block">
                     {t('drivers.submitted')}: {date(d.submittedAt)}
                   </span>
-                  <Badge tone={STATUS_TONE[d.status]}>{t(`drivers.status.${d.status}` as MessageKey)}</Badge>
+                  {/* The tab already names the status; on phones the name gets the room. */}
+                  <span className="hidden sm:inline-flex">
+                    <Badge tone={STATUS_TONE[d.status]}>{t(`drivers.status.${d.status}` as MessageKey)}</Badge>
+                  </span>
                 </button>
               </motion.li>
             ))}

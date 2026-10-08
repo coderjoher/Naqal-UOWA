@@ -51,6 +51,7 @@ test('[T6-05] office reviews, approves and downloads PDF and XLSX; totals in the
   expect(rows.sort()).toEqual([...linePayouts].sort());
 
   // The approval is in the audit log.
+  await page.getByRole('navigation', { name: 'main' }).getByRole('button', { name: 'الإعدادات' }).click();
   await page.getByRole('link', { name: 'سجل التغييرات' }).click();
   await expect(page.getByText('settlement.approve')).toBeVisible();
 });

@@ -76,7 +76,7 @@ export function AnnouncementsPage() {
               <div className="grid gap-3 sm:grid-cols-2">
                 <label className="flex flex-col gap-1.5 text-label">
                   {t('ann.wave')}
-                  <select className="h-11 rounded-md border border-border bg-surface px-3" value={form.waveId ?? ''} onChange={(e) => set({ waveId: e.target.value || undefined })} data-testid="ann-wave">
+                  <select className="h-12 rounded-pill border border-border bg-surface px-5" value={form.waveId ?? ''} onChange={(e) => set({ waveId: e.target.value || undefined })} data-testid="ann-wave">
                     <option value="">—</option>
                     {(waves.data ?? []).filter((w) => w.active).map((w) => (
                       <option key={w.id} value={w.id}>
@@ -91,7 +91,7 @@ export function AnnouncementsPage() {
             {form.target === 'point' ? (
               <label className="flex flex-col gap-1.5 text-label">
                 {t('ann.point')}
-                <select className="h-11 rounded-md border border-border bg-surface px-3" value={form.pointId ?? ''} onChange={(e) => set({ pointId: e.target.value || undefined })} data-testid="ann-point">
+                <select className="h-12 rounded-pill border border-border bg-surface px-5" value={form.pointId ?? ''} onChange={(e) => set({ pointId: e.target.value || undefined })} data-testid="ann-point">
                   <option value="">—</option>
                   {(points.data ?? []).filter((p) => p.active).map((p) => (
                     <option key={p.id} value={p.id}>

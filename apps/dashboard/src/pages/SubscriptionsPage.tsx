@@ -5,8 +5,8 @@ import { useMemo, useState, type FormEvent } from 'react';
 import { ApiError } from '../lib/api';
 import { useI18n, useMoney } from '../lib/i18n';
 import { downloadReceipt, subscriptionPreview, useRecordSubscription, useReversePayment, useSubscriptions, type SubscriptionPreview, type SubscriptionRow } from '../lib/queries';
-import { AnimatedNumber, Badge, Button, Card, Drawer, EmptyState, IconButton, Input, PageHeader, SkeletonRows, Stagger, Table, Textarea, useToast } from '../ui';
-import { itemVariants, spring } from '../ui/motion';
+import { Badge, Button, Card, Drawer, EmptyState, IconButton, Input, Kpi, KpiGrid, PageHeader, SkeletonRows, Stagger, Table, Textarea, useToast } from '../ui';
+import { spring } from '../ui/motion';
 
 const thisMonth = () => {
   const d = new Date(Date.now() + 3 * 3600_000); // Baghdad
@@ -155,30 +155,10 @@ export function SubscriptionsPage() {
         description={t('subs.desc')}
         actions={<Input id="sub-month" label={t('subs.month')} type="month" dir="ltr" value={month} onChange={(e) => e.target.value && setMonth(e.target.value)} />}
       />
-      <motion.div variants={itemVariants} className="grid gap-4 sm:grid-cols-2">
-        <div className="flex items-center gap-4 rounded-lg bg-surface p-5 shadow-card">
-          <span className="grid size-12 place-items-center rounded-md bg-primary-soft text-primary" aria-hidden>
-            <ReceiptText className="size-6" />
-          </span>
-          <div>
-            <p className="text-title">
-              <AnimatedNumber value={stats.count} />
-            </p>
-            <p className="text-caption text-text-muted">{t('subs.count')}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-4 rounded-lg bg-surface p-5 shadow-card">
-          <span className="grid size-12 place-items-center rounded-md bg-success-soft text-success" aria-hidden>
-            <Banknote className="size-6" />
-          </span>
-          <div>
-            <p className="text-title">
-              <AnimatedNumber value={stats.total} format={(n) => money(n)} />
-            </p>
-            <p className="text-caption text-text-muted">{t('subs.total')}</p>
-          </div>
-        </div>
-      </motion.div>
+      <KpiGrid cols={2}>
+        <Kpi tone="brand" icon={ReceiptText} label={t('subs.count')} value={stats.count} loading={q.isPending} />
+        <Kpi tone="gold" compact icon={Banknote} label={t('subs.total')} value={stats.total} format={(n) => money(n)} loading={q.isPending} />
+      </KpiGrid>
       <RecordPayment month={month} />
       <Card animated title={t('subs.list')}>
         {q.isPending ? (

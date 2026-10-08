@@ -28,6 +28,7 @@ test('[T2-10] office reviews a pending driver, opens documents and approves; the
   await page.getByRole('button', { name: 'دخول' }).click();
   await expect(page.getByRole('heading', { level: 1 })).toContainText('أهلاً');
 
+  await page.getByRole('navigation', { name: 'main' }).getByRole('button', { name: 'الأشخاص' }).click();
   await page.getByRole('navigation', { name: 'main' }).getByRole('link', { name: 'السائقون' }).click();
   await expect(page.getByRole('tab', { name: /بانتظار المراجعة/ })).toHaveAttribute('aria-selected', 'true');
   await page.getByRole('button', { name: /حيدر كاظم/ }).click();
@@ -55,6 +56,7 @@ test('office imports the roster and issues an activation code that the student c
   await page.getByLabel('كلمة المرور').fill('password123');
   await page.getByRole('button', { name: 'دخول' }).click();
   await expect(page.getByRole('heading', { level: 1 })).toContainText('أهلاً');
+  await page.getByRole('navigation', { name: 'main' }).getByRole('button', { name: 'الأشخاص' }).click();
   await page.getByRole('navigation', { name: 'main' }).getByRole('link', { name: 'الطلبة' }).click();
 
   await page.locator('#roster-file').setInputFiles({

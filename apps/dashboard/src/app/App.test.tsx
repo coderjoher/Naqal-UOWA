@@ -57,9 +57,13 @@ describe('app routing', () => {
     );
     renderAt('/universities');
     expect(screen.queryByRole('link', { name: 'الجامعات' })).not.toBeInTheDocument();
+    // Less-used pages sit in rail flyouts: «الأشخاص» (drivers, students, users) and «الإعدادات».
+    await userEvent.click(screen.getByRole('button', { name: 'الأشخاص' }));
     expect(screen.getByRole('link', { name: 'المستخدمون' })).toBeInTheDocument();
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('أهلاً');
+    await userEvent.click(screen.getByRole('button', { name: 'الإعدادات' }));
     expect(screen.getByRole('link', { name: 'فئات المسافة' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'الجامعات' })).not.toBeInTheDocument();
   });
 
   it('shows a login error for wrong credentials', async () => {
