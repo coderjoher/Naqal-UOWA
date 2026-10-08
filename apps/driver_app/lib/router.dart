@@ -7,13 +7,13 @@ import 'package:naql_ui/naql_ui.dart';
 import 'data/session.dart';
 import 'data/taxi.dart';
 import 'l10n/gen/app_localizations.dart';
+import 'screens/account_screen.dart';
 import 'screens/application_screen.dart';
 import 'screens/earnings_screen.dart';
 import 'screens/onboarding/code_screen.dart';
 import 'screens/onboarding/phone_screen.dart';
 import 'screens/onboarding/university_screen.dart';
 import 'screens/onboarding/welcome_screen.dart';
-import 'screens/placeholder_screen.dart';
 import 'screens/status_screen.dart';
 import 'screens/runs/run_screen.dart';
 import 'screens/runs/today_screen.dart';
@@ -70,7 +70,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           ]),
           StatefulShellBranch(routes: [GoRoute(path: '/schedule', builder: (_, _) => const ScheduleScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/earnings', builder: (_, _) => const EarningsScreen())]),
-          StatefulShellBranch(routes: [GoRoute(path: '/profile', builder: (c, _) => PlaceholderScreen(title: AppLocalizations.of(c).tabProfile))]),
+          StatefulShellBranch(routes: [GoRoute(path: '/profile', builder: (_, _) => const AccountScreen())]),
         ],
       ),
     ],

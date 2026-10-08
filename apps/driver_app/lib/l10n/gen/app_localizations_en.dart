@@ -661,4 +661,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get taxiCashCollected => 'Cash collected';
+
+  @override
+  String get accountApproved => 'Approved';
+
+  @override
+  String get accountVehicle => 'Your vehicle';
+
+  @override
+  String get accountFromOffice => 'Approved by the transport office';
+
+  @override
+  String get accountChangeHint =>
+      'To change your vehicle details, contact the transport office.';
+
+  @override
+  String get accountNotSet => 'Not set';
+
+  @override
+  String get accountDocuments => 'Documents';
+
+  @override
+  String accountDocumentsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count documents uploaded',
+      one: '1 document uploaded',
+      zero: 'No documents uploaded',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get accountLanguage => 'Language';
+
+  @override
+  String get accountSignOutTitle => 'Sign out?';
+
+  @override
+  String get accountSignOutBody =>
+      'You will need a new code sent to your phone to sign in again.';
+
+  @override
+  String get accountStay => 'Stay signed in';
 }
