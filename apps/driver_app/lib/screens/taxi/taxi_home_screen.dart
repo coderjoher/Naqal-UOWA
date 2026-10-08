@@ -96,7 +96,8 @@ class TaxiHomeScreen extends ConsumerWidget {
   }
 }
 
-/// The online/offline switch: a wide 88 dp pill whose knob slides across and turns green.
+/// The online/offline switch: a wide 88 dp pill whose knob slides across; online turns it gold
+/// (the university's accent), offline it is a quiet surface with a blue (ink in dark mode) knob.
 class _OnlineSwitch extends ConsumerWidget {
   const _OnlineSwitch({required this.online, required this.switching});
   final bool online;
@@ -107,7 +108,9 @@ class _OnlineSwitch extends ConsumerWidget {
     final t = AppLocalizations.of(context);
     final reduce = _reduceMotion(context);
     final d = reduce ? Duration.zero : _enter;
-    final fg = online ? NaqlColors.onPrimary : NaqlColors.text;
+    final fg = online ? NaqlColors.onAccent : NaqlColors.text;
+    final knob = naqlIsDark ? NaqlColors.ink : NaqlColors.primary;
+    final onKnob = naqlIsDark ? NaqlColors.onInk : NaqlColors.onPrimary;
     final title = online ? t.taxiOnline : t.taxiOffline;
     final hint = switching ? t.taxiConnecting : (online ? t.taxiOnlineHint : t.taxiOfflineHint);
     return Semantics(
@@ -130,10 +133,10 @@ class _OnlineSwitch extends ConsumerWidget {
           height: 88,
           padding: const EdgeInsets.all(NaqlSpace.s2),
           decoration: BoxDecoration(
-            color: online ? NaqlColors.success : NaqlColors.surface,
+            color: online ? NaqlColors.accent : NaqlColors.surface,
             borderRadius: BorderRadius.circular(NaqlRadius.pill),
-            border: Border.all(color: online ? NaqlColors.success : NaqlColors.border, width: 1.5),
-            boxShadow: naqlCardShadow,
+            border: Border.all(color: online ? NaqlColors.accent : NaqlColors.border, width: 1.5),
+            boxShadow: online ? [BoxShadow(color: NaqlColors.accent.withValues(alpha: 0.35), blurRadius: 24, offset: const Offset(0, 8))] : naqlCardShadow,
           ),
           child: Stack(
             children: [
@@ -156,7 +159,7 @@ class _OnlineSwitch extends ConsumerWidget {
                       ),
                       Text(
                         hint,
-                        style: NaqlText.label.copyWith(color: online ? NaqlColors.onPrimary : NaqlColors.textMuted),
+                        style: NaqlText.label.copyWith(color: online ? NaqlColors.onAccent.withValues(alpha: 0.8) : NaqlColors.textMuted),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -173,11 +176,11 @@ class _OnlineSwitch extends ConsumerWidget {
                   curve: _easeOut,
                   width: 72,
                   height: 72,
-                  decoration: BoxDecoration(color: online ? NaqlColors.surface : NaqlColors.primary, shape: BoxShape.circle),
+                  decoration: BoxDecoration(color: online ? NaqlColors.onAccent : knob, shape: BoxShape.circle),
                   child: AnimatedOpacity(
                     opacity: switching ? 0.4 : 1,
                     duration: d,
-                    child: Icon(LucideIcons.power, size: 32, color: online ? NaqlColors.success : NaqlColors.onPrimary),
+                    child: Icon(LucideIcons.power, size: 32, color: online ? NaqlColors.accent : onKnob),
                   ),
                 ),
               ),
@@ -433,7 +436,7 @@ class _OfferCard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              StatusPill(label: toCampus ? t.taxiToCampus : t.taxiFromCampus, tone: NaqlTone.primary, icon: toCampus ? LucideIcons.school : LucideIcons.house),
+              StatusPill(label: toCampus ? t.taxiToCampus : t.taxiFromCampus, tone: toCampus ? NaqlTone.primary : NaqlTone.accent, icon: toCampus ? LucideIcons.school : LucideIcons.house),
               const Spacer(),
               _CountdownRing(left: left, total: total),
             ],
@@ -637,38 +640,14 @@ class _ActiveRide extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: NaqlSpace.s3),
-          Row(
-            children: [
-              Container(
-                width: 56,
-                height: 56,
-                alignment: Alignment.center,
-                decoration: const BoxDecoration(color: NaqlColors.primarySoft, shape: BoxShape.circle),
-                child: Text(ride.studentName.isEmpty ? '?' : ride.studentName.characters.first, style: NaqlText.title.copyWith(color: NaqlColors.primary)),
-              ),
-              const SizedBox(width: NaqlSpace.s3),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(ride.studentName, key: const ValueKey('taxi-student'), style: NaqlText.title.copyWith(fontSize: 26, height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis),
-                    if (ride.label != null && ride.label!.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: NaqlSpace.s1),
-                        child: Row(
-                          children: [
-                            const Icon(LucideIcons.mapPin, size: 16, color: NaqlColors.textMuted),
-                            const SizedBox(width: NaqlSpace.s1),
-                            Expanded(
-                              child: Text(ride.label!, style: NaqlText.body.copyWith(color: NaqlColors.textMuted)),
-                            ),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
+          NaqlCard(
+            nested: true,
+            padding: const EdgeInsets.all(NaqlSpace.s3),
+            child: NaqlPersonCard(
+              name: ride.studentName,
+              caption: ride.label != null && ride.label!.isNotEmpty ? ride.label! : null,
+              large: true,
+            ),
           ),
           const SizedBox(height: NaqlSpace.s4),
           Row(
@@ -707,34 +686,8 @@ class _ActiveRide extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: NaqlSpace.s4),
-          Container(
-            padding: const EdgeInsets.all(NaqlSpace.s4),
-            decoration: BoxDecoration(color: NaqlColors.surfaceMuted, borderRadius: BorderRadius.circular(NaqlRadius.md)),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(t.taxiFare, style: NaqlText.caption),
-                      Text(
-                        amount,
-                        style: NaqlText.title.copyWith(fontSize: 26, color: NaqlColors.success, fontWeight: FontWeight.w700),
-                        textDirection: TextDirection.ltr,
-                      ),
-                    ],
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(t.taxiDistance, style: NaqlText.caption),
-                    Text(t.taxiKm(_km(ride.distanceKm)), style: NaqlText.headline),
-                  ],
-                ),
-              ],
-            ),
-          ),
+          NaqlSummaryRow(label: t.taxiDistance, value: t.taxiKm(_km(ride.distanceKm)), icon: LucideIcons.route),
+          NaqlSummaryRow(label: t.taxiFare, value: amount, total: true),
           const SizedBox(height: NaqlSpace.s4),
           NaqlButton(
             key: const ValueKey('taxi-step'),
@@ -798,7 +751,7 @@ class _StepBar extends StatelessWidget {
                 duration: d,
                 curve: _easeOut,
                 height: 6,
-                decoration: BoxDecoration(color: i <= step ? NaqlColors.primary : NaqlColors.border, borderRadius: BorderRadius.circular(NaqlRadius.pill)),
+                decoration: BoxDecoration(color: i <= step ? NaqlColors.accent : NaqlColors.border, borderRadius: BorderRadius.circular(NaqlRadius.pill)),
               ),
             ),
           ],
@@ -830,8 +783,8 @@ class _DoneView extends ConsumerWidget {
             child: Container(
               width: 96,
               height: 96,
-              decoration: const BoxDecoration(color: NaqlColors.successSoft, shape: BoxShape.circle),
-              child: const Icon(LucideIcons.circleCheck, size: 52, color: NaqlColors.success),
+              decoration: BoxDecoration(color: NaqlColors.successSoft, shape: BoxShape.circle),
+              child: Icon(LucideIcons.circleCheck, size: 52, color: NaqlColors.success),
             ),
           ),
           const SizedBox(height: NaqlSpace.s4),

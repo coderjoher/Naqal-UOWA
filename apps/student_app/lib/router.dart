@@ -84,7 +84,7 @@ class _Splash extends StatelessWidget {
   const _Splash();
 
   @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Icon(LucideIcons.busFront, size: 48, color: NaqlColors.primary)));
+  Widget build(BuildContext context) => Scaffold(body: Center(child: Icon(LucideIcons.busFront, size: 48, color: NaqlColors.primary)));
 }
 
 /// Content scrolls under the floating pill navigation (no Material NavigationBar).

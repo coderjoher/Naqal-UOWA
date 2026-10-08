@@ -5,13 +5,15 @@ import { motion } from 'motion/react';
 import { forwardRef, type ButtonHTMLAttributes } from 'react';
 import { spring } from './motion';
 
-type Variant = 'primary' | 'secondary' | 'ink' | 'ghost' | 'danger';
+type Variant = 'primary' | 'accent' | 'secondary' | 'ink' | 'ghost' | 'danger';
 type Size = 'md' | 'sm';
 
 const VARIANTS: Record<Variant, string> = {
-  primary: 'bg-primary text-on-primary hover:bg-primary-pressed shadow-card',
+  // Dark mode: a bright ink pill (the brand's high-contrast call to action).
+  primary: 'bg-primary text-on-primary hover:bg-primary-pressed shadow-card dark:bg-ink dark:text-on-ink dark:shadow-none dark:hover:bg-ink dark:hover:opacity-90',
+  accent: 'bg-accent text-on-accent hover:bg-accent-pressed',
   secondary: 'bg-surface text-text border border-border hover:bg-surface-muted',
-  ink: 'bg-ink text-on-primary hover:opacity-90',
+  ink: 'bg-ink text-on-ink hover:opacity-90',
   ghost: 'bg-transparent text-primary hover:bg-primary-soft',
   danger: 'bg-danger text-on-primary hover:opacity-90',
 };

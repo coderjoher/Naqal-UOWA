@@ -36,14 +36,7 @@ class AccountScreen extends ConsumerWidget {
             NaqlEntrance(
               child: NaqlCard(
                 child: Row(children: [
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundColor: NaqlColors.primarySoft,
-                    child: Text(
-                      (a.name?.trim().isNotEmpty ?? false) ? a.name!.trim().characters.first : '؟',
-                      style: NaqlText.title.copyWith(color: NaqlColors.primary),
-                    ),
-                  ),
+                  NaqlAvatar(name: (a.name?.trim().isNotEmpty ?? false) ? a.name!.trim() : '؟', size: 60),
                   const SizedBox(width: NaqlSpace.s4),
                   Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -61,10 +54,27 @@ class AccountScreen extends ConsumerWidget {
               index: 1,
               child: NaqlCard(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  Text(t.accountVehicle, style: NaqlText.headline),
-                  const SizedBox(height: NaqlSpace.s2),
+                  Row(children: [
+                    NaqlIconTile(a.vehicleType == 'taxi' ? LucideIcons.carTaxiFront : LucideIcons.busFront, size: 52),
+                    const SizedBox(width: NaqlSpace.s3),
+                    Expanded(child: Text(t.accountVehicle, style: NaqlText.headline)),
+                  ]),
+                  const SizedBox(height: NaqlSpace.s4),
+                  // The plate as it looks on the vehicle.
+                  Semantics(
+                    label: '${t.plate}: ${a.plate ?? t.accountNotSet}. ${t.accountFromOffice}',
+                    excludeSemantics: true,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: NaqlSpace.s2),
+                      child: Row(children: [
+                        Expanded(child: Text(t.plate, style: NaqlText.body.copyWith(color: NaqlColors.textMuted))),
+                        if (a.plate != null) NaqlPlateBadge(a.plate!, large: true) else Text(t.accountNotSet, style: NaqlText.body.copyWith(fontWeight: FontWeight.w600)),
+                        const SizedBox(width: NaqlSpace.s2),
+                        Icon(LucideIcons.lock, size: 16, color: NaqlColors.textMuted),
+                      ]),
+                    ),
+                  ),
                   NaqlInfoRow(label: t.vehicleType, value: vehicle(a.vehicleType), locked: true, lockedHint: t.accountFromOffice),
-                  NaqlInfoRow(label: t.plate, value: a.plate ?? t.accountNotSet, locked: true, lockedHint: t.accountFromOffice),
                   NaqlInfoRow(label: t.seats, value: a.seats?.toString() ?? t.accountNotSet, locked: true, lockedHint: t.accountFromOffice),
                   NaqlInfoRow(label: t.modelYear, value: a.modelYear?.toString() ?? t.accountNotSet, locked: true, lockedHint: t.accountFromOffice),
                   const SizedBox(height: NaqlSpace.s1),
@@ -78,7 +88,7 @@ class AccountScreen extends ConsumerWidget {
               child: NaqlListRow(
                 title: t.accountDocuments,
                 subtitle: t.accountDocumentsCount(a.documents.length),
-                leading: const Icon(LucideIcons.fileCheck2, color: NaqlColors.primary),
+                leading: const NaqlIconTile(LucideIcons.fileCheck2, size: 40),
                 onTap: () => showNaqlSheet<void>(context, builder: (_) => _DocumentsSheet(lang: lang)),
               ),
             ),
@@ -88,7 +98,7 @@ class AccountScreen extends ConsumerWidget {
               child: NaqlListRow(
                 title: t.accountLanguage,
                 subtitle: lang == 'ar' ? t.arabic : t.english,
-                leading: const Icon(LucideIcons.languages, color: NaqlColors.primary),
+                leading: const NaqlIconTile(LucideIcons.languages, size: 40),
                 onTap: () => ref.read(localeProvider.notifier).toggle(),
               ),
             ),

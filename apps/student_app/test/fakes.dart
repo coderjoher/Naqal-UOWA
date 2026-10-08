@@ -380,3 +380,9 @@ void usePhone(WidgetTester tester) {
   tester.view.physicalSize = const Size(390 * 2, 844 * 2);
   addTearDown(tester.view.reset);
 }
+
+/// The phone in dark mode for this test (the app follows the platform brightness).
+void useDark(WidgetTester tester) {
+  tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
+  addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+}

@@ -34,7 +34,9 @@ void main() {
     expect(find.text('08:00'), findsOneWidget); // at campus by the wave time
     expect(find.text('ساحة العباس'), findsOneWidget);
     expect(find.text('حيدر عباس'), findsOneWidget);
-    expect(find.text('كوستر · 12345 كربلاء'), findsOneWidget);
+    // Vehicle type as a caption and the plate in its own plate badge.
+    expect(find.text('كوستر'), findsOneWidget);
+    expect(find.text('12345 كربلاء'), findsOneWidget);
     expect(find.byWidgetPredicate((w) => w is Image && w.image is MemoryImage), findsOneWidget);
     expect(find.text('مؤكد'), findsOneWidget);
     expect(find.text('للطالبات فقط'), findsOneWidget);

@@ -125,7 +125,7 @@ class _WaveToggle extends StatelessWidget {
                 duration: NaqlMotion.fast,
                 transitionBuilder: (c, a) => ScaleTransition(scale: a, child: c),
                 child: wave.locked
-                    ? const Icon(LucideIcons.lock, key: ValueKey('lock'), color: NaqlColors.textMuted)
+                    ? Icon(LucideIcons.lock, key: ValueKey('lock'), color: NaqlColors.textMuted)
                     : Icon(on ? LucideIcons.circleCheck : LucideIcons.circle, key: ValueKey(on), color: on ? NaqlColors.primary : NaqlColors.border, size: 28),
               ),
             ]),

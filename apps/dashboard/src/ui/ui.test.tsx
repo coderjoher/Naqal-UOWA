@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { Badge, Button, Card, Input, Table } from './index';
 
 /** Classes must come from design tokens (see packages/design-tokens). */
-const TOKEN_CLASS = /^(bg|text|border|shadow|rounded)-(primary|primary-pressed|primary-soft|on-primary|surface|surface-muted|bg|border|text|text-muted|ink|success|success-soft|warning|warning-soft|danger|danger-soft|female-only|female-only-soft|transparent|current|card|sm|md|lg|pill|display|title|headline|body|label|caption|start|center|e-transparent)$/;
+const TOKEN_CLASS = /^(bg|text|border|shadow|rounded)-(primary|primary-pressed|primary-soft|on-primary|surface|surface-muted|bg|border|text|text-muted|ink|on-ink|accent|accent-pressed|accent-soft|on-accent|success|success-soft|warning|warning-soft|danger|danger-soft|female-only|female-only-soft|transparent|current|card|sm|md|lg|pill|display|title|headline|body|label|caption|start|center|e-transparent)$/;
 
 function colourClasses(el: Element) {
   return [...el.classList].map((c) => c.replace(/^(hover|focus|disabled|active|placeholder|last):/, '')).filter((c) => /^(bg|text|border|shadow|rounded)-/.test(c));
@@ -35,7 +35,7 @@ describe('dashboard UI kit', () => {
 
   it('[T0-05] Button variants map to token colours', () => {
     const { rerender } = render(<Button variant="secondary">x</Button>);
-    for (const v of ['secondary', 'ink', 'ghost', 'danger'] as const) {
+    for (const v of ['accent', 'secondary', 'ink', 'ghost', 'danger'] as const) {
       rerender(<Button variant={v}>x</Button>);
       for (const c of colourClasses(screen.getByRole('button'))) expect(c).toMatch(TOKEN_CLASS);
     }

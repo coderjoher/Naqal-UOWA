@@ -26,7 +26,8 @@ test('[T9-05] no tile host is hard-coded outside the map settings', () => {
   assert.match(read('apps/dashboard/src/ui/MapView.tsx'), /import\.meta\.env\.VITE_MAP_TILES/);
   assert.match(read('packages/naql_app/lib/src/config.dart'), /String\.fromEnvironment\('MAP_TILES'/);
   assert.match(read('apps/student_app/lib/screens/track_screen.dart'), /urlTemplate: mapTilesUrl/);
-  assert.match(read('apps/student_app/lib/screens/track_screen.dart'), /SimpleAttributionWidget/);
+  // The provider's credit is shown from the same setting (flutter_map's widget or our pill above the sheet).
+  assert.match(read('apps/student_app/lib/screens/track_screen.dart'), /SimpleAttributionWidget|TaxiAttribution\(text: mapAttribution/);
 });
 
 test('[T9-05] the dashboard CSP is filled with the tile host at build time', () => {

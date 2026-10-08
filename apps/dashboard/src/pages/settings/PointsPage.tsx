@@ -91,7 +91,7 @@ export function PointsPage() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="pointer-events-none absolute top-4 start-4 flex items-center gap-2 rounded-pill bg-ink px-4 py-2 text-caption text-on-primary"
+                className="pointer-events-none absolute top-4 start-4 flex items-center gap-2 rounded-pill bg-ink px-4 py-2 text-caption text-on-ink"
               >
                 <Plus className="size-4" aria-hidden /> {t('points.clickMap')}
               </motion.p>

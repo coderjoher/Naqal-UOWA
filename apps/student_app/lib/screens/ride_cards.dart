@@ -132,8 +132,8 @@ class _WaitlistCardState extends State<WaitlistCard> {
             Container(
               width: 44,
               height: 44,
-              decoration: const BoxDecoration(color: NaqlColors.warningSoft, shape: BoxShape.circle),
-              child: const Icon(LucideIcons.hourglass, color: NaqlColors.warning, size: 22),
+              decoration: BoxDecoration(color: NaqlColors.warningSoft, borderRadius: BorderRadius.circular(NaqlRadius.sm + 4)),
+              child: Icon(LucideIcons.hourglass, color: NaqlColors.warning, size: 22),
             ),
             const SizedBox(width: NaqlSpace.s3),
             Expanded(
@@ -153,7 +153,7 @@ class _WaitlistCardState extends State<WaitlistCard> {
           ClipRRect(
             borderRadius: BorderRadius.circular(NaqlRadius.pill),
             child: Container(
-              height: 6,
+              height: 8,
               color: NaqlColors.warningSoft,
               alignment: AlignmentDirectional.centerStart,
               child: AnimatedFractionallySizedBox(
@@ -193,12 +193,7 @@ class PendingRideCard extends StatelessWidget {
       NaqlCard(
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: const BoxDecoration(color: NaqlColors.primarySoft, shape: BoxShape.circle),
-              child: const Icon(LucideIcons.clock, color: NaqlColors.primary, size: 22),
-            ),
+            const NaqlIconTile(LucideIcons.clock),
             const SizedBox(width: NaqlSpace.s3),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -232,26 +227,33 @@ class RequestRideCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return NaqlCard(
-      padding: const EdgeInsets.symmetric(horizontal: NaqlSpace.s5, vertical: NaqlSpace.s6),
+      padding: const EdgeInsets.all(NaqlSpace.s5),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         if (expiredNote != null) ...[
           Container(
             padding: const EdgeInsets.all(NaqlSpace.s3),
-            decoration: BoxDecoration(color: NaqlColors.warningSoft, borderRadius: BorderRadius.circular(NaqlRadius.sm)),
+            decoration: BoxDecoration(color: NaqlColors.warningSoft, borderRadius: BorderRadius.circular(NaqlRadius.md)),
             child: Row(children: [
-              const Icon(LucideIcons.info, color: NaqlColors.warning, size: 18),
+              Icon(LucideIcons.info, color: NaqlColors.warning, size: 18),
               const SizedBox(width: NaqlSpace.s2),
               Expanded(child: Text(expiredNote!, style: NaqlText.body.copyWith(color: NaqlColors.warning))),
             ]),
           ),
-          const SizedBox(height: NaqlSpace.s5),
+          const SizedBox(height: NaqlSpace.s4),
         ],
-        NaqlEmptyState(
-          icon: LucideIcons.busFront,
-          title: t.noRideToday,
-          message: t.noRideTodayBody,
-          action: NaqlButton(label: t.rideRequest, icon: LucideIcons.plus, onPressed: onRequest),
-        ),
+        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(t.noRideToday, style: NaqlText.title),
+              const SizedBox(height: NaqlSpace.s1),
+              Text(t.noRideTodayBody, style: NaqlText.body.copyWith(color: NaqlColors.textMuted)),
+            ]),
+          ),
+          const SizedBox(width: NaqlSpace.s3),
+          const NaqlIconTile(LucideIcons.busFront, size: 52),
+        ]),
+        const SizedBox(height: NaqlSpace.s5),
+        NaqlButton(label: t.rideRequest, icon: LucideIcons.plus, expand: true, onPressed: onRequest),
       ]),
     );
   }

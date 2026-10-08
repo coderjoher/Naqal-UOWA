@@ -34,7 +34,7 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
       ),
       Expanded(
         child: AnimatedSwitcher(
-          duration: NaqlMotion.fast,
+          duration: naqlMotion(context),
           child: _tab == 0 ? const _RideList(key: ValueKey('rides')) : const _PaymentList(key: ValueKey('payments')),
         ),
       ),
@@ -94,7 +94,7 @@ class _Paged<T> extends ConsumerWidget {
                     if (list.hasMore) {
                       // Visible end of the list: ask for the next page.
                       WidgetsBinding.instance.addPostFrameCallback((_) => onMore());
-                      return const Padding(
+                      return Padding(
                         key: ValueKey('more-loading'),
                         padding: EdgeInsets.all(NaqlSpace.s4),
                         child: Center(child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2.5, color: NaqlColors.primary))),
@@ -141,25 +141,42 @@ class _RideRow extends ConsumerWidget {
       'cancelled' => (ride.cancelReason == 'expired' ? t.historyExpired : t.historyCancelled, NaqlTone.neutral),
       _ => (t.historyMissed, NaqlTone.neutral),
     };
+    final morning = ride.waveType == WaveType.morning;
+    final point = ride.point(lang);
     return NaqlCard(
       key: ValueKey('ride-${ride.id}'),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Row(children: [
-          Icon(ride.waveType == WaveType.morning ? LucideIcons.sunrise : LucideIcons.sunset, color: NaqlColors.textMuted),
+          NaqlIconTile(morning ? LucideIcons.sunrise : LucideIcons.sunset, accent: !morning, size: 40),
           const SizedBox(width: NaqlSpace.s3),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(formatDayName(ride.date, lang), style: NaqlText.label),
-              Text('${ride.waveType == WaveType.morning ? t.rideMorning : t.rideReturn} ${ride.waveTime} · ${ride.point(lang)}', style: NaqlText.caption),
+              Text(formatDayName(ride.date, lang), style: NaqlText.label.copyWith(fontWeight: FontWeight.w600)),
+              Text('${morning ? t.rideMorning : t.rideReturn} ${ride.waveTime}', style: NaqlText.caption),
             ]),
           ),
           StatusPill(label: label, tone: tone),
         ]),
+        const SizedBox(height: NaqlSpace.s3),
+        // Morning: from the gathering point to campus by the wave time. Return: leaves campus then.
+        NaqlTripTimeline(
+          accentEnd: true,
+          dense: true,
+          stops: [
+            NaqlTimelineStop(title: morning ? point : t.rideCampus, time: morning ? null : ride.waveTime),
+            NaqlTimelineStop(title: morning ? t.rideCampus : point, time: morning ? ride.waveTime : null),
+          ],
+        ),
         if (ride.driverName != null || ride.fare > 0) ...[
-          const SizedBox(height: NaqlSpace.s2),
+          const SizedBox(height: NaqlSpace.s3),
           Row(children: [
-            if (ride.driverName != null) Expanded(child: Text(ride.driverName!, style: NaqlText.caption)) else const Spacer(),
-            if (ride.fare > 0) Text(formatIqd(ride.fare, lang), style: NaqlText.caption, textDirection: TextDirection.ltr),
+            if (ride.driverName != null) ...[
+              Icon(LucideIcons.user, size: 16, color: NaqlColors.textMuted),
+              const SizedBox(width: NaqlSpace.s1),
+              Expanded(child: Text(ride.driverName!, style: NaqlText.caption)),
+            ] else
+              const Spacer(),
+            if (ride.fare > 0) Text(formatIqd(ride.fare, lang), style: NaqlText.label.copyWith(fontWeight: FontWeight.w600), textDirection: TextDirection.ltr),
           ]),
         ],
         if (ride.rating != null || ride.canRate || ride.status == 'done') ...[
@@ -217,7 +234,7 @@ class _PaymentList extends ConsumerWidget {
               Container(
                 width: 40,
                 height: 40,
-                decoration: BoxDecoration(color: p.reversal ? NaqlColors.dangerSoft : NaqlColors.successSoft, shape: BoxShape.circle),
+                decoration: BoxDecoration(color: p.reversal ? NaqlColors.dangerSoft : NaqlColors.successSoft, borderRadius: BorderRadius.circular(NaqlRadius.sm + 2)),
                 child: Icon(p.reversal ? LucideIcons.undo2 : LucideIcons.receipt, size: 20, color: p.reversal ? NaqlColors.danger : NaqlColors.success),
               ),
               const SizedBox(width: NaqlSpace.s3),

@@ -9,8 +9,8 @@ void main() {
     final api = FakeBackend();
     await tester.pumpWidget(await api.app());
     await tester.pumpAndSettle();
-    expect(find.text('تنقّلك اليومي إلى الجامعة'), findsOneWidget);
-    expect(Directionality.of(tester.element(find.text('تنقّلك اليومي إلى الجامعة'))), TextDirection.rtl);
+    expect(find.text('تنقّل جامعي مريح'), findsOneWidget);
+    expect(Directionality.of(tester.element(find.text('تنقّل جامعي مريح'))), TextDirection.rtl);
 
     await tester.tap(find.text('متابعة'));
     await tester.pumpAndSettle();

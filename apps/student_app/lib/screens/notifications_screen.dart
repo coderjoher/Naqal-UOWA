@@ -81,12 +81,12 @@ class _Item extends StatelessWidget {
     final ago = clock.now().difference(n.createdAt);
     return NaqlCard(
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(width: 44, height: 44, decoration: BoxDecoration(color: tone.bg, shape: BoxShape.circle), child: Icon(icon, color: tone.fg, size: 22)),
+        Container(width: 44, height: 44, decoration: BoxDecoration(color: tone.bg, borderRadius: BorderRadius.circular(NaqlRadius.sm + 4)), child: Icon(icon, color: tone.fg, size: 22)),
         const SizedBox(width: NaqlSpace.s3),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
-              Expanded(child: Text(title, style: NaqlText.label)),
+              Expanded(child: Text(title, style: NaqlText.label.copyWith(fontWeight: FontWeight.w600))),
               Text(ago.inMinutes < 60 ? t.agoMinutes(ago.inMinutes) : formatClock(n.createdAt), style: NaqlText.caption, textDirection: TextDirection.ltr),
             ]),
             const SizedBox(height: 2),
@@ -95,7 +95,7 @@ class _Item extends StatelessWidget {
         ),
         if (n.readAt == null) ...[
           const SizedBox(width: NaqlSpace.s2),
-          Container(width: 10, height: 10, margin: const EdgeInsets.only(top: 6), decoration: const BoxDecoration(color: NaqlColors.primary, shape: BoxShape.circle)),
+          Container(width: 10, height: 10, margin: const EdgeInsets.only(top: 6), decoration: BoxDecoration(color: NaqlColors.accent, shape: BoxShape.circle)),
         ],
       ]),
     );

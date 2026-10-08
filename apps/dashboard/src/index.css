@@ -1,6 +1,18 @@
 @import 'tailwindcss';
 @import '../../../packages/design-tokens/build/tokens.theme.css';
 
+/* Dark mode follows the device unless the header toggle pins a theme on <html data-theme>. */
+@custom-variant dark {
+  &:where([data-theme='dark'], [data-theme='dark'] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme='light']), :root:not([data-theme='light']) *) {
+      @slot;
+    }
+  }
+}
+
 @layer base {
   html,
   body,
@@ -114,4 +126,13 @@
 }
 .maplibregl-map {
   font-family: var(--font-sans);
+}
+/* Dark basemap: invert the street tiles (markers are DOM and keep their colours). */
+:root[data-theme='dark'] .maplibregl-canvas {
+  filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .maplibregl-canvas {
+    filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9);
+  }
 }

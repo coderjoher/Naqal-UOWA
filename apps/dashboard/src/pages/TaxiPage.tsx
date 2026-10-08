@@ -53,7 +53,7 @@ export function TaxiPage() {
         actions={settings.data ? <ServiceSwitch settings={settings.data} /> : null}
       />
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
         <Kpi icon={CarTaxiFront} label={t('taxi.kpi.online')} value={k?.online ?? 0} tone="warning" />
         <Kpi icon={Navigation} label={t('taxi.kpi.active')} value={k?.active ?? 0} tone="primary" />
         <Kpi icon={CircleCheck} label={t('taxi.kpi.done')} value={k?.done ?? 0} tone="success" />
@@ -101,7 +101,7 @@ export function TaxiPage() {
                           o.driverId === selected ? 'bg-primary-soft' : 'hover:bg-surface-muted',
                         )}
                       >
-                        <span className={clsx('grid size-9 shrink-0 place-items-center rounded-md', o.busy ? 'bg-ink text-surface' : 'bg-warning-soft text-warning')} aria-hidden>
+                        <span className={clsx('grid size-9 shrink-0 place-items-center rounded-md', o.busy ? 'bg-ink text-on-ink' : 'bg-warning-soft text-warning')} aria-hidden>
                           <CarTaxiFront size={18} />
                         </span>
                         <span className="min-w-0 flex-1">
@@ -271,7 +271,7 @@ function TariffCard() {
 
 function Kpi({ icon: Icon, label, value, tone, format }: { icon: typeof CarTaxiFront; label: string; value: number; tone: 'primary' | 'warning' | 'success' | 'danger'; format?: (n: number) => string }) {
   return (
-    <div className="flex items-center gap-3 rounded-lg bg-surface p-4 shadow-sm">
+    <div className="flex items-center gap-3 rounded-lg bg-surface p-4 shadow-sm dark:border dark:border-border dark:shadow-none">
       <span
         className={clsx(
           'grid size-10 shrink-0 place-items-center rounded-pill',

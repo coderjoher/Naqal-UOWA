@@ -52,11 +52,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get comingSoonBody => 'This page is under construction.';
 
   @override
-  String get welcomeTitle => 'Your daily ride to campus';
+  String get welcomeTitle => 'A comfortable campus ride';
 
   @override
   String get welcomeBody =>
-      'Request a seat every day, follow your bus on the map and know when it arrives.';
+      'Request a seat, follow your bus and know when it arrives.';
 
   @override
   String get chooseLanguage => 'Choose language';
@@ -808,4 +808,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get taxiPlateLabel => 'Plate';
+
+  @override
+  String get taxiChipHere => 'Current location';
+
+  @override
+  String get taxiChipPoint => 'My gathering point';
+
+  @override
+  String get taxiToCampusSub => 'From your spot to the campus gate';
+
+  @override
+  String get taxiFromCampusSub => 'From campus to your spot';
+
+  @override
+  String get driverCaption => 'Your driver';
+
+  @override
+  String get vehicleCaption => 'Bus';
+
+  @override
+  String get rideSummaryTotal => 'Total';
+
+  @override
+  String get rideFare => 'Fare';
 }

@@ -179,13 +179,13 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeTitle.
   ///
   /// In ar, this message translates to:
-  /// **'تنقّلك اليومي إلى الجامعة'**
+  /// **'تنقّل جامعي مريح'**
   String get welcomeTitle;
 
   /// No description provided for @welcomeBody.
   ///
   /// In ar, this message translates to:
-  /// **'اطلب مقعدك كل يوم، وتابع حافلتك على الخريطة، واعرف متى تصل.'**
+  /// **'اطلب مقعدك، وتابع حافلتك، واعرف متى تصل.'**
   String get welcomeBody;
 
   /// No description provided for @chooseLanguage.
@@ -1537,6 +1537,54 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'اللوحة'**
   String get taxiPlateLabel;
+
+  /// No description provided for @taxiChipHere.
+  ///
+  /// In ar, this message translates to:
+  /// **'موقعي الحالي'**
+  String get taxiChipHere;
+
+  /// No description provided for @taxiChipPoint.
+  ///
+  /// In ar, this message translates to:
+  /// **'نقطة تجمّعي'**
+  String get taxiChipPoint;
+
+  /// No description provided for @taxiToCampusSub.
+  ///
+  /// In ar, this message translates to:
+  /// **'من مكانك إلى بوابة الجامعة'**
+  String get taxiToCampusSub;
+
+  /// No description provided for @taxiFromCampusSub.
+  ///
+  /// In ar, this message translates to:
+  /// **'من الجامعة إلى مكانك'**
+  String get taxiFromCampusSub;
+
+  /// No description provided for @driverCaption.
+  ///
+  /// In ar, this message translates to:
+  /// **'سائقك'**
+  String get driverCaption;
+
+  /// No description provided for @vehicleCaption.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحافلة'**
+  String get vehicleCaption;
+
+  /// No description provided for @rideSummaryTotal.
+  ///
+  /// In ar, this message translates to:
+  /// **'المجموع'**
+  String get rideSummaryTotal;
+
+  /// No description provided for @rideFare.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأجرة'**
+  String get rideFare;
 }
 
 class _AppLocalizationsDelegate

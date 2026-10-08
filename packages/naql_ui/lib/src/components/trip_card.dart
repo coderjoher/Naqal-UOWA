@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../foundation/theme.dart';
 import '../foundation/tokens.g.dart';
 import 'card.dart';
+import 'plate.dart';
 import 'status_pill.dart';
 
 /// The core "answer card": pickup time and place → arrival, bus and driver, status.
@@ -50,18 +51,24 @@ class TripCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final time = NaqlText.title.copyWith(fontSize: 24);
+    final time = NaqlText.title.copyWith(fontSize: 28, height: 1.15);
     return NaqlCard(
       onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Row(children: [
+            StatusPill(label: status, tone: statusTone),
+            const Spacer(),
+            if (femaleOnly) StatusPill(label: femaleOnlyLabel ?? 'Female only', tone: NaqlTone.femaleOnly, icon: LucideIcons.users),
+          ]),
+          const SizedBox(height: NaqlSpace.s4),
           Row(
             children: [
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(departTime, style: time, textDirection: TextDirection.ltr),
-                  const SizedBox(height: NaqlSpace.s1),
+                  const SizedBox(height: 2),
                   Text(from, style: NaqlText.caption, maxLines: 1, overflow: TextOverflow.ellipsis),
                 ]),
               ),
@@ -69,34 +76,35 @@ class TripCard extends StatelessWidget {
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
                   Text(arriveTime, style: time, textDirection: TextDirection.ltr),
-                  const SizedBox(height: NaqlSpace.s1),
+                  const SizedBox(height: 2),
                   Text(to, style: NaqlText.caption, maxLines: 1, overflow: TextOverflow.ellipsis),
                 ]),
               ),
             ],
           ),
-          const Padding(padding: EdgeInsets.symmetric(vertical: NaqlSpace.s4), child: Divider(height: 1, color: NaqlColors.border)),
-          Row(
-            children: [
-              if (photo != null) ...[
-                _Photo(image: photo!),
-                const SizedBox(width: NaqlSpace.s3),
-              ],
-              Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  if (driverName != null) Text(driverName!, style: NaqlText.label),
-                  if (busLabel != null || plate != null)
-                    Text([busLabel, plate].whereType<String>().join(' · '), style: NaqlText.caption),
-                ]),
+          if (driverName != null || busLabel != null || plate != null || photo != null) ...[
+            const SizedBox(height: NaqlSpace.s4),
+            Container(
+              padding: const EdgeInsets.all(NaqlSpace.s3),
+              decoration: BoxDecoration(color: NaqlColors.surfaceMuted, borderRadius: BorderRadius.circular(NaqlRadius.md)),
+              child: Row(
+                children: [
+                  if (photo != null) ...[
+                    _Photo(image: photo!),
+                    const SizedBox(width: NaqlSpace.s3),
+                  ],
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      if (driverName != null) Text(driverName!, style: NaqlText.label.copyWith(fontWeight: FontWeight.w600)),
+                      if (busLabel != null) Text(busLabel!, style: NaqlText.caption),
+                    ]),
+                  ),
+                  if (plate != null) ...[const SizedBox(width: NaqlSpace.s2), NaqlPlateBadge(plate!)],
+                ],
               ),
-              if (femaleOnly) ...[
-                StatusPill(label: femaleOnlyLabel ?? 'Female only', tone: NaqlTone.femaleOnly, icon: LucideIcons.users),
-                const SizedBox(width: NaqlSpace.s2),
-              ],
-              StatusPill(label: status, tone: statusTone),
-            ],
-          ),
-          if (footer != null) ...[const SizedBox(height: NaqlSpace.s4), footer!],
+            ),
+          ],
+          if (footer != null) ...[const SizedBox(height: NaqlSpace.s3), footer!],
         ],
       ),
     );
@@ -110,15 +118,15 @@ class _Photo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(NaqlRadius.sm),
+      borderRadius: BorderRadius.circular(NaqlRadius.sm + 2),
       child: Container(
-        width: 56,
-        height: 44,
+        width: 60,
+        height: 46,
         color: NaqlColors.primarySoft,
         child: Image(
           image: image,
           fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => const Icon(LucideIcons.busFront, color: NaqlColors.primary, size: 22),
+          errorBuilder: (_, _, _) => Icon(LucideIcons.busFront, color: NaqlColors.primary, size: 22),
         ),
       ),
     );
@@ -139,8 +147,8 @@ class _Route extends StatelessWidget {
             width: 36,
             height: 36,
             margin: const EdgeInsets.symmetric(horizontal: NaqlSpace.s1),
-            decoration: const BoxDecoration(color: NaqlColors.primarySoft, shape: BoxShape.circle),
-            child: const Icon(LucideIcons.busFront, size: 18, color: NaqlColors.primary),
+            decoration: BoxDecoration(color: naqlIsDark ? NaqlColors.ink : NaqlColors.primary, shape: BoxShape.circle),
+            child: Icon(LucideIcons.busFront, size: 18, color: naqlIsDark ? NaqlColors.onInk : NaqlColors.onPrimary),
           ),
           const Expanded(child: _Dash()),
         ]),
@@ -162,7 +170,7 @@ class _Dash extends StatelessWidget {
       final n = (c.maxWidth / 6).floor().clamp(1, 40);
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: List.generate(n, (_) => Container(width: 3, height: 1.5, color: NaqlColors.border)),
+        children: List.generate(n, (_) => Container(width: 3, height: 2, decoration: BoxDecoration(color: NaqlColors.textMuted.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(1)))),
       );
     });
   }

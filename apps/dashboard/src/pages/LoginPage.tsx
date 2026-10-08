@@ -35,20 +35,25 @@ export function LoginPage() {
 
   return (
     <div className="grid min-h-full lg:grid-cols-2">
-      <section className="hidden flex-col justify-between bg-primary p-12 text-on-primary lg:flex">
+      <section className="relative hidden flex-col justify-between overflow-hidden bg-primary p-12 text-on-primary lg:flex dark:border-e dark:border-border dark:bg-surface dark:text-text">
+        {/* Large faded word behind the copy, as in the brand artwork. */}
+        <span className="pointer-events-none absolute -bottom-10 -end-6 select-none text-[220px] leading-none font-semibold opacity-[0.06]" aria-hidden>
+          {t('login.watermark')}
+        </span>
         <div className="flex items-center gap-3">
-          <span className="grid size-12 place-items-center rounded-md bg-on-primary text-primary" aria-hidden>
+          <span className="grid size-12 place-items-center rounded-md bg-accent text-on-accent" aria-hidden>
             <Bus className="size-6" />
           </span>
           <span className="text-headline">{t('appName')}</span>
         </div>
         <motion.div variants={listVariants} initial="hidden" animate="show" className="flex max-w-md flex-col gap-6">
-          <motion.h2 variants={itemVariants} className="text-display text-balance">
+          <motion.span variants={itemVariants} className="h-1 w-16 rounded-pill bg-accent" aria-hidden />
+          <motion.h2 variants={itemVariants} className="text-[44px] leading-[52px] font-semibold text-balance">
             {t('login.tagline')}
           </motion.h2>
           {(['login.point1', 'login.point2', 'login.point3'] as const).map((k) => (
             <motion.p key={k} variants={itemVariants} className="flex items-center gap-3 text-body">
-              <CircleCheck className="size-5 shrink-0" aria-hidden />
+              <CircleCheck className="size-5 shrink-0 text-accent" aria-hidden />
               {t(k)}
             </motion.p>
           ))}
@@ -57,7 +62,7 @@ export function LoginPage() {
       </section>
 
       <section className="grid place-items-center p-6">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={spring} className="w-full max-w-md rounded-lg bg-surface p-8 shadow-card">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={spring} className="w-full max-w-md rounded-lg bg-surface p-8 shadow-card dark:border dark:border-border dark:shadow-none">
           <div className="mb-8 flex items-start justify-between gap-4">
             <div>
               <h1 className="text-title">{t('login.title')}</h1>
@@ -80,7 +85,7 @@ export function LoginPage() {
               error={error ?? undefined}
               required
             />
-            <Button type="submit" loading={busy} className="mt-2 w-full">
+            <Button type="submit" loading={busy} className="mt-2 h-14 w-full">
               {t('login.submit')}
             </Button>
           </form>

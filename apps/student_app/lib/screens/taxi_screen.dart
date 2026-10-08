@@ -41,6 +41,9 @@ class _TaxiScreenState extends ConsumerState<TaxiScreen> {
   var _direction = TaxiDirection.toCampus;
   LatLng? _start;
   LatLng? _point;
+
+  /// The student's gathering point on the map, when the office has placed it.
+  LatLng? _gathering;
   LatLng? _campus;
   var _moving = false;
   var _locating = false;
@@ -98,6 +101,7 @@ class _TaxiScreenState extends ConsumerState<TaxiScreen> {
         _campus = (await api.taxiQuote(_direction, taxiFallbackCenter)).campus;
       } catch (_) {}
     }
+    _gathering = p;
     _start = p ?? _campus ?? taxiFallbackCenter;
     _point = _start;
     unawaited(_loadQuote());
@@ -161,6 +165,12 @@ class _TaxiScreenState extends ConsumerState<TaxiScreen> {
     _pointChanged(p, gesture: false);
   }
 
+  /// Quick destination chip: centre the map there and price it.
+  void _goTo(LatLng p) {
+    _map.move(p, _map.camera.zoom < 15 ? 15 : _map.camera.zoom);
+    _pointChanged(p, gesture: false);
+  }
+
   Future<void> _request() async {
     final p = _point;
     if (p == null || _sending) return;
@@ -220,152 +230,175 @@ class _TaxiScreenState extends ConsumerState<TaxiScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
+    final back = MaterialLocalizations.of(context).backButtonTooltip;
     final Widget body = _booting
-        ? const Padding(
-            key: ValueKey('boot'),
-            padding: EdgeInsets.all(NaqlSpace.s5),
-            child: NaqlSkeleton(height: 360, radius: NaqlRadius.lg),
+        ? TaxiBarFrame(
+            key: const ValueKey('boot'),
+            title: t.taxiTitle,
+            onBack: _home,
+            child: const Padding(padding: EdgeInsets.all(NaqlSpace.s5), child: NaqlSkeleton(height: 360, radius: NaqlRadius.lg)),
           )
         : _rideId != null
-        ? TaxiRideView(key: ValueKey('ride-$_rideId'), rideId: _rideId!, onRetry: _retry, onHome: _home)
-        : KeyedSubtree(key: const ValueKey('plan'), child: _plan(context, t));
+        ? TaxiRideView(key: ValueKey('ride-$_rideId'), rideId: _rideId!, onRetry: _retry, onHome: _home, title: t.taxiTitle, backLabel: back)
+        : KeyedSubtree(key: const ValueKey('plan'), child: _plan(context, t, back));
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            NaqlTopBar(title: t.taxiTitle, onBack: _home, backLabel: MaterialLocalizations.of(context).backButtonTooltip),
-            Expanded(
-              child: AnimatedSwitcher(duration: motion(context, NaqlMotion.sheet), switchInCurve: Curves.easeOutCubic, switchOutCurve: Curves.easeInCubic, child: body),
-            ),
-          ],
-        ),
-      ),
+      body: AnimatedSwitcher(duration: motion(context, NaqlMotion.sheet), switchInCurve: Curves.easeOutCubic, switchOutCurve: Curves.easeInCubic, child: body),
     );
   }
 
-  Widget _plan(BuildContext context, AppLocalizations t) {
+  /// Map-first planning: a full-bleed map with the pin at its centre, floating controls and quick
+  /// destinations on top, and a sheet with the direction options, the fare and the request button.
+  Widget _plan(BuildContext context, AppLocalizations t, String backLabel) {
     final tiles = ref.watch(mapTilesProvider);
     final toCampus = _direction == TaxiDirection.toCampus;
     final campus = _campus;
-    return LayoutBuilder(
-      builder: (context, box) => Column(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: NaqlSpace.s5),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(NaqlRadius.lg),
-                child: ColoredBox(
-                  color: NaqlColors.surfaceMuted,
-                  child: Stack(
+    final gathering = _gathering;
+    const overlap = 28.0;
+    final map = Stack(
+      children: [
+        Positioned.fill(
+          child: ColoredBox(
+            color: NaqlColors.surfaceMuted,
+            child: FlutterMap(
+              key: const ValueKey('taxi-plan-map'),
+              mapController: _map,
+              options: MapOptions(
+                backgroundColor: NaqlColors.surfaceMuted,
+                initialCenter: _start ?? taxiFallbackCenter,
+                initialZoom: 15,
+                interactionOptions: const InteractionOptions(flags: InteractiveFlag.all & ~InteractiveFlag.rotate),
+                onPositionChanged: (camera, gesture) => _pointChanged(camera.center, gesture: gesture),
+                onTap: (_, p) {
+                  _map.move(p, _map.camera.zoom);
+                  _pointChanged(p, gesture: false);
+                },
+              ),
+              children: [
+                if (tiles) NaqlMapTint(child: TileLayer(urlTemplate: mapTilesUrl, userAgentPackageName: 'iq.edu.uowa.naql.student')),
+                if (campus != null)
+                  MarkerLayer(
+                    markers: [
+                      Marker(
+                        point: campus,
+                        width: 40,
+                        height: 40,
+                        child: TaxiMapPin(icon: LucideIcons.school, label: t.taxiCampus, color: NaqlColors.accent, onColor: NaqlColors.onAccent),
+                      ),
+                    ],
+                  ),
+                if (tiles) const TaxiAttribution(text: mapAttribution, bottom: overlap + 56),
+              ],
+            ),
+          ),
+        ),
+        // The pin's tip sits on the map centre.
+        Align(
+          alignment: Alignment.center,
+          child: Transform.translate(
+            offset: const Offset(0, -36),
+            child: TaxiCenterPin(lifted: _moving, label: toCampus ? t.taxiPickupPin : t.taxiDropoffPin),
+          ),
+        ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: TaxiMapTop(
+            title: t.taxiTitle,
+            onBack: _home,
+            backLabel: backLabel,
+            below: TaxiMapHint(toCampus ? t.taxiPickupHint : t.taxiDropoffHint),
+          ),
+        ),
+        // Quick destinations, just above the sheet.
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: overlap + NaqlSpace.s3,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: NaqlSpace.s4, vertical: NaqlSpace.s1),
+            child: Row(
+              spacing: NaqlSpace.s2,
+              children: [
+                NaqlChip(
+                  key: const ValueKey('taxi-locate'),
+                  label: t.taxiChipHere,
+                  icon: _locating ? LucideIcons.loaderCircle : LucideIcons.locateFixed,
+                  floating: true,
+                  selected: false,
+                  onSelected: _locating ? null : _useMyLocation,
+                ),
+                if (campus != null) NaqlChip(label: t.taxiCampus, icon: LucideIcons.school, floating: true, selected: false, onSelected: () => _goTo(campus)),
+                if (gathering != null) NaqlChip(label: t.taxiChipPoint, icon: LucideIcons.mapPin, floating: true, selected: false, onSelected: () => _goTo(gathering)),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+    final quote = _quote;
+    final busy = _quoting || _moving;
+    String? badgeFor(TaxiDirection d) => d == _direction && quote != null ? formatIqd(quote.fare, ref.watch(localeProvider).languageCode) : null;
+    String subFor(TaxiDirection d) => d == _direction && quote != null
+        ? [t.taxiKm(formatKm(quote.distanceKm)), if (quote.durationMin != null) t.taxiMinutes(quote.durationMin!)].join(' · ')
+        : (d == TaxiDirection.toCampus ? t.taxiToCampusSub : t.taxiFromCampusSub);
+    final sheet = NaqlMapSheet(
+      child: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Semantics(
+                container: true,
+                label: t.taxiDirection,
+                child: AnimatedOpacity(
+                  duration: motion(context, NaqlMotion.fast),
+                  opacity: busy && quote != null ? 0.7 : 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    spacing: NaqlSpace.s2,
                     children: [
-                      FlutterMap(
-                        key: const ValueKey('taxi-plan-map'),
-                        mapController: _map,
-                        options: MapOptions(
-                          initialCenter: _start ?? taxiFallbackCenter,
-                          initialZoom: 15,
-                          interactionOptions: const InteractionOptions(flags: InteractiveFlag.all & ~InteractiveFlag.rotate),
-                          onPositionChanged: (camera, gesture) => _pointChanged(camera.center, gesture: gesture),
-                          onTap: (_, p) {
-                            _map.move(p, _map.camera.zoom);
-                            _pointChanged(p, gesture: false);
-                          },
+                      for (final (d, title, icon) in [(TaxiDirection.toCampus, t.taxiToCampus, LucideIcons.school), (TaxiDirection.fromCampus, t.taxiFromCampus, LucideIcons.house)])
+                        NaqlOptionCard(
+                          key: ValueKey('taxi-dir-$d'),
+                          icon: icon,
+                          title: title,
+                          subtitle: subFor(d),
+                          badge: badgeFor(d),
+                          selected: d == _direction,
+                          onTap: d == _direction ? () {} : () => _setDirection(d),
                         ),
-                        children: [
-                          if (tiles) TileLayer(urlTemplate: mapTilesUrl, userAgentPackageName: 'iq.edu.uowa.naql.student'),
-                          if (campus != null)
-                            MarkerLayer(
-                              markers: [
-                                Marker(
-                                  point: campus,
-                                  width: 40,
-                                  height: 40,
-                                  child: TaxiMapPin(icon: LucideIcons.school, label: t.taxiCampus, color: NaqlColors.ink),
-                                ),
-                              ],
-                            ),
-                          if (tiles) const SimpleAttributionWidget(source: Text(mapAttribution)),
-                        ],
-                      ),
-                      // The pin's tip sits on the map centre.
-                      Align(
-                        alignment: Alignment.center,
-                        child: Transform.translate(
-                          offset: const Offset(0, -36),
-                          child: TaxiCenterPin(lifted: _moving, label: toCampus ? t.taxiPickupPin : t.taxiDropoffPin),
-                        ),
-                      ),
-                      PositionedDirectional(
-                        top: NaqlSpace.s3,
-                        start: NaqlSpace.s3,
-                        end: NaqlSpace.s3,
-                        child: Center(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: NaqlSpace.s3, vertical: NaqlSpace.s2),
-                            decoration: BoxDecoration(color: NaqlColors.surface, borderRadius: BorderRadius.circular(NaqlRadius.pill), boxShadow: naqlCardShadow),
-                            child: Text(
-                              toCampus ? t.taxiPickupHint : t.taxiDropoffHint,
-                              style: NaqlText.caption.copyWith(color: NaqlColors.text),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ),
-                      PositionedDirectional(
-                        bottom: NaqlSpace.s3,
-                        end: NaqlSpace.s3,
-                        child: NaqlIconButton(
-                          key: const ValueKey('taxi-locate'),
-                          icon: _locating ? LucideIcons.loaderCircle : LucideIcons.locateFixed,
-                          semanticLabel: t.taxiMyLocation,
-                          onPressed: _locating ? null : _useMyLocation,
-                        ),
-                      ),
                     ],
                   ),
                 ),
               ),
-            ),
-          ),
-          ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: box.maxHeight * 0.66),
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(NaqlSpace.s5, NaqlSpace.s4, NaqlSpace.s5, NaqlSpace.s5),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  TaxiSegmented<TaxiDirection>(
-                    label: t.taxiDirection,
-                    value: _direction,
-                    onChanged: _setDirection,
-                    options: [(TaxiDirection.toCampus, t.taxiToCampus, LucideIcons.school), (TaxiDirection.fromCampus, t.taxiFromCampus, LucideIcons.house)],
-                  ),
-                  const SizedBox(height: NaqlSpace.s4),
-                  NaqlField(key: const ValueKey('taxi-label'), label: t.taxiLabel, hint: t.taxiLabelHint, controller: _label, prefixIcon: LucideIcons.signpost),
-                  const SizedBox(height: NaqlSpace.s4),
-                  _QuoteCard(quote: _quote, error: _quoteError, loading: _quoting || _moving, onRetry: _loadQuote),
-                  const SizedBox(height: NaqlSpace.s4),
-                  NaqlButton(
-                    key: const ValueKey('taxi-request'),
-                    label: t.taxiRequest,
-                    icon: LucideIcons.carTaxiFront,
-                    expand: true,
-                    loading: _sending,
-                    onPressed: _quote == null || _quoting || _moving ? null : _request,
-                  ),
-                ],
+              const SizedBox(height: NaqlSpace.s3),
+              _QuoteCard(quote: _quote, error: _quoteError, loading: busy, onRetry: _loadQuote),
+              const SizedBox(height: NaqlSpace.s3),
+              NaqlField(key: const ValueKey('taxi-label'), label: t.taxiLabel, hint: t.taxiLabelHint, controller: _label, prefixIcon: LucideIcons.signpost),
+              const SizedBox(height: NaqlSpace.s4),
+              NaqlButton(
+                key: const ValueKey('taxi-request'),
+                label: t.taxiRequest,
+                icon: LucideIcons.carTaxiFront,
+                expand: true,
+                loading: _sending,
+                onPressed: quote == null || busy ? null : _request,
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
+    return NaqlMapScaffold(map: map, sheet: sheet, overlap: overlap);
   }
 }
 
-/// The fare before booking: price first, then distance, time and how many taxis are around.
-class _QuoteCard extends ConsumerWidget {
+/// What the fare depends on, under the options: cash, taxis around and pickup time; or why there
+/// is no fare (outside the service area, offline). The fare itself sits on the selected option.
+class _QuoteCard extends StatelessWidget {
   const _QuoteCard({required this.quote, required this.error, required this.loading, required this.onRetry});
   final TaxiQuote? quote;
   final Object? error;
@@ -373,74 +406,52 @@ class _QuoteCard extends ConsumerWidget {
   final VoidCallback onRetry;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final lang = ref.watch(localeProvider).languageCode;
     final q = quote;
     final e = error;
     final Widget child;
     if (q == null && e == null) {
-      child = const NaqlSkeleton(key: ValueKey('q-loading'), height: 112, radius: NaqlRadius.lg);
+      child = const NaqlSkeleton(key: ValueKey('q-loading'), height: 36, radius: NaqlRadius.pill);
     } else if (q == null) {
       final outside = e is ApiException && e.statusCode == 422;
-      child = NaqlCard(
+      child = Container(
         key: ValueKey('q-error-$outside'),
+        padding: const EdgeInsetsDirectional.fromSTEB(NaqlSpace.s4, NaqlSpace.s1, NaqlSpace.s1, NaqlSpace.s1),
+        constraints: const BoxConstraints(minHeight: 56),
+        decoration: BoxDecoration(color: NaqlColors.warningSoft, borderRadius: BorderRadius.circular(NaqlRadius.md)),
         child: Row(
           children: [
-            Icon(outside ? LucideIcons.mapPinOff : LucideIcons.wifiOff, color: NaqlColors.warning),
+            Icon(outside ? LucideIcons.mapPinOff : LucideIcons.wifiOff, color: NaqlColors.warning, size: 20),
             const SizedBox(width: NaqlSpace.s3),
-            Expanded(child: Text(outside ? t.taxiUnavailableHere : t.loadFailed, style: NaqlText.body)),
+            Expanded(child: Text(outside ? t.taxiUnavailableHere : t.loadFailed, style: NaqlText.label.copyWith(color: NaqlColors.text))),
             if (!outside) NaqlButton(label: t.retry, variant: NaqlButtonVariant.ghost, onPressed: onRetry),
           ],
         ),
       );
     } else {
-      final facts = [t.taxiKm(formatKm(q.distanceKm)), if (q.durationMin != null) t.taxiMinutes(q.durationMin!)].join(' · ');
-      child = NaqlCard(
+      child = AnimatedOpacity(
         key: const ValueKey('q-data'),
-        child: AnimatedOpacity(
-          duration: motion(context, NaqlMotion.fast),
-          opacity: loading ? 0.55 : 1,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(t.taxiFare, style: NaqlText.caption),
-                        Text(formatIqd(q.fare, lang), key: const ValueKey('taxi-fare'), style: NaqlText.display.copyWith(fontSize: 28, height: 1.2)),
-                      ],
-                    ),
-                  ),
-                  Text(facts, style: NaqlText.label.copyWith(color: NaqlColors.textMuted)),
-                ],
-              ),
-              const SizedBox(height: NaqlSpace.s1),
-              Row(
-                children: [
-                  const Icon(LucideIcons.banknote, size: 16, color: NaqlColors.textMuted),
-                  const SizedBox(width: NaqlSpace.s1),
-                  Text(t.taxiCash, style: NaqlText.caption),
-                ],
-              ),
-              const SizedBox(height: NaqlSpace.s3),
-              if (q.taxisNearby == 0)
-                Text(t.taxiNoneNearby, style: NaqlText.label.copyWith(color: NaqlColors.warning))
-              else
-                Wrap(
-                  spacing: NaqlSpace.s2,
-                  runSpacing: NaqlSpace.s2,
-                  children: [
-                    StatusPill(label: t.taxiNearby(q.taxisNearby), tone: NaqlTone.success, icon: LucideIcons.carTaxiFront),
-                    if (q.pickupMin != null) StatusPill(label: t.taxiPickupIn(q.pickupMin!), tone: NaqlTone.primary, icon: LucideIcons.clock),
-                  ],
-                ),
+        duration: motion(context, NaqlMotion.fast),
+        opacity: loading ? 0.55 : 1,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Wrap(
+              spacing: NaqlSpace.s2,
+              runSpacing: NaqlSpace.s2,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                StatusPill(label: t.taxiCash, icon: LucideIcons.banknote),
+                if (q.taxisNearby > 0) StatusPill(label: t.taxiNearby(q.taxisNearby), tone: NaqlTone.success, icon: LucideIcons.carTaxiFront),
+                if (q.taxisNearby > 0 && q.pickupMin != null) StatusPill(label: t.taxiPickupIn(q.pickupMin!), tone: NaqlTone.primary, icon: LucideIcons.clock),
+              ],
+            ),
+            if (q.taxisNearby == 0) ...[
+              const SizedBox(height: NaqlSpace.s2),
+              Text(t.taxiNoneNearby, style: NaqlText.label.copyWith(color: NaqlColors.warning)),
             ],
-          ),
+          ],
         ),
       );
     }

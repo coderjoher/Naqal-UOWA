@@ -14,19 +14,25 @@ class DriverApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      onGenerateTitle: (c) => AppLocalizations.of(c).appTitle,
-      theme: buildNaqlTheme(),
-      locale: ref.watch(localeProvider),
-      supportedLocales: AppLocalizations.supportedLocales,
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      routerConfig: ref.watch(routerProvider),
+    // Light/dark follows the phone. NaqlThemeScope keeps NaqlColors on the matching palette and
+    // repaints everything (keeping state) when the phone switches mode.
+    return NaqlThemeScope(
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        onGenerateTitle: (c) => AppLocalizations.of(c).appTitle,
+        theme: buildNaqlTheme(),
+        darkTheme: buildNaqlTheme(NaqlPalette.dark),
+        themeMode: ThemeMode.system,
+        locale: ref.watch(localeProvider),
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        routerConfig: ref.watch(routerProvider),
+      ),
     );
   }
 }

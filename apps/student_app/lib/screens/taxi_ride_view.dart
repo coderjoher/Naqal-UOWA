@@ -14,34 +14,47 @@ import 'taxi_widgets.dart';
 /// A booked taxi ride, live: searching → accepted → arrived → on trip → done (or expired /
 /// cancelled). One view per phase; the map stays in place across the driving phases.
 class TaxiRideView extends ConsumerWidget {
-  const TaxiRideView({super.key, required this.rideId, required this.onRetry, required this.onHome});
+  const TaxiRideView({super.key, required this.rideId, required this.onRetry, required this.onHome, required this.title, required this.backLabel});
   final String rideId;
   final VoidCallback onRetry;
   final VoidCallback onHome;
+
+  /// Screen title and back label: shown in the top bar, or floating over the map while driving.
+  final String title;
+  final String backLabel;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = AppLocalizations.of(context);
     final ride = ref.watch(taxiRideProvider(rideId));
+    Widget framed(Key key, Widget child) => TaxiBarFrame(key: key, title: title, onBack: onHome, child: child);
     final Widget child = ride.when(
-      loading: () => const Padding(
-        key: ValueKey('loading'),
-        padding: EdgeInsets.all(NaqlSpace.s5),
-        child: NaqlSkeleton(height: 320, radius: NaqlRadius.lg),
+      loading: () => framed(
+        const ValueKey('loading'),
+        const Padding(padding: EdgeInsets.all(NaqlSpace.s5), child: NaqlSkeleton(height: 320, radius: NaqlRadius.lg)),
       ),
-      error: (e, _) => Center(
-        key: const ValueKey('error'),
-        child: NaqlEmptyState(
-          icon: LucideIcons.wifiOff,
-          title: t.loadFailed,
-          action: NaqlButton(label: t.retry, onPressed: () => ref.invalidate(taxiRideProvider(rideId))),
+      error: (e, _) => framed(
+        const ValueKey('error'),
+        Center(
+          child: NaqlEmptyState(
+            icon: LucideIcons.wifiOff,
+            title: t.loadFailed,
+            action: NaqlButton(label: t.retry, onPressed: () => ref.invalidate(taxiRideProvider(rideId))),
+          ),
         ),
       ),
       data: (r) => switch (r.status) {
-        TaxiStatus.requested => _Searching(key: const ValueKey('searching'), ride: r, onCancel: () => _cancel(context, ref, r)),
-        TaxiStatus.accepted || TaxiStatus.arrived || TaxiStatus.onTrip => _Active(key: const ValueKey('active'), ride: r, onCancel: () => _cancel(context, ref, r)),
-        TaxiStatus.done => _Done(key: const ValueKey('done'), ride: r, onHome: onHome),
-        TaxiStatus.expired || TaxiStatus.cancelled => _Ended(key: ValueKey('ended-${r.status.name}'), ride: r, onRetry: onRetry, onHome: onHome),
+        TaxiStatus.requested => framed(const ValueKey('searching'), _Searching(ride: r, onCancel: () => _cancel(context, ref, r))),
+        TaxiStatus.accepted || TaxiStatus.arrived || TaxiStatus.onTrip => _Active(
+          key: const ValueKey('active'),
+          ride: r,
+          title: title,
+          backLabel: backLabel,
+          onBack: onHome,
+          onCancel: () => _cancel(context, ref, r),
+        ),
+        TaxiStatus.done => framed(const ValueKey('done'), _Done(ride: r, onHome: onHome)),
+        TaxiStatus.expired || TaxiStatus.cancelled => framed(ValueKey('ended-${r.status.name}'), _Ended(ride: r, onRetry: onRetry, onHome: onHome)),
       },
     );
     return AnimatedSwitcher(
@@ -92,7 +105,7 @@ class TaxiRideView extends ConsumerWidget {
 }
 
 class _Searching extends StatelessWidget {
-  const _Searching({super.key, required this.ride, required this.onCancel});
+  const _Searching({required this.ride, required this.onCancel});
   final TaxiRide ride;
   final VoidCallback onCancel;
 
@@ -102,8 +115,8 @@ class _Searching extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(NaqlSpace.s5, NaqlSpace.s4, NaqlSpace.s5, NaqlSpace.s6),
       children: [
-        const Center(
-          child: TaxiRadar(child: Icon(LucideIcons.carTaxiFront, color: NaqlColors.onPrimary, size: 32)),
+        Center(
+          child: TaxiRadar(child: Icon(LucideIcons.carTaxiFront, color: naqlIsDark ? NaqlColors.onInk : NaqlColors.onPrimary, size: 32)),
         ),
         const SizedBox(height: NaqlSpace.s4),
         Semantics(
@@ -130,7 +143,7 @@ class _Searching extends StatelessWidget {
   }
 }
 
-/// From → to, the distance and the cash fare, in a quiet nested card.
+/// From → to on a trip timeline, then the distance and the cash fare as summary rows.
 class _RideSummary extends ConsumerWidget {
   const _RideSummary({required this.ride});
   final TaxiRide ride;
@@ -139,58 +152,46 @@ class _RideSummary extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = AppLocalizations.of(context);
     final lang = ref.watch(localeProvider).languageCode;
-    final toCampus = ride.direction == TaxiDirection.toCampus;
-    final spot = ride.label?.isNotEmpty == true ? ride.label! : t.taxiYourSpot;
     return NaqlCard(
-      nested: true,
-      padding: const EdgeInsets.all(NaqlSpace.s4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _Leg(icon: LucideIcons.mapPin, text: toCampus ? spot : t.taxiCampus),
-          Padding(
-            padding: const EdgeInsetsDirectional.only(start: 9),
-            child: Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: Container(width: 2, height: 14, color: NaqlColors.border),
-            ),
-          ),
-          _Leg(icon: toCampus ? LucideIcons.school : LucideIcons.house, text: toCampus ? t.taxiCampus : spot),
-          const Divider(height: NaqlSpace.s6, color: NaqlColors.border),
-          Row(
-            children: [
-              Expanded(
-                child: Text(t.taxiKm(formatKm(ride.distanceKm)), style: NaqlText.label.copyWith(color: NaqlColors.textMuted)),
-              ),
-              Text(formatIqd(ride.fare, lang), style: NaqlText.headline),
-            ],
-          ),
+          _RideTimeline(ride: ride),
+          const SizedBox(height: NaqlSpace.s3),
+          NaqlSummaryRow(label: t.taxiDistance, value: t.taxiKm(formatKm(ride.distanceKm))),
+          NaqlSummaryRow(label: t.taxiCash, value: formatIqd(ride.fare, lang), total: true),
         ],
       ),
     );
   }
 }
 
-class _Leg extends StatelessWidget {
-  const _Leg({required this.icon, required this.text});
-  final IconData icon;
-  final String text;
+/// Pickup (ring) → drop-off (gold dot), named the way the student set them.
+class _RideTimeline extends StatelessWidget {
+  const _RideTimeline({required this.ride});
+  final TaxiRide ride;
 
   @override
-  Widget build(BuildContext context) => Row(
-    children: [
-      Icon(icon, size: 20, color: NaqlColors.primary),
-      const SizedBox(width: NaqlSpace.s3),
-      Expanded(
-        child: Text(text, style: NaqlText.body, maxLines: 1, overflow: TextOverflow.ellipsis),
-      ),
-    ],
-  );
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final toCampus = ride.direction == TaxiDirection.toCampus;
+    final spot = ride.label?.isNotEmpty == true ? ride.label! : t.taxiYourSpot;
+    return NaqlTripTimeline(
+      accentEnd: true,
+      stops: [
+        NaqlTimelineStop(subtitle: t.taxiPickupPin, title: toCampus ? spot : t.taxiCampus),
+        NaqlTimelineStop(subtitle: t.taxiDropoffPin, title: toCampus ? t.taxiCampus : spot),
+      ],
+    );
+  }
 }
 
 class _Active extends ConsumerWidget {
-  const _Active({super.key, required this.ride, required this.onCancel});
+  const _Active({super.key, required this.ride, required this.title, required this.backLabel, required this.onBack, required this.onCancel});
   final TaxiRide ride;
+  final String title;
+  final String backLabel;
+  final VoidCallback onBack;
   final VoidCallback onCancel;
 
   @override
@@ -198,7 +199,7 @@ class _Active extends ConsumerWidget {
     final t = AppLocalizations.of(context);
     final lang = ref.watch(localeProvider).languageCode;
     final tiles = ref.watch(mapTilesProvider);
-    final (headline, tone, icon) = taxiStatusLine(t, ride);
+    final (headline, _, _) = taxiStatusLine(t, ride);
     final eta = ride.status == TaxiStatus.arrived ? null : ride.etaMin;
     final driver = ride.driver;
     final step = switch (ride.status) {
@@ -212,166 +213,98 @@ class _Active extends ConsumerWidget {
       _ when ride.label?.isNotEmpty == true => ride.label!,
       _ => null,
     };
+    const overlap = 28.0;
 
-    return LayoutBuilder(
-      builder: (context, box) => Column(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: NaqlSpace.s5),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(NaqlRadius.lg),
-                child: _RideMap(ride: ride, tiles: tiles),
-              ),
-            ),
-          ),
-          ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: box.maxHeight * 0.62),
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(NaqlSpace.s5, NaqlSpace.s4, NaqlSpace.s5, NaqlSpace.s5),
-              child: NaqlCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(color: tone.bg, shape: BoxShape.circle),
-                          child: Icon(icon, color: tone.fg),
+    // Full-bleed map with floating controls; the ride sheet sits over its bottom edge.
+    final map = Stack(
+      children: [
+        Positioned.fill(child: _RideMap(ride: ride, tiles: tiles, attributionBottom: overlap)),
+        Positioned(top: 0, left: 0, right: 0, child: TaxiMapTop(title: title, onBack: onBack, backLabel: backLabel)),
+      ],
+    );
+
+    final sheet = NaqlMapSheet(
+      child: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Semantics(
+                      liveRegion: true,
+                      child: AnimatedSwitcher(
+                        duration: motion(context, NaqlMotion.fast),
+                        layoutBuilder: (cur, prev) => Stack(alignment: AlignmentDirectional.topStart, children: [...prev, ?cur]),
+                        child: Column(
+                          key: ValueKey(ride.status),
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(headline, style: NaqlText.title),
+                            if (subtitle != null) Text(subtitle, style: NaqlText.body.copyWith(color: NaqlColors.textMuted)),
+                          ],
                         ),
-                        const SizedBox(width: NaqlSpace.s3),
-                        Expanded(
-                          child: Semantics(
-                            liveRegion: true,
-                            child: AnimatedSwitcher(
-                              duration: motion(context, NaqlMotion.fast),
-                              layoutBuilder: (cur, prev) => Stack(alignment: AlignmentDirectional.centerStart, children: [...prev, ?cur]),
-                              child: Column(
-                                key: ValueKey(ride.status),
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(headline, style: NaqlText.headline),
-                                  if (subtitle != null)
-                                    Text(
-                                      subtitle,
-                                      style: NaqlText.label.copyWith(color: NaqlColors.textMuted, fontWeight: FontWeight.w400),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        if (eta != null) ...[
-                          const SizedBox(width: NaqlSpace.s2),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                t.taxiMinutes(eta),
-                                key: const ValueKey('taxi-eta'),
-                                style: NaqlText.title.copyWith(color: NaqlColors.primary),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: NaqlSpace.s5),
-                    TaxiStepper(steps: steps, current: step, semanticLabel: t.taxiStepOf(step + 1, steps[step])),
-                    if (driver != null) ...[
-                      const Divider(height: NaqlSpace.s8, color: NaqlColors.border),
-                      Row(
-                        children: [
-                          Container(
-                            width: 48,
-                            height: 48,
-                            alignment: Alignment.center,
-                            decoration: const BoxDecoration(color: NaqlColors.primarySoft, shape: BoxShape.circle),
-                            child: ExcludeSemantics(
-                              child: Text(driver.name.isEmpty ? '?' : driver.name.characters.first, style: NaqlText.headline.copyWith(color: NaqlColors.primary)),
-                            ),
-                          ),
-                          const SizedBox(width: NaqlSpace.s3),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(driver.name, style: NaqlText.headline, maxLines: 1, overflow: TextOverflow.ellipsis),
-                                if (driver.plate != null) ...[const SizedBox(height: 2), _Plate(plate: driver.plate!, semantic: t.taxiPlate(driver.plate!))],
-                              ],
-                            ),
-                          ),
-                          if (driver.phone != null)
-                            NaqlIconButton(
-                              key: const ValueKey('taxi-call'),
-                              icon: LucideIcons.phone,
-                              semanticLabel: t.taxiCall,
-                              onPressed: () => ref.read(taxiDialerProvider)(Uri(scheme: 'tel', path: driver.phone)),
-                            ),
-                        ],
                       ),
-                    ],
-                    const SizedBox(height: NaqlSpace.s4),
-                    Row(
-                      children: [
-                        const Icon(LucideIcons.banknote, size: 20, color: NaqlColors.textMuted),
-                        const SizedBox(width: NaqlSpace.s2),
-                        Expanded(
-                          child: Text(
-                            t.taxiCash,
-                            style: NaqlText.label.copyWith(color: NaqlColors.textMuted, fontWeight: FontWeight.w400),
-                          ),
-                        ),
-                        Text(formatIqd(ride.fare, lang), style: NaqlText.label.copyWith(fontWeight: FontWeight.w600)),
-                      ],
                     ),
-                    if (ride.status.canCancel) ...[
-                      const SizedBox(height: NaqlSpace.s3),
-                      Align(
-                        alignment: AlignmentDirectional.centerStart,
-                        child: NaqlButton(label: t.taxiCancel, variant: NaqlButtonVariant.ghost, onPressed: onCancel),
-                      ),
-                    ],
+                  ),
+                  if (eta != null) ...[
+                    const SizedBox(width: NaqlSpace.s3),
+                    NaqlLivePill(key: const ValueKey('taxi-eta'), label: t.taxiMinutes(eta), semanticLabel: t.taxiAway(eta)),
                   ],
-                ),
+                ],
               ),
-            ),
+              const SizedBox(height: NaqlSpace.s5),
+              TaxiStepper(steps: steps, current: step, semanticLabel: t.taxiStepOf(step + 1, steps[step])),
+              if (driver != null) ...[
+                const SizedBox(height: NaqlSpace.s5),
+                NaqlCard(
+                  nested: true,
+                  padding: const EdgeInsets.all(NaqlSpace.s3),
+                  child: NaqlPersonCard(
+                    name: driver.name,
+                    caption: t.driverCaption,
+                    below: driver.plate == null ? null : NaqlPlateBadge(driver.plate!, semanticLabel: t.taxiPlate(driver.plate!)),
+                    actions: [
+                      if (driver.phone != null)
+                        NaqlPersonAction(
+                          key: const ValueKey('taxi-call'),
+                          icon: LucideIcons.phone,
+                          label: t.taxiCall,
+                          primary: true,
+                          onPressed: () => ref.read(taxiDialerProvider)(Uri(scheme: 'tel', path: driver.phone)),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+              const SizedBox(height: NaqlSpace.s5),
+              _RideTimeline(ride: ride),
+              const SizedBox(height: NaqlSpace.s2),
+              NaqlSummaryRow(label: t.taxiCash, value: formatIqd(ride.fare, lang), icon: LucideIcons.banknote),
+              if (ride.status.canCancel) ...[
+                const SizedBox(height: NaqlSpace.s2),
+                NaqlButton(label: t.taxiCancel, variant: NaqlButtonVariant.secondary, expand: true, onPressed: onCancel),
+              ],
+            ],
           ),
-        ],
+        ),
       ),
     );
+    return NaqlMapScaffold(map: map, sheet: sheet, overlap: overlap, maxSheetFraction: 0.6);
   }
-}
-
-/// The plate as it looks on the car: a bordered box with Western digits.
-class _Plate extends StatelessWidget {
-  const _Plate({required this.plate, required this.semantic});
-  final String plate;
-  final String semantic;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: NaqlSpace.s2, vertical: 2),
-    decoration: BoxDecoration(
-      color: NaqlColors.surface,
-      borderRadius: BorderRadius.circular(6),
-      border: Border.all(color: NaqlColors.text, width: 1.2),
-    ),
-    child: Text(
-      plate,
-      style: NaqlText.label.copyWith(fontWeight: FontWeight.w600, letterSpacing: 0.5),
-      semanticsLabel: semantic,
-    ),
-  );
 }
 
 /// Pickup, drop-off and the moving taxi.
 class _RideMap extends StatelessWidget {
-  const _RideMap({required this.ride, required this.tiles});
+  const _RideMap({required this.ride, required this.tiles, this.attributionBottom = 0});
   final TaxiRide ride;
   final bool tiles;
+
+  /// Keeps the map credit above a sheet that overlaps the map's bottom edge.
+  final double attributionBottom;
 
   @override
   Widget build(BuildContext context) {
@@ -386,20 +319,21 @@ class _RideMap extends StatelessWidget {
       child: FlutterMap(
         key: const ValueKey('taxi-ride-map'),
         options: MapOptions(
-          initialCameraFit: pts.length > 1 ? CameraFit.coordinates(coordinates: pts, padding: const EdgeInsets.all(56), maxZoom: 16) : null,
+          backgroundColor: NaqlColors.surfaceMuted,
+          initialCameraFit: pts.length > 1 ? CameraFit.coordinates(coordinates: pts, padding: EdgeInsets.fromLTRB(56, 120, 56, 56 + attributionBottom), maxZoom: 16) : null,
           initialCenter: pickup,
           initialZoom: 15,
           interactionOptions: const InteractionOptions(flags: InteractiveFlag.all & ~InteractiveFlag.rotate),
         ),
         children: [
-          if (tiles) TileLayer(urlTemplate: mapTilesUrl, userAgentPackageName: 'iq.edu.uowa.naql.student'),
+          if (tiles) NaqlMapTint(child: TileLayer(urlTemplate: mapTilesUrl, userAgentPackageName: 'iq.edu.uowa.naql.student')),
           MarkerLayer(
             markers: [
               Marker(
                 point: pickup,
                 width: 44,
                 height: 44,
-                child: TaxiMapPin(key: const ValueKey('taxi-pickup-pin'), icon: toCampus ? LucideIcons.mapPin : LucideIcons.school, label: t.taxiPickupPin, color: NaqlColors.ink),
+                child: TaxiMapPin(key: const ValueKey('taxi-pickup-pin'), icon: toCampus ? LucideIcons.mapPin : LucideIcons.school, label: t.taxiPickupPin, color: NaqlColors.ink, onColor: NaqlColors.onInk),
               ),
               if (dropoff != null)
                 Marker(
@@ -410,7 +344,8 @@ class _RideMap extends StatelessWidget {
                     key: const ValueKey('taxi-dropoff-pin'),
                     icon: toCampus ? LucideIcons.school : LucideIcons.house,
                     label: t.taxiDropoffPin,
-                    color: NaqlColors.success,
+                    color: NaqlColors.accent,
+                    onColor: NaqlColors.onAccent,
                   ),
                 ),
             ],
@@ -427,12 +362,12 @@ class _RideMap extends StatelessWidget {
                     point: p,
                     width: 48,
                     height: 48,
-                    child: TaxiMapPin(key: const ValueKey('taxi-car-pin'), icon: LucideIcons.carTaxiFront, label: t.taxiCarPin, color: NaqlColors.primary, square: true),
+                    child: TaxiMapPin(key: const ValueKey('taxi-car-pin'), icon: LucideIcons.carTaxiFront, label: t.taxiCarPin, color: naqlIsDark ? NaqlColors.accent : NaqlColors.primary, onColor: naqlIsDark ? NaqlColors.onAccent : NaqlColors.onPrimary, square: true),
                   ),
                 ],
               ),
             ),
-          if (tiles) const SimpleAttributionWidget(source: Text(mapAttribution)),
+          if (tiles) TaxiAttribution(text: mapAttribution, bottom: attributionBottom),
         ],
       ),
     );
@@ -440,7 +375,7 @@ class _RideMap extends StatelessWidget {
 }
 
 class _Done extends ConsumerWidget {
-  const _Done({super.key, required this.ride, required this.onHome});
+  const _Done({required this.ride, required this.onHome});
   final TaxiRide ride;
   final VoidCallback onHome;
 
@@ -448,36 +383,34 @@ class _Done extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = AppLocalizations.of(context);
     final lang = ref.watch(localeProvider).languageCode;
-    final toCampus = ride.direction == TaxiDirection.toCampus;
-    final spot = ride.label?.isNotEmpty == true ? ride.label! : t.taxiYourSpot;
-    final arrow = Directionality.of(context) == TextDirection.rtl ? '←' : '→';
     return ListView(
-      padding: const EdgeInsets.fromLTRB(NaqlSpace.s5, NaqlSpace.s6, NaqlSpace.s5, NaqlSpace.s6),
+      padding: const EdgeInsets.fromLTRB(NaqlSpace.s5, NaqlSpace.s4, NaqlSpace.s5, NaqlSpace.s6),
       children: [
         Center(
           child: Container(
-            width: 72,
-            height: 72,
-            decoration: const BoxDecoration(color: NaqlColors.successSoft, shape: BoxShape.circle),
-            child: const Icon(LucideIcons.circleCheckBig, color: NaqlColors.success, size: 34),
+            width: 76,
+            height: 76,
+            decoration: BoxDecoration(color: NaqlColors.successSoft, shape: BoxShape.circle),
+            child: Icon(LucideIcons.circleCheckBig, color: NaqlColors.success, size: 36),
           ),
         ),
         const SizedBox(height: NaqlSpace.s4),
-        Text(t.taxiDone, style: NaqlText.title, textAlign: TextAlign.center),
+        Text(t.taxiDone, style: NaqlText.hero.copyWith(fontSize: 28), textAlign: TextAlign.center),
         const SizedBox(height: NaqlSpace.s5),
+        // The one thing to do now: pay the driver in cash (gold highlight).
         Container(
           padding: const EdgeInsets.all(NaqlSpace.s4),
-          decoration: BoxDecoration(color: NaqlColors.primarySoft, borderRadius: BorderRadius.circular(NaqlRadius.md)),
+          decoration: BoxDecoration(
+            color: NaqlColors.accentSoft,
+            borderRadius: BorderRadius.circular(NaqlRadius.lg),
+            border: Border.all(color: NaqlColors.accent.withValues(alpha: 0.6)),
+          ),
           child: Row(
             children: [
-              const Icon(LucideIcons.banknote, color: NaqlColors.primary),
+              const NaqlIconTile(LucideIcons.banknote, accent: true),
               const SizedBox(width: NaqlSpace.s3),
               Expanded(
-                child: Text(
-                  t.taxiPayCash(formatIqd(ride.fare, lang)),
-                  key: const ValueKey('taxi-pay'),
-                  style: NaqlText.headline.copyWith(color: NaqlColors.ink),
-                ),
+                child: Text(t.taxiPayCash(formatIqd(ride.fare, lang)), key: const ValueKey('taxi-pay'), style: NaqlText.headline),
               ),
             ],
           ),
@@ -488,11 +421,22 @@ class _Done extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(t.taxiSummary, style: NaqlText.headline),
-              const SizedBox(height: NaqlSpace.s2),
-              NaqlInfoRow(label: t.taxiRoute, value: toCampus ? '$spot $arrow ${t.taxiCampus}' : '${t.taxiCampus} $arrow $spot'),
-              NaqlInfoRow(label: t.taxiDistance, value: t.taxiKm(formatKm(ride.distanceKm))),
-              if (ride.driver != null) NaqlInfoRow(label: t.taxiDriver, value: ride.driver!.name),
-              if (ride.driver?.plate != null) NaqlInfoRow(label: t.taxiPlateLabel, value: ride.driver!.plate!),
+              const SizedBox(height: NaqlSpace.s4),
+              _RideTimeline(ride: ride),
+              const SizedBox(height: NaqlSpace.s3),
+              NaqlSummaryRow(label: t.taxiDistance, value: t.taxiKm(formatKm(ride.distanceKm))),
+              if (ride.driver != null) NaqlSummaryRow(label: t.taxiDriver, value: ride.driver!.name),
+              if (ride.driver?.plate != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: NaqlSpace.s2),
+                  child: Row(
+                    children: [
+                      Expanded(child: Text(t.taxiPlateLabel, style: NaqlText.body.copyWith(color: NaqlColors.textMuted))),
+                      NaqlPlateBadge(ride.driver!.plate!, semanticLabel: t.taxiPlate(ride.driver!.plate!)),
+                    ],
+                  ),
+                ),
+              NaqlSummaryRow(label: t.rideSummaryTotal, value: formatIqd(ride.fare, lang), total: true),
             ],
           ),
         ),
@@ -504,7 +448,7 @@ class _Done extends ConsumerWidget {
 }
 
 class _Ended extends StatelessWidget {
-  const _Ended({super.key, required this.ride, required this.onRetry, required this.onHome});
+  const _Ended({required this.ride, required this.onRetry, required this.onHome});
   final TaxiRide ride;
   final VoidCallback onRetry;
   final VoidCallback onHome;

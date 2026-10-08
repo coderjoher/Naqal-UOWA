@@ -32,7 +32,10 @@ class HomeScreen extends ConsumerWidget {
             child: Row(children: [
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(user == null ? t.hello : t.helloName(user.displayName(lang).split(' ').first), style: NaqlText.title),
+                  Text(
+                    user == null ? t.hello : t.helloName(user.displayName(lang).split(' ').first),
+                    style: NaqlText.title.copyWith(fontSize: 28, height: 1.25),
+                  ),
                 ]),
               ),
               NaqlIconButton(icon: LucideIcons.bell, semanticLabel: t.notifications, onPressed: () => context.go('/alerts')),
@@ -59,12 +62,7 @@ class HomeScreen extends ConsumerWidget {
               child: NaqlCard(
                 onTap: () => context.go('/profile/point'),
                 child: Row(children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: const BoxDecoration(color: NaqlColors.primarySoft, shape: BoxShape.circle),
-                    child: const Icon(LucideIcons.mapPin, color: NaqlColors.primary, size: 22),
-                  ),
+                  const NaqlIconTile(LucideIcons.mapPin, accent: true),
                   const SizedBox(width: NaqlSpace.s3),
                   Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -72,7 +70,7 @@ class HomeScreen extends ConsumerWidget {
                       Text(point.displayName(lang), style: NaqlText.headline),
                     ]),
                   ),
-                  Text(t.change, style: NaqlText.label.copyWith(color: NaqlColors.primary)),
+                  NaqlBadge(t.change),
                 ]),
               ),
             ),
@@ -91,7 +89,7 @@ class _Announcements extends ConsumerWidget {
     final t = AppLocalizations.of(context);
     final list = ref.watch(announcementsProvider).value ?? const [];
     return AnimatedSize(
-      duration: NaqlMotion.sheet,
+      duration: naqlMotion(context, NaqlMotion.sheet),
       curve: Curves.easeOutCubic,
       child: Column(children: [
         for (final a in list)
@@ -99,14 +97,18 @@ class _Announcements extends ConsumerWidget {
             key: ValueKey('announcement-${a.id}'),
             padding: const EdgeInsets.only(bottom: NaqlSpace.s4),
             child: Container(
-              padding: const EdgeInsets.all(NaqlSpace.s4),
-              decoration: BoxDecoration(color: NaqlColors.primarySoft, borderRadius: BorderRadius.circular(NaqlRadius.lg)),
+              padding: const EdgeInsetsDirectional.fromSTEB(NaqlSpace.s4, NaqlSpace.s4, NaqlSpace.s2, NaqlSpace.s4),
+              decoration: BoxDecoration(
+                color: NaqlColors.accentSoft,
+                borderRadius: BorderRadius.circular(NaqlRadius.lg),
+                border: Border.all(color: NaqlColors.accent.withValues(alpha: 0.5)),
+              ),
               child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Icon(LucideIcons.megaphone, color: NaqlColors.primary),
+                const NaqlIconTile(LucideIcons.megaphone, accent: true, size: 40),
                 const SizedBox(width: NaqlSpace.s3),
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(a.title, style: NaqlText.label.copyWith(color: NaqlColors.primary)),
+                    Text(a.title, style: NaqlText.label.copyWith(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 2),
                     Text(a.body, style: NaqlText.body),
                   ]),

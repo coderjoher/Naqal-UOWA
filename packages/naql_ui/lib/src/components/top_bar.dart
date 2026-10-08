@@ -5,26 +5,64 @@ import '../foundation/theme.dart';
 import '../foundation/tokens.g.dart';
 import 'pressable.dart';
 
-/// Circular white icon button (back, notifications…) as in the reference designs.
+enum NaqlIconButtonStyle {
+  /// Surface circle with a hairline border (top bars).
+  outline,
+
+  /// Translucent surface with a soft shadow, to float over a map.
+  floating,
+
+  /// Soft filled circle (call / message actions in cards).
+  soft,
+
+  /// Solid primary (light) / ink (dark) circle for the main action in a row.
+  solid,
+}
+
+/// Circular icon button (back, notifications, call…) as in the reference designs.
 class NaqlIconButton extends StatelessWidget {
-  const NaqlIconButton({super.key, required this.icon, required this.onPressed, required this.semanticLabel, this.badge = false});
+  const NaqlIconButton({
+    super.key,
+    required this.icon,
+    required this.onPressed,
+    required this.semanticLabel,
+    this.badge = false,
+    this.style = NaqlIconButtonStyle.outline,
+    this.size = NaqlTouch.min,
+  });
+
+  /// Shortcut for a round control that floats over a map.
+  const NaqlIconButton.floating({super.key, required this.icon, required this.onPressed, required this.semanticLabel, this.badge = false, this.size = NaqlTouch.min})
+      : style = NaqlIconButtonStyle.floating;
 
   final IconData icon;
   final VoidCallback? onPressed;
   final String semanticLabel;
   final bool badge;
+  final NaqlIconButtonStyle style;
+
+  /// Diameter; at least 48 dp (use 56 in the driver app).
+  final double size;
 
   @override
   Widget build(BuildContext context) {
+    final dark = naqlIsDark;
+    final (Color bg, Color fg, BoxBorder? border, List<BoxShadow>? shadow) = switch (style) {
+      NaqlIconButtonStyle.outline => (NaqlColors.surface, NaqlColors.text, Border.all(color: NaqlColors.border), null),
+      NaqlIconButtonStyle.floating => (NaqlColors.surface.withValues(alpha: 0.94), NaqlColors.text, null, naqlFloatShadow),
+      NaqlIconButtonStyle.soft => (dark ? NaqlColors.surfaceMuted : NaqlColors.primarySoft, dark ? NaqlColors.text : NaqlColors.primary, null, null),
+      NaqlIconButtonStyle.solid => (dark ? NaqlColors.ink : NaqlColors.primary, dark ? NaqlColors.onInk : NaqlColors.onPrimary, null, null),
+    };
     return NaqlPressable(
       onPressed: onPressed,
       semanticLabel: semanticLabel,
+      minSize: size,
       child: Stack(clipBehavior: Clip.none, children: [
         Container(
-          width: NaqlTouch.min,
-          height: NaqlTouch.min,
-          decoration: BoxDecoration(color: NaqlColors.surface, shape: BoxShape.circle, border: Border.all(color: NaqlColors.border)),
-          child: Icon(icon, size: 20, color: NaqlColors.text),
+          width: size,
+          height: size,
+          decoration: BoxDecoration(color: bg, shape: BoxShape.circle, border: border, boxShadow: shadow),
+          child: Icon(icon, size: size > NaqlTouch.min ? 22 : 20, color: fg),
         ),
         if (badge)
           PositionedDirectional(

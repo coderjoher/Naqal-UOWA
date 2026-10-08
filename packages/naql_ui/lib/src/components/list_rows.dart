@@ -46,9 +46,9 @@ class NaqlListRow extends StatelessWidget {
             ),
             trailing ??
                 (selected
-                    ? const Icon(LucideIcons.circleCheck, color: NaqlColors.primary, size: 22)
+                    ? Icon(LucideIcons.circleCheck, color: NaqlColors.primary, size: 22)
                     : selectable
-                        ? const Icon(LucideIcons.circle, color: NaqlColors.border, size: 22)
+                        ? Icon(LucideIcons.circle, color: NaqlColors.border, size: 22)
                         : Icon(rtl ? LucideIcons.chevronLeft : LucideIcons.chevronRight, color: NaqlColors.textMuted, size: 20)),
           ]),
         ),
@@ -76,7 +76,7 @@ class NaqlInfoRow extends StatelessWidget {
         child: Row(children: [
           Expanded(child: Text(label, style: NaqlText.body.copyWith(color: NaqlColors.textMuted))),
           Text(value, style: NaqlText.body.copyWith(fontWeight: FontWeight.w600)),
-          if (locked) ...[const SizedBox(width: NaqlSpace.s2), const Icon(LucideIcons.lock, size: 16, color: NaqlColors.textMuted)],
+          if (locked) ...[const SizedBox(width: NaqlSpace.s2), Icon(LucideIcons.lock, size: 16, color: NaqlColors.textMuted)],
         ]),
       ),
     );

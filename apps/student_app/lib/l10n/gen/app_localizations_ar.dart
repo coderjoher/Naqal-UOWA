@@ -51,11 +51,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get comingSoonBody => 'هذه الصفحة قيد التطوير.';
 
   @override
-  String get welcomeTitle => 'تنقّلك اليومي إلى الجامعة';
+  String get welcomeTitle => 'تنقّل جامعي مريح';
 
   @override
-  String get welcomeBody =>
-      'اطلب مقعدك كل يوم، وتابع حافلتك على الخريطة، واعرف متى تصل.';
+  String get welcomeBody => 'اطلب مقعدك، وتابع حافلتك، واعرف متى تصل.';
 
   @override
   String get chooseLanguage => 'اختر اللغة';
@@ -799,4 +798,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get taxiPlateLabel => 'اللوحة';
+
+  @override
+  String get taxiChipHere => 'موقعي الحالي';
+
+  @override
+  String get taxiChipPoint => 'نقطة تجمّعي';
+
+  @override
+  String get taxiToCampusSub => 'من مكانك إلى بوابة الجامعة';
+
+  @override
+  String get taxiFromCampusSub => 'من الجامعة إلى مكانك';
+
+  @override
+  String get driverCaption => 'سائقك';
+
+  @override
+  String get vehicleCaption => 'الحافلة';
+
+  @override
+  String get rideSummaryTotal => 'المجموع';
+
+  @override
+  String get rideFare => 'الأجرة';
 }

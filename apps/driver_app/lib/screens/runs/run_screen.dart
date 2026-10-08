@@ -90,7 +90,7 @@ class _Summary extends StatelessWidget {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(label, style: NaqlText.caption),
             const SizedBox(height: NaqlSpace.s1),
-            Text(value, style: NaqlText.headline.copyWith(color: color), textDirection: TextDirection.ltr),
+            Text(value, style: NaqlText.title.copyWith(fontSize: 20, color: color), textDirection: TextDirection.ltr),
           ]),
         );
     return NaqlCard(
@@ -229,7 +229,7 @@ class _ActionPanelState extends ConsumerState<ActionPanel> {
         if (left > 0) ...[
           const SizedBox(height: NaqlSpace.s2),
           Row(children: [
-            const Icon(LucideIcons.hourglass, size: 18, color: NaqlColors.warning),
+            Icon(LucideIcons.hourglass, size: 18, color: NaqlColors.warning),
             const SizedBox(width: NaqlSpace.s2),
             Text(t.waitLeft(formatCountdown(Duration(seconds: left))), key: const ValueKey('wait'), style: NaqlText.label.copyWith(color: NaqlColors.warning)),
           ]),
@@ -263,12 +263,12 @@ class _Big extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Row(children: [
           if (icon != null) ...[
-            Container(width: 44, height: 44, decoration: BoxDecoration(color: tone.bg, shape: BoxShape.circle), child: Icon(icon, color: tone.fg)),
+            Container(width: 48, height: 48, decoration: BoxDecoration(color: tone.bg, borderRadius: BorderRadius.circular(NaqlRadius.md)), child: Icon(icon, color: tone.fg)),
             const SizedBox(width: NaqlSpace.s3),
           ],
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title, style: NaqlText.title.copyWith(fontSize: 20)),
+              Text(title, style: NaqlText.title.copyWith(fontSize: 22)),
               if (subtitle != null) ...[const SizedBox(height: 2), Text(subtitle!, style: NaqlText.body.copyWith(color: NaqlColors.textMuted))],
             ]),
           ),
@@ -304,7 +304,7 @@ class _RiderRow extends StatelessWidget {
         semanticLabel: passenger.name,
         child: AnimatedContainer(
           key: ValueKey('rider-${passenger.requestId}'),
-          duration: NaqlMotion.fast,
+          duration: naqlMotion(context),
           constraints: const BoxConstraints(minHeight: NaqlTouch.driver),
           padding: const EdgeInsets.symmetric(horizontal: NaqlSpace.s3),
           decoration: BoxDecoration(
@@ -325,7 +325,7 @@ class _RiderRow extends StatelessWidget {
                   : TextButton(
                       key: ValueKey('fare-${passenger.requestId}'),
                       onPressed: onCollect,
-                      style: TextButton.styleFrom(minimumSize: const Size(0, 44), foregroundColor: NaqlColors.success, textStyle: NaqlText.label),
+                      style: TextButton.styleFrom(minimumSize: const Size(0, 48), foregroundColor: NaqlColors.success, textStyle: NaqlText.label.copyWith(fontWeight: FontWeight.w600)),
                       child: Text(t.collectFare(formatIqd(passenger.fare, lang))),
                     )
             else if (!on)
@@ -443,7 +443,7 @@ class _StopTileState extends State<StopTile> {
                         AnimatedRotation(
                           turns: _open ? 0.5 : 0,
                           duration: NaqlMotion.fast,
-                          child: const Icon(LucideIcons.chevronDown, size: 20, color: NaqlColors.textMuted),
+                          child: Icon(LucideIcons.chevronDown, size: 20, color: NaqlColors.textMuted),
                         ),
                       ]),
                     ),
@@ -455,7 +455,7 @@ class _StopTileState extends State<StopTile> {
                     child: !_open
                         ? const SizedBox(width: double.infinity)
                         : Column(children: [
-                            const Divider(height: 1, color: NaqlColors.border),
+                            Divider(height: 1, color: NaqlColors.border),
                             for (final p in s.passengers)
                               ConstrainedBox(
                                 constraints: const BoxConstraints(minHeight: NaqlTouch.driver),
@@ -552,7 +552,7 @@ class _Rail extends StatelessWidget {
           child: icon != null
               ? Icon(icon, size: 18, color: NaqlColors.onPrimary)
               : done
-                  ? const Icon(LucideIcons.check, size: 18, color: NaqlColors.success)
+                  ? Icon(LucideIcons.check, size: 18, color: NaqlColors.success)
                   : Text(label ?? '', style: NaqlText.label.copyWith(color: filled ? NaqlColors.onPrimary : color)),
         ),
         Expanded(child: Container(width: 2, color: last ? Colors.transparent : NaqlColors.border)),

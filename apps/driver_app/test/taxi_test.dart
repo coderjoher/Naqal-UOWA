@@ -269,4 +269,23 @@ void main() {
     expect(find.text('From campus'), findsOneWidget);
     expect(find.text('3,500 IQD'), findsOneWidget);
   });
+
+  for (final dark in [false, true]) {
+    final mode = dark ? '.dark' : '';
+    testWidgets('[T10-11] taxi home: offline switch and an accepted ride (golden${dark ? ', dark mode' : ''})', (tester) async {
+      tester.view.devicePixelRatio = 2.0;
+      tester.view.physicalSize = const Size(390 * 2, 844 * 2);
+      addTearDown(tester.view.reset);
+      if (dark) useDark(tester);
+      final api = taxiDriver()..taxiOffers = [FakeDriverBackend.taxiOffer('r1', fare: 6250)];
+      await tester.pumpWidget(await api.app(signedIn: true));
+      await tester.pumpAndSettle();
+      await expectLater(find.byType(MaterialApp), matchesGoldenFile('goldens/taxi_home$mode.rtl.png'));
+
+      await tapKey(tester, 'taxi-online');
+      await tapKey(tester, 'accept-r1');
+      await tester.pumpAndSettle();
+      await expectLater(find.byType(MaterialApp), matchesGoldenFile('goldens/taxi_ride$mode.rtl.png'));
+    });
+  }
 }
