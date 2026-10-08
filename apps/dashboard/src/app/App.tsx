@@ -10,6 +10,7 @@ import { OverviewPage } from '../pages/OverviewPage';
 import { StudentsPage } from '../pages/StudentsPage';
 import { LiveOpsPage } from '../pages/LiveOpsPage';
 import { DispatchPage } from '../pages/DispatchPage';
+import { TaxiPage } from '../pages/TaxiPage';
 import { SubscriptionsPage } from '../pages/SubscriptionsPage';
 import { SettlementPage } from '../pages/SettlementPage';
 import { AuditPage } from '../pages/AuditPage';
@@ -50,6 +51,7 @@ export function AppRoutes() {
         />
         <Route path="live" element={office(<LiveOpsPage />)} />
         <Route path="dispatch" element={office(<DispatchPage />)} />
+        <Route path="taxi" element={office(<TaxiPage />)} />
         <Route path="subscriptions" element={office(<SubscriptionsPage />)} />
         <Route path="settlement" element={office(<SettlementPage />)} />
         <Route path="reports" element={office(<ReportsPage />)} />

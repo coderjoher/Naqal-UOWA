@@ -15,6 +15,8 @@ import { addExtraRun, cancelRequest, insertRequest, MoveError, moveRequest, plan
 import { CAMPUS, Ctx, DEFAULT_CONFIG, DispatchEvent, Passenger, Run, TravelFn, WaitlistEntry } from './domain/types';
 
 export const DISPATCH_QUEUE = 'dispatch';
+/** P10: taxi drivers take campus taxi trips, never bus runs. */
+export const BUS_ONLY = { OR: [{ vehicleType: null }, { vehicleType: { not: 'taxi' } }] };
 export const WAVE_PLAN = 'wave.plan';
 export const WAITLIST_RECHECK = 'waitlist.recheck';
 export const WAITLIST_EXPIRE = 'waitlist.expire';
@@ -71,7 +73,7 @@ export class DispatchEngine {
       const s = await this.load(tx, ref);
       const used = new Set(s.dbRuns.map((r) => r.driverId));
       const available = await tx.driverAvailability.findMany({
-        where: { waveId: ref.waveId, date: dbDate(ref.date), driver: { status: 'active', driver: { status: 'approved', seats: { gt: 0 } } } },
+        where: { waveId: ref.waveId, date: dbDate(ref.date), driver: { status: 'active', driver: { status: 'approved', seats: { gt: 0 }, ...BUS_ONLY } } },
         include: { driver: { include: { driver: true } } },
       });
       const drivers = available.filter((a) => !used.has(a.driverId)).map((a) => ({ id: a.driverId, seats: a.driver.driver!.seats! }));
@@ -151,7 +153,7 @@ export class DispatchEngine {
     const out = await this.locked(ref, async (tx) => {
       const done = await tx.wavePlan.findUnique({ where: { waveId_date: { waveId: ref.waveId, date: dbDate(ref.date) } } });
       if (!done) throw new ConflictException('Dispatch the wave first');
-      const driver = await tx.user.findFirst({ where: { id: driverId, role: 'driver', status: 'active', driver: { status: 'approved', seats: { gt: 0 } } }, include: { driver: true } });
+      const driver = await tx.user.findFirst({ where: { id: driverId, role: 'driver', status: 'active', driver: { status: 'approved', seats: { gt: 0 }, ...BUS_ONLY } }, include: { driver: true } });
       if (!driver) throw new ConflictException('Choose an approved driver');
       if (await tx.run.findUnique({ where: { driverId_waveId_date: { driverId, waveId: ref.waveId, date: dbDate(ref.date) } } })) throw new ConflictException('This driver already has a run in this wave');
       const s = await this.load(tx, ref);

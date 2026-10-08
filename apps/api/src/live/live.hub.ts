@@ -7,6 +7,8 @@ export const rooms = {
   ops: (universityId: string) => `ops:${universityId}`,
   user: (id: string) => `user:${id}`,
   driver: (id: string) => `driver:${id}`,
+  /** P10: the university's online taxi drivers (offers and "taken" notices). */
+  taxi: (universityId: string) => `taxi:${universityId}`,
 };
 
 /** Live bus position as broadcast. Only the bus — never a student's location (NF-12). */
@@ -54,5 +56,24 @@ export class LiveHub {
 
   toUser(userId: string, event: string, payload: unknown) {
     this.server?.to(rooms.user(userId)).emit(event, payload);
+  }
+
+  /** P10: one ride's state changed; the student, its driver and the office refetch. */
+  taxiRide(universityId: string, userIds: string[], payload: { rideId: string; status: string }) {
+    let to = this.server?.to(rooms.ops(universityId));
+    for (const id of userIds) to = to?.to(rooms.user(id));
+    to?.emit('taxi:ride', payload);
+  }
+
+  /** P10: a ride is no longer on offer (accepted, cancelled, expired); drivers drop its card. */
+  taxiGone(universityId: string, rideId: string) {
+    this.server?.to(rooms.taxi(universityId)).emit('taxi:gone', { rideId });
+  }
+
+  /** P10: online taxi drivers' sockets join the taxi room; offline ones leave it. */
+  taxiPresence(universityId: string, driverId: string, online: boolean) {
+    const s = this.server?.in(rooms.user(driverId));
+    if (online) s?.socketsJoin(rooms.taxi(universityId));
+    else s?.socketsLeave(rooms.taxi(universityId));
   }
 }

@@ -65,6 +65,25 @@
 .naql-pin--bus-female {
   background: var(--color-female-only);
 }
+.naql-pin--taxi,
+.naql-pin--taxi-busy {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: var(--color-warning);
+  color: var(--color-ink);
+  z-index: 2;
+}
+.naql-pin--taxi-busy {
+  background: var(--color-ink);
+  color: var(--color-surface);
+}
+.naql-pin--rider {
+  width: 16px;
+  height: 16px;
+  border-width: 3px;
+  background: var(--color-warning);
+}
 .naql-pin--stop {
   width: 18px;
   height: 18px;

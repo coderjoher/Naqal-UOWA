@@ -29,14 +29,21 @@ export interface Application {
   documentKeys: string[];
 }
 
+/** P10: taxi drivers register with this vehicle type when the university runs campus taxis. */
+export const TAXI = 'taxi';
+/** A taxi carries 3–7 passengers; the bus minimum (minSeats) does not apply to it. */
+export const TAXI_SEATS = { min: 3, max: 7 };
+
 /** Everything the office requires (TO-01) that is still missing or invalid (DR-01). Empty = complete. */
-export function missingRequirements(app: Application, req: DriverRequirementsDto, year = new Date().getFullYear()): string[] {
+export function missingRequirements(app: Application, req: DriverRequirementsDto, opts: { taxi?: boolean; year?: number } = {}): string[] {
+  const year = opts.year ?? new Date().getFullYear();
   const missing: string[] = [];
+  const taxi = app.vehicleType === TAXI && !!opts.taxi;
   if (!app.name?.trim()) missing.push('name');
   if (!app.phone) missing.push('phone');
-  if (!app.vehicleType || !req.vehicleTypes.includes(app.vehicleType)) missing.push('vehicle_type');
+  if (!app.vehicleType || !(req.vehicleTypes.includes(app.vehicleType) || taxi)) missing.push('vehicle_type');
   if (!app.plate?.trim()) missing.push('plate');
-  if (!app.seats || app.seats < req.minSeats) missing.push('seats');
+  if (!app.seats || (taxi ? app.seats < TAXI_SEATS.min || app.seats > TAXI_SEATS.max : app.seats < req.minSeats)) missing.push('seats');
   if (!app.modelYear || app.modelYear < year - req.maxVehicleAgeYears || app.modelYear > year + 1) missing.push('model_year');
   for (const d of req.documents) if (d.required && !app.documentKeys.includes(d.key)) missing.push(`doc_${d.key}`);
   return missing;

@@ -1,4 +1,4 @@
-import { BarChart3, Building2, Bus, HandCoins, History, Inbox, Megaphone, Radio, Route, CreditCard, CalendarClock, FileCheck2, GraduationCap, LayoutDashboard, Layers, MapPin, Users, type LucideIcon } from 'lucide-react';
+import { BarChart3, Building2, Bus, CarTaxiFront, HandCoins, History, Inbox, Megaphone, Radio, Route, CreditCard, CalendarClock, FileCheck2, GraduationCap, LayoutDashboard, Layers, MapPin, Users, type LucideIcon } from 'lucide-react';
 import type { Role } from '../lib/api';
 import type { MessageKey } from '../lib/i18n';
 
@@ -22,6 +22,7 @@ export const NAV: NavGroup[] = [
       { to: '/', label: 'nav.overview', icon: LayoutDashboard, roles: ['office', 'super_admin'] },
       { to: '/live', label: 'nav.live', icon: Radio, roles: ['office'] },
       { to: '/dispatch', label: 'nav.dispatch', icon: Route, roles: ['office'] },
+      { to: '/taxi', label: 'nav.taxi', icon: CarTaxiFront, roles: ['office'] },
       { to: '/subscriptions', label: 'nav.subscriptions', icon: CreditCard, roles: ['office'] },
       { to: '/settlement', label: 'nav.settlement', icon: HandCoins, roles: ['office'] },
       { to: '/reports', label: 'nav.reports', icon: BarChart3, roles: ['office'] },
