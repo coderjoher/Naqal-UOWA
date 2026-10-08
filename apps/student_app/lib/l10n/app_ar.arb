@@ -342,5 +342,126 @@
   "nMovedTitle": "تغيّرت حافلتك",
   "nMovedBody": "نقلك مكتب النقل إلى حافلة أخرى. افتح الرئيسية لترى التفاصيل.",
   "nAnsweredTitle": "ردّ مكتب النقل على بلاغك",
-  "dismiss": "إخفاء"
+  "dismiss": "إخفاء",
+  "taxiTitle": "تكسي الجامعة",
+  "taxiCardTitle": "تكسي من الجامعة وإليها",
+  "taxiCardBody": "تعرف الأجرة قبل الطلب، وتدفعها نقداً للسائق.",
+  "taxiDirection": "وجهة الرحلة",
+  "taxiToCampus": "إلى الجامعة",
+  "taxiFromCampus": "من الجامعة للبيت",
+  "taxiPickupHint": "حرّك الخريطة أو المسها لتحديد مكان الركوب",
+  "taxiDropoffHint": "حرّك الخريطة أو المسها لتحديد مكان النزول",
+  "taxiMyLocation": "استخدم موقعي الحالي",
+  "taxiLocationFailed": "تعذّر تحديد موقعك. فعّل خدمة الموقع أو حرّك الخريطة.",
+  "taxiLabel": "علامة دالّة (اختياري)",
+  "taxiLabelHint": "مثلاً: قرب باب الجامع",
+  "taxiFare": "الأجرة",
+  "taxiCash": "تُدفع نقداً للسائق",
+  "taxiKm": "{km} كم",
+  "@taxiKm": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "taxiMinutes": "{n} د",
+  "@taxiMinutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "taxiNearby": "سيارات قريبة: {n}",
+  "@taxiNearby": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "taxiNoneNearby": "لا توجد سيارة قريبة الآن، ويمكنك الطلب مع ذلك.",
+  "taxiPickupIn": "يصلك خلال {n} د تقريباً",
+  "@taxiPickupIn": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "taxiRequest": "اطلب تكسي",
+  "taxiUnavailableHere": "خدمة التكسي غير متاحة في هذا المكان",
+  "taxiSearching": "نبحث عن تكسي قريب",
+  "taxiSearchingBody": "وصل طلبك إلى السائقين القريبين، وأول من يقبل يأتي إليك.",
+  "taxiTimeLeft": "الوقت المتبقي",
+  "taxiCancel": "إلغاء الطلب",
+  "taxiCancelTitle": "إلغاء التكسي؟",
+  "taxiCancelBody": "سنُبلغ السائق بالإلغاء.",
+  "taxiCancelYes": "نعم، ألغِ",
+  "taxiKeep": "لا، أبقِه",
+  "taxiAccepted": "التكسي في الطريق إليك",
+  "taxiArrived": "وصل التكسي",
+  "taxiArrivedBody": "السائق ينتظرك في مكان الركوب.",
+  "taxiOnTripToCampus": "في الطريق إلى الجامعة",
+  "taxiOnTripHome": "في الطريق إلى البيت",
+  "taxiAway": "يصل خلال {n} د",
+  "@taxiAway": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "taxiCall": "اتصل بالسائق",
+  "taxiPlate": "اللوحة {plate}",
+  "@taxiPlate": {
+    "placeholders": {
+      "plate": {
+        "type": "String"
+      }
+    }
+  },
+  "taxiStepAccepted": "قُبل",
+  "taxiStepArrived": "وصل",
+  "taxiStepOnTrip": "في الطريق",
+  "taxiStepDone": "انتهت",
+  "taxiStepOf": "الخطوة {n} من 4: {name}",
+  "@taxiStepOf": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "taxiDone": "وصلت بالسلامة",
+  "taxiPayCash": "ادفع للسائق {amount} نقداً",
+  "@taxiPayCash": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "taxiSummary": "ملخص الرحلة",
+  "taxiRoute": "المسار",
+  "taxiCampus": "الجامعة",
+  "taxiYourSpot": "موقعك",
+  "taxiDriver": "السائق",
+  "taxiDistance": "المسافة",
+  "taxiBackHome": "العودة للرئيسية",
+  "taxiExpired": "لم يقبل أي سائق هذه المرة",
+  "taxiExpiredBody": "قد يكون السائقون مشغولين. جرّب مرة أخرى بعد قليل.",
+  "taxiCancelledByYou": "ألغيت الطلب",
+  "taxiCancelledOther": "أُلغي الطلب",
+  "taxiCancelledBody": "يمكنك طلب تكسي جديد متى شئت.",
+  "taxiTryAgain": "حاول مرة أخرى",
+  "taxiPickupPin": "مكان الركوب",
+  "taxiDropoffPin": "مكان النزول",
+  "taxiCarPin": "التكسي",
+  "taxiFollow": "تابِع رحلتك",
+  "taxiPlateLabel": "اللوحة"
 }

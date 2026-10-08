@@ -15,6 +15,7 @@ import 'screens/onboarding/sign_in_screen.dart';
 import 'screens/onboarding/university_screen.dart';
 import 'screens/onboarding/welcome_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/taxi_screen.dart';
 import 'screens/trips_screen.dart';
 
 const _onboarding = {'/welcome', '/university', '/sign-in', '/activate'};
@@ -54,6 +55,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/sign-in', builder: (_, _) => const SignInScreen()),
       GoRoute(path: '/activate', builder: (_, _) => const ActivateScreen()),
       GoRoute(path: '/choose-point', builder: (_, _) => const ChoosePointScreen()),
+      // P10: full screen (no tab bar) so the map and the ride card have the room.
+      GoRoute(path: '/taxi', builder: (_, s) => TaxiScreen(rideId: s.uri.queryParameters['ride'])),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => _Shell(shell: shell),
         branches: [
