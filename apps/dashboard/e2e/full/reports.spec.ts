@@ -13,7 +13,7 @@ test('[T7-05] reports page filters by month and tier and exports CSV', async ({ 
   await page.getByLabel('كلمة المرور').fill('password123');
   await page.getByRole('button', { name: 'دخول' }).click();
   await page.getByRole('link', { name: 'التقارير' }).click();
-  await page.getByLabel('الشهر').fill(MONTH);
+  await page.getByLabel('الشهر', { exact: true }).fill(MONTH);
 
   // The fixture month: 28 subscribers, every finished run on time, one run never finished.
   await expect(page.getByTestId('m-subscribers')).toHaveAttribute('data-value', '28');
