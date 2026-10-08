@@ -461,4 +461,204 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get earningsOwe => 'You owe the office';
+
+  @override
+  String get taxi => 'Taxi';
+
+  @override
+  String get taxiTitle => 'Campus taxi';
+
+  @override
+  String get taxiOnline => 'You\'re online';
+
+  @override
+  String get taxiOffline => 'You\'re offline';
+
+  @override
+  String get taxiOnlineHint => 'Ride requests near you will show here';
+
+  @override
+  String get taxiOfflineHint => 'Tap to start getting rides';
+
+  @override
+  String get taxiGoOnline => 'Go online';
+
+  @override
+  String get taxiGoOffline => 'Go offline';
+
+  @override
+  String get taxiConnecting => 'Connecting…';
+
+  @override
+  String get taxiWaitingTitle => 'Waiting for requests';
+
+  @override
+  String get taxiWaitingBody => 'Keep the app open. New requests appear here.';
+
+  @override
+  String get taxiOfflineTitle => 'You won\'t get requests now';
+
+  @override
+  String get taxiOfflineBody =>
+      'Go online to get ride requests from students near you.';
+
+  @override
+  String get taxiToCampus => 'To campus';
+
+  @override
+  String get taxiFromCampus => 'From campus';
+
+  @override
+  String taxiTripKm(String km) {
+    return '$km km trip';
+  }
+
+  @override
+  String taxiAwayKm(String km) {
+    return '$km km away';
+  }
+
+  @override
+  String get taxiAccept => 'Accept';
+
+  @override
+  String taxiSecondsLeft(int seconds) {
+    return '$seconds seconds left';
+  }
+
+  @override
+  String get taxiNewRequest => 'New request';
+
+  @override
+  String get taxiTaken => 'Another driver took this ride.';
+
+  @override
+  String get taxiNoLocation => 'Turn on location to go online.';
+
+  @override
+  String get taxisOff => 'The office has switched taxis off for now.';
+
+  @override
+  String get taxiStudentCancelled => 'The student cancelled the ride.';
+
+  @override
+  String get taxiFailed => 'Couldn\'t connect. Try again.';
+
+  @override
+  String get taxiDismiss => 'Dismiss';
+
+  @override
+  String get taxiGoToStudent => 'Go to the student';
+
+  @override
+  String get taxiGoToGate => 'Go to the campus gate';
+
+  @override
+  String get taxiWaitingStudent => 'Waiting for the student';
+
+  @override
+  String get taxiOnTripCampus => 'On the way to campus';
+
+  @override
+  String get taxiOnTripHome => 'On the way to the student\'s place';
+
+  @override
+  String taxiStep(int n) {
+    return 'Step $n of 3';
+  }
+
+  @override
+  String get taxiCall => 'Call';
+
+  @override
+  String taxiCallStudent(String name) {
+    return 'Call $name';
+  }
+
+  @override
+  String get taxiArrived => 'I\'ve arrived';
+
+  @override
+  String get taxiStartTrip => 'Start trip';
+
+  @override
+  String taxiEndTrip(String amount) {
+    return 'End trip & collect $amount';
+  }
+
+  @override
+  String taxiEndConfirmTitle(String amount) {
+    return 'Did you collect $amount in cash?';
+  }
+
+  @override
+  String get taxiEndConfirmBody =>
+      'The fare is recorded to you when the trip ends.';
+
+  @override
+  String get taxiEndConfirmYes => 'Yes, I collected it';
+
+  @override
+  String get taxiNotYet => 'Not yet';
+
+  @override
+  String get taxiCancelRide => 'Cancel ride';
+
+  @override
+  String get taxiCancelConfirmTitle => 'Cancel this ride?';
+
+  @override
+  String get taxiCancelConfirmBody => 'The request goes back to other drivers.';
+
+  @override
+  String get taxiCancelYes => 'Yes, cancel ride';
+
+  @override
+  String get taxiKeepRide => 'Keep the ride';
+
+  @override
+  String get taxiFare => 'Cash fare';
+
+  @override
+  String get taxiDistance => 'Distance';
+
+  @override
+  String taxiKm(String km) {
+    return '$km km';
+  }
+
+  @override
+  String get taxiDoneTitle => 'Trip done';
+
+  @override
+  String get taxiDoneBody => 'The cash is recorded to you.';
+
+  @override
+  String get taxiBackToRequests => 'Back to requests';
+
+  @override
+  String get taxiMonthTitle => 'Taxi trips this month';
+
+  @override
+  String taxiMonthSummary(int trips, String amount) {
+    return '$trips trips · $amount';
+  }
+
+  @override
+  String get taxiRecent => 'Recent taxi trips';
+
+  @override
+  String get taxiNoTrips => 'No taxi trips yet';
+
+  @override
+  String get taxiStatusDone => 'Done';
+
+  @override
+  String get taxiStatusCancelled => 'Cancelled';
+
+  @override
+  String get taxiStatusActive => 'In progress';
+
+  @override
+  String get taxiCashCollected => 'Cash collected';
 }

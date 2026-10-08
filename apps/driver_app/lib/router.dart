@@ -5,6 +5,7 @@ import 'package:naql_core/naql_core.dart';
 import 'package:naql_ui/naql_ui.dart';
 
 import 'data/session.dart';
+import 'data/taxi.dart';
 import 'l10n/gen/app_localizations.dart';
 import 'screens/application_screen.dart';
 import 'screens/earnings_screen.dart';
@@ -17,12 +18,14 @@ import 'screens/status_screen.dart';
 import 'screens/runs/run_screen.dart';
 import 'screens/runs/today_screen.dart';
 import 'screens/schedule_screen.dart';
+import 'screens/taxi/taxi_home_screen.dart';
 
 const _onboarding = {'/welcome', '/university', '/phone', '/code'};
 
 final routerProvider = Provider<GoRouter>((ref) {
   final refresh = ValueNotifier(0);
   ref.listen(applicationProvider, (_, _) => refresh.value++);
+  ref.listen(isTaxiDriverProvider, (_, _) => refresh.value++);
   ref.onDispose(refresh.dispose);
 
   return GoRouter(
@@ -43,6 +46,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       };
       if (home != null) return loc == home ? null : home;
       if (_onboarding.contains(loc) || loc == '/splash' || loc == '/apply' || loc == '/status') return '/today';
+      // P10: taxi drivers have no bus waves (the server refuses them) and no bus runs.
+      if (ref.read(isTaxiDriverProvider) && (loc == '/schedule' || loc.startsWith('/today/run/'))) return '/today';
       return null;
     },
     routes: [
@@ -59,7 +64,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/today',
-              builder: (_, _) => const TodayScreen(),
+              builder: (_, _) => const _TodayTab(),
               routes: [GoRoute(path: 'run/:id', builder: (_, s) => RunScreen(runId: s.pathParameters['id']!))],
             ),
           ]),
@@ -72,27 +77,41 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
-class _Shell extends StatelessWidget {
+/// First tab: the taxi home for taxi drivers, today's bus runs for everyone else.
+class _TodayTab extends ConsumerWidget {
+  const _TodayTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => ref.watch(isTaxiDriverProvider) ? const TaxiHomeScreen() : const TodayScreen();
+}
+
+/// Shell branches, in order: today, schedule, earnings, profile.
+const _scheduleBranch = 1;
+
+class _Shell extends ConsumerWidget {
   const _Shell({required this.shell});
   final StatefulNavigationShell shell;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = AppLocalizations.of(context);
+    final taxi = ref.watch(isTaxiDriverProvider);
+    // Taxi drivers work on demand, so the Schedule tab is left out; the other tabs keep their branches.
+    final tabs = [
+      (branch: 0, item: taxi ? NaqlNavItem(icon: LucideIcons.carTaxiFront, label: t.taxi) : NaqlNavItem(icon: LucideIcons.route, label: t.tabToday)),
+      if (!taxi) (branch: _scheduleBranch, item: NaqlNavItem(icon: LucideIcons.calendarDays, label: t.tabSchedule)),
+      (branch: 2, item: NaqlNavItem(icon: LucideIcons.wallet, label: t.tabEarnings)),
+      (branch: 3, item: NaqlNavItem(icon: LucideIcons.circleUser, label: t.tabProfile)),
+    ];
+    final current = tabs.indexWhere((x) => x.branch == shell.currentIndex);
     return Scaffold(
       extendBody: true,
       body: shell,
       bottomNavigationBar: NaqlBottomNav(
-        currentIndex: shell.currentIndex,
-        onTap: (i) => shell.goBranch(i, initialLocation: i == shell.currentIndex),
-        items: [
-          NaqlNavItem(icon: LucideIcons.route, label: t.tabToday),
-          NaqlNavItem(icon: LucideIcons.calendarDays, label: t.tabSchedule),
-          NaqlNavItem(icon: LucideIcons.wallet, label: t.tabEarnings),
-          NaqlNavItem(icon: LucideIcons.circleUser, label: t.tabProfile),
-        ],
+        currentIndex: current < 0 ? 0 : current,
+        onTap: (i) => shell.goBranch(tabs[i].branch, initialLocation: tabs[i].branch == shell.currentIndex),
+        items: [for (final x in tabs) x.item],
       ),
     );
   }
 }
-

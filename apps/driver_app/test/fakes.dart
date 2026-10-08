@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:clock/clock.dart';
 import 'package:driver_app/app.dart';
 import 'package:driver_app/data/image_document_picker.dart';
 import 'package:driver_app/data/run_controller.dart';
 import 'package:driver_app/data/session.dart';
+import 'package:driver_app/data/taxi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -31,6 +33,26 @@ class FakeLocation implements LocationSource {
   Future<bool> ensurePermission() async => true;
   @override
   Stream<GpsFix> positions() => controller.stream;
+
+  /// What a one-off fix returns (taxi heartbeat); null = no GPS.
+  GpsFix? fix = GpsFix(lat: 32.616, lng: 44.024, at: DateTime(2026, 10, 8, 9));
+  @override
+  Future<GpsFix?> current() async => fix;
+}
+
+/// Taxi socket stand-in: tests push offers, "gone" and ride changes.
+class FakeTaxiEvents implements TaxiEvents {
+  final offersCtl = StreamController<TaxiOffer>.broadcast();
+  final goneCtl = StreamController<String>.broadcast();
+  final ridesCtl = StreamController<({String rideId, String status})>.broadcast();
+  @override
+  Stream<TaxiOffer> get offers => offersCtl.stream;
+  @override
+  Stream<String> get gone => goneCtl.stream;
+  @override
+  Stream<({String rideId, String status})> get rides => ridesCtl.stream;
+  @override
+  void dispose() {}
 }
 
 class FakeLiveFeed implements LiveFeed {
@@ -74,6 +96,42 @@ class FakeDriverBackend {
   bool loseNextReply = false;
   final location = FakeLocation();
   final feed = FakeLiveFeed();
+  final taxiEvents = FakeTaxiEvents();
+
+  /// P10 taxi: open offers near the driver, the driver's accepted ride, and what was sent.
+  List<Map<String, Object?>> taxiOffers = [];
+  Map<String, Object?>? taxiActive;
+  final taxiRides = <Map<String, Object?>>[];
+
+  /// Offers another driver already took (accept answers 409).
+  final taxiTaken = <String>{};
+  final taxiHeartbeats = <Map<String, dynamic>>[];
+  bool taxiOnline = false;
+
+  static Map<String, Object?> taxiOffer(String id, {String direction = 'to_campus', int fare = 4500, double km = 6.2, double away = 1.4, int seconds = 90}) => {
+        'id': id,
+        'direction': direction,
+        'area': {'lat': 32.615, 'lng': 44.025},
+        'distanceKm': km,
+        'fare': fare,
+        'expiresAt': clock.now().add(Duration(seconds: seconds)).toUtc().toIso8601String(),
+        'awayKm': away,
+      };
+
+  Map<String, Object?> _taxiRide(Map<String, Object?> offer) => {
+        'id': offer['id'],
+        'status': 'accepted',
+        'direction': offer['direction'],
+        'pickup': {'lat': 32.6151, 'lng': 44.0253},
+        'dropoff': {'lat': 32.59, 'lng': 44.05},
+        'label': 'قرب جامع الحي',
+        'distanceKm': offer['distanceKm'],
+        'fare': offer['fare'],
+        'acceptedAt': clock.now().toUtc().toIso8601String(),
+        'endedAt': null,
+        'createdAt': clock.now().toUtc().toIso8601String(),
+        'student': {'name': 'زهراء علي', 'phone': '07701234567'},
+      };
 
   /// GET /drivers/me/runs (P4).
   List<Map<String, Object?>> runs = [];
@@ -260,6 +318,48 @@ class FakeDriverBackend {
       final d = days.firstWhere((x) => x['date'] == body['date']);
       d['waves'] = [for (final w in d['waves'] as List) {...(w as Map<String, Object?>), 'available': want.contains(w['waveId'])}];
       res = _json(d);
+    } else if (path == 'POST /taxi/driver/online') {
+      taxiHeartbeats.add(jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>);
+      taxiOnline = true;
+      res = _json({'online': true, 'active': taxiActive, 'offers': taxiActive == null ? taxiOffers : []});
+    } else if (path == 'POST /taxi/driver/offline') {
+      taxiOnline = false;
+      res = _json({'online': false});
+    } else if (path == 'GET /taxi/driver/offers') {
+      res = _json(taxiOffers);
+    } else if (path == 'GET /taxi/driver/rides') {
+      final done = taxiRides.where((r) => r['status'] == 'done');
+      res = _json({'rides': taxiRides, 'month': '2026-10', 'trips': done.length, 'cash': done.fold<int>(0, (n, r) => n + (r['fare'] as int))});
+    } else if (req.method == 'GET' && req.url.path.startsWith('/taxi/driver/rides/')) {
+      final r = taxiRides.where((r) => r['id'] == req.url.pathSegments.last).firstOrNull;
+      res = r == null ? _json({'message': 'not found'}, 404) : _json(r);
+    } else if (req.method == 'POST' && req.url.path.startsWith('/taxi/rides/')) {
+      final id = req.url.pathSegments[2];
+      final step = req.url.pathSegments[3];
+      if (step == 'accept') {
+        final offer = taxiOffers.where((o) => o['id'] == id).firstOrNull;
+        if (offer == null || taxiTaken.contains(id)) {
+          taxiOffers.removeWhere((o) => o['id'] == id);
+          res = _json({'message': 'Another driver took this ride, or it is no longer open'}, 409);
+        } else {
+          taxiOffers.removeWhere((o) => o['id'] == id);
+          taxiActive = _taxiRide(offer);
+          taxiRides.insert(0, taxiActive!);
+          res = _json(taxiActive!);
+        }
+      } else if (step == 'cancel') {
+        taxiActive?['status'] = 'cancelled';
+        taxiActive = null;
+        res = _json({'ok': true});
+      } else {
+        final ride = taxiActive!;
+        ride['status'] = switch (step) { 'arrive' => 'arrived', 'start' => 'on_trip', _ => 'done' };
+        if (step == 'end') {
+          ride['endedAt'] = clock.now().toUtc().toIso8601String();
+          taxiActive = null;
+        }
+        res = _json(ride);
+      }
     } else if (path == 'POST /drivers/me/submit') {
       if (missing.isNotEmpty) {
         res = _json({'message': 'The application is incomplete', 'missing': missing}, 422);
@@ -312,6 +412,7 @@ class FakeDriverBackend {
         documentPickerProvider.overrideWithValue(camera ?? FakeCamera()),
         locationSourceProvider.overrideWithValue(location),
         liveFeedProvider.overrideWith((ref) async => feed),
+        taxiEventsProvider.overrideWith((ref) async => taxiEvents),
         urlLauncherProvider.overrideWithValue((uri) async {
           launched.add(uri);
           return true;
