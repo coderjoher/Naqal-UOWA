@@ -705,4 +705,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountStay => 'Stay signed in';
+
+  @override
+  String get accountDocumentsHint =>
+      'The documents the transport office asked for. To update one, contact the office.';
+
+  @override
+  String get accountDocUploaded => 'Uploaded';
+
+  @override
+  String get accountDocMissing => 'Missing';
+
+  @override
+  String get accountClose => 'Close';
 }

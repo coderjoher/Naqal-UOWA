@@ -207,5 +207,9 @@
   "accountLanguage": "Language",
   "accountSignOutTitle": "Sign out?",
   "accountSignOutBody": "You will need a new code sent to your phone to sign in again.",
-  "accountStay": "Stay signed in"
+  "accountStay": "Stay signed in",
+  "accountDocumentsHint": "The documents the transport office asked for. To update one, contact the office.",
+  "accountDocUploaded": "Uploaded",
+  "accountDocMissing": "Missing",
+  "accountClose": "Close"
 }

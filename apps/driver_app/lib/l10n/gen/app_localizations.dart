@@ -1345,6 +1345,30 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'البقاء مسجّلاً'**
   String get accountStay;
+
+  /// No description provided for @accountDocumentsHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'المستمسكات التي طلبها مكتب النقل. لتحديث أي منها راجع المكتب.'**
+  String get accountDocumentsHint;
+
+  /// No description provided for @accountDocUploaded.
+  ///
+  /// In ar, this message translates to:
+  /// **'مرفوع'**
+  String get accountDocUploaded;
+
+  /// No description provided for @accountDocMissing.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير مرفوع'**
+  String get accountDocMissing;
+
+  /// No description provided for @accountClose.
+  ///
+  /// In ar, this message translates to:
+  /// **'إغلاق'**
+  String get accountClose;
 }
 
 class _AppLocalizationsDelegate

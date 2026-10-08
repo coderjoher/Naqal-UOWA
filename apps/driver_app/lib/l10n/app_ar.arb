@@ -401,5 +401,9 @@
         "type": "int"
       }
     }
-  }
+  },
+  "accountDocumentsHint": "المستمسكات التي طلبها مكتب النقل. لتحديث أي منها راجع المكتب.",
+  "accountDocUploaded": "مرفوع",
+  "accountDocMissing": "غير مرفوع",
+  "accountClose": "إغلاق"
 }

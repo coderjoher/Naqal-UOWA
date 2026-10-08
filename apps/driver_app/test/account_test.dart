@@ -23,6 +23,16 @@ void main() {
     expect(find.text('2019'), findsOneWidget);
     expect(find.text('مستمسكان مرفوعان'), findsOneWidget);
 
+    // Tapping Documents lists each one the office asked for, with its state.
+    await tester.tap(find.text('المستمسكات'));
+    await tester.pumpAndSettle();
+    expect(find.text('إجازة السوق'), findsOneWidget);
+    expect(find.text('سنوية السيارة'), findsOneWidget);
+    expect(find.text('مرفوع'), findsNWidgets(2));
+    await tester.tap(find.text('إغلاق'));
+    await tester.pumpAndSettle();
+    expect(find.text('إجازة السوق'), findsNothing);
+
     await tester.tap(find.text('اللغة'));
     await tester.pumpAndSettle();
     expect(find.text('Your vehicle'), findsOneWidget);
