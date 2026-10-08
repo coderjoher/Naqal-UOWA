@@ -20,8 +20,8 @@
   "tabProfile": "حسابي",
   "comingSoon": "قريباً",
   "comingSoonBody": "هذه الصفحة قيد التطوير.",
-  "welcomeTitle": "تنقّلك اليومي إلى الجامعة",
-  "welcomeBody": "اطلب مقعدك كل يوم، وتابع حافلتك على الخريطة، واعرف متى تصل.",
+  "welcomeTitle": "تنقّل جامعي مريح",
+  "welcomeBody": "اطلب مقعدك، وتابع حافلتك، واعرف متى تصل.",
   "chooseLanguage": "اختر اللغة",
   "arabic": "العربية",
   "english": "English",
@@ -463,5 +463,13 @@
   "taxiDropoffPin": "مكان النزول",
   "taxiCarPin": "التكسي",
   "taxiFollow": "تابِع رحلتك",
-  "taxiPlateLabel": "اللوحة"
+  "taxiPlateLabel": "اللوحة",
+  "taxiChipHere": "موقعي الحالي",
+  "taxiChipPoint": "نقطة تجمّعي",
+  "taxiToCampusSub": "من مكانك إلى بوابة الجامعة",
+  "taxiFromCampusSub": "من الجامعة إلى مكانك",
+  "driverCaption": "سائقك",
+  "vehicleCaption": "الحافلة",
+  "rideSummaryTotal": "المجموع",
+  "rideFare": "الأجرة"
 }

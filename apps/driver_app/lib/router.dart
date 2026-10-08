@@ -51,7 +51,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(path: '/splash', builder: (_, _) => const Scaffold(body: Center(child: Icon(LucideIcons.busFront, size: 48, color: NaqlColors.primary)))),
+      GoRoute(path: '/splash', builder: (_, _) => Scaffold(body: Center(child: Icon(LucideIcons.busFront, size: 48, color: NaqlColors.primary)))),
       GoRoute(path: '/welcome', builder: (_, _) => const WelcomeScreen()),
       GoRoute(path: '/university', builder: (_, _) => const UniversityScreen()),
       GoRoute(path: '/phone', builder: (_, _) => const PhoneScreen()),

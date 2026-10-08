@@ -13,8 +13,8 @@
   "tabProfile": "Account",
   "comingSoon": "Coming soon",
   "comingSoonBody": "This page is under construction.",
-  "welcomeTitle": "Your daily ride to campus",
-  "welcomeBody": "Request a seat every day, follow your bus on the map and know when it arrives.",
+  "welcomeTitle": "A comfortable campus ride",
+  "welcomeBody": "Request a seat, follow your bus and know when it arrives.",
   "chooseLanguage": "Choose language",
   "arabic": "العربية",
   "english": "English",
@@ -239,5 +239,13 @@
   "taxiDropoffPin": "Drop-off spot",
   "taxiCarPin": "Taxi",
   "taxiFollow": "Follow your ride",
-  "taxiPlateLabel": "Plate"
+  "taxiPlateLabel": "Plate",
+  "taxiChipHere": "Current location",
+  "taxiChipPoint": "My gathering point",
+  "taxiToCampusSub": "From your spot to the campus gate",
+  "taxiFromCampusSub": "From campus to your spot",
+  "driverCaption": "Your driver",
+  "vehicleCaption": "Bus",
+  "rideSummaryTotal": "Total",
+  "rideFare": "Fare"
 }

@@ -35,7 +35,12 @@ export function renderCss(t) {
   const hex = s.color.replace('#', '');
   const rgb = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(', ');
   L.push('  --shadow-*: initial;', `  --shadow-card: ${s.x}px ${s.y}px ${s.blur}px rgba(${rgb}, ${s.opacity});`);
-  L.push('}', '', ':root {');
+  L.push('}', '');
+  // Dark palette: follows the device unless the page pins a theme with <html data-theme="light|dark">.
+  const dark = Object.entries(t['color-dark']).map(([k, v]) => `    --color-${k}: ${v};`);
+  L.push('@media (prefers-color-scheme: dark) {', '  :root:not([data-theme="light"]) {', '    color-scheme: dark;', ...dark, '  }', '}');
+  L.push(':root[data-theme="dark"] {', '  color-scheme: dark;', ...dark.map((l) => l.slice(2)), '}', '');
+  L.push(':root {');
   for (const [k, v] of Object.entries(t.motion)) L.push(`  --motion-${k}: ${v}ms;`);
   for (const [k, v] of Object.entries(t.touch)) L.push(`  --touch-${k}: ${v}px;`);
   L.push('}', '');
@@ -45,8 +50,20 @@ export function renderCss(t) {
 export function renderDart(t) {
   const argb = (hex) => `Color(0xFF${hex.replace('#', '').toUpperCase()})`;
   const L = [`// ${HEADER}`, '// ignore_for_file: constant_identifier_names', '', "import 'dart:ui';", ''];
+  const keys = Object.keys(t.color);
+  L.push('/// One full set of colours. [light] and [dark] follow the device setting.');
+  L.push('final class NaqlPalette {');
+  L.push(`  const NaqlPalette({${keys.map((k) => `required this.${camel(k)}`).join(', ')}});`);
+  for (const k of keys) L.push(`  final Color ${camel(k)};`);
+  for (const mode of ['light', 'dark']) {
+    const src = mode === 'light' ? t.color : t['color-dark'];
+    L.push(`  static const ${mode} = NaqlPalette(${keys.map((k) => `${camel(k)}: ${argb(src[k])}`).join(', ')});`);
+  }
+  L.push('}', '');
+  L.push('/// The active palette. NaqlTheme switches [current] with the platform brightness.');
   L.push('abstract final class NaqlColors {');
-  for (const [k, v] of Object.entries(t.color)) L.push(`  static const ${camel(k)} = ${argb(v)};`);
+  L.push('  static NaqlPalette current = NaqlPalette.light;');
+  for (const k of keys) L.push(`  static Color get ${camel(k)} => current.${camel(k)};`);
   L.push('}', '', 'abstract final class NaqlSpace {');
   for (const [k, v] of Object.entries(t.space)) L.push(`  static const double s${k} = ${v};`);
   L.push('}', '', 'abstract final class NaqlRadius {');

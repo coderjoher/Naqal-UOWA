@@ -4,9 +4,23 @@ import '../foundation/theme.dart';
 import '../foundation/tokens.g.dart';
 import 'pressable.dart';
 
-enum NaqlButtonVariant { primary, secondary, ghost, danger }
+enum NaqlButtonVariant {
+  /// The one strong call to action: university blue in light mode, a near-white ink pill in dark mode.
+  primary,
+
+  /// Soft outline pill.
+  secondary,
+
+  /// Text only.
+  ghost,
+  danger,
+
+  /// Gold highlight for special moments (go online, rate the ride). Use sparingly.
+  accent,
+}
 
 enum NaqlButtonSize {
+  /// Inline buttons (48 dp).
   regular(NaqlTouch.min),
 
   /// Driver app: larger target for use in the vehicle.
@@ -17,6 +31,9 @@ enum NaqlButtonSize {
 }
 
 /// Pill button. Use exactly one [NaqlButtonVariant.primary] per screen.
+///
+/// A primary button with [expand] is the screen's full-width CTA: it is always at least 56 dp
+/// tall with a larger label, like the reference's "Continue".
 class NaqlButton extends StatelessWidget {
   const NaqlButton({
     super.key,
@@ -38,25 +55,28 @@ class NaqlButton extends StatelessWidget {
   final bool expand;
 
   (Color bg, Color fg, Color? border) get _colors => switch (variant) {
-        NaqlButtonVariant.primary => (NaqlColors.primary, NaqlColors.onPrimary, null),
-        NaqlButtonVariant.secondary => (NaqlColors.surface, NaqlColors.text, NaqlColors.border),
+        NaqlButtonVariant.primary => naqlIsDark ? (NaqlColors.ink, NaqlColors.onInk, null) : (NaqlColors.primary, NaqlColors.onPrimary, null),
+        NaqlButtonVariant.secondary => (naqlIsDark ? NaqlColors.surfaceMuted : NaqlColors.surface, NaqlColors.text, NaqlColors.border),
         NaqlButtonVariant.ghost => (Colors.transparent, NaqlColors.primary, null),
         NaqlButtonVariant.danger => (NaqlColors.danger, NaqlColors.onPrimary, null),
+        NaqlButtonVariant.accent => (NaqlColors.accent, NaqlColors.onAccent, null),
       };
 
   @override
   Widget build(BuildContext context) {
     final (bg, fg, border) = _colors;
     final enabled = onPressed != null && !loading;
-    final style = (size == NaqlButtonSize.large ? NaqlText.headline : NaqlText.label).copyWith(color: fg, fontWeight: FontWeight.w600);
+    final cta = expand && variant != NaqlButtonVariant.ghost;
+    final height = cta && size.height < NaqlTouch.driver ? NaqlTouch.driver : size.height;
+    final style = (size == NaqlButtonSize.large || cta ? NaqlText.headline.copyWith(fontSize: 17) : NaqlText.label).copyWith(color: fg, fontWeight: FontWeight.w600);
     return Opacity(
       opacity: onPressed == null ? 0.5 : 1,
       child: NaqlPressable(
         onPressed: enabled ? onPressed : null,
         semanticLabel: label,
-        minSize: size.height,
+        minSize: height,
         child: Container(
-          height: size.height,
+          height: height,
           width: expand ? double.infinity : null,
           padding: const EdgeInsets.symmetric(horizontal: NaqlSpace.s6),
           decoration: BoxDecoration(

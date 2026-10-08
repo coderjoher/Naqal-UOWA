@@ -31,7 +31,7 @@ class _NaqlSkeletonState extends State<NaqlSkeleton> with SingleTickerProviderSt
     final block = Container(
       width: widget.width,
       height: widget.height,
-      decoration: BoxDecoration(color: NaqlColors.border, borderRadius: BorderRadius.circular(widget.radius)),
+      decoration: BoxDecoration(color: naqlIsDark ? NaqlColors.surfaceMuted : NaqlColors.border, borderRadius: BorderRadius.circular(widget.radius)),
     );
     return Semantics(label: 'loading', child: reduce ? block : FadeTransition(opacity: _c, child: block));
   }
@@ -54,7 +54,7 @@ class NaqlEmptyState extends StatelessWidget {
         Container(
           width: 64,
           height: 64,
-          decoration: const BoxDecoration(color: NaqlColors.primarySoft, shape: BoxShape.circle),
+          decoration: BoxDecoration(color: NaqlColors.primarySoft, shape: BoxShape.circle),
           child: Icon(icon, size: 28, color: NaqlColors.primary),
         ),
         const SizedBox(height: NaqlSpace.s4),
@@ -77,7 +77,7 @@ Future<T?> showNaqlSheet<T>(BuildContext context, {required WidgetBuilder builde
     elevation: 0,
     isScrollControlled: true,
     showDragHandle: false,
-    barrierColor: NaqlColors.text.withValues(alpha: 0.32),
+    barrierColor: const Color(0xFF000000).withValues(alpha: naqlIsDark ? 0.6 : 0.32),
     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(NaqlRadius.lg))),
     builder: (ctx) => SafeArea(
       child: Padding(

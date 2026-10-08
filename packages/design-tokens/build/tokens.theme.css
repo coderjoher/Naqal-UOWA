@@ -3,20 +3,25 @@
   --color-*: initial;
   --color-transparent: transparent;
   --color-current: currentColor;
-  --color-bg: #EEF2F8;
+  --color-bg: #F3F5F9;
   --color-surface: #FFFFFF;
-  --color-surface-muted: #F5F7FB;
-  --color-border: #E2E8F0;
-  --color-text: #0F172A;
-  --color-text-muted: #56627A;
-  --color-primary: #2563EB;
-  --color-primary-pressed: #1D4ED8;
-  --color-primary-soft: #EEF3FE;
+  --color-surface-muted: #EDF0F5;
+  --color-border: #DCE2EB;
+  --color-text: #0A1428;
+  --color-text-muted: #525D72;
+  --color-primary: #0F3D8C;
+  --color-primary-pressed: #0A2F6E;
+  --color-primary-soft: #E6EDF8;
   --color-on-primary: #FFFFFF;
-  --color-ink: #1E1B4B;
+  --color-accent: #E9B824;
+  --color-accent-pressed: #CC9C0E;
+  --color-accent-soft: #FCF3D6;
+  --color-on-accent: #1C1500;
+  --color-ink: #0A1A3A;
+  --color-on-ink: #FFFFFF;
   --color-success: #047857;
   --color-success-soft: #E3F6EF;
-  --color-warning: #B45309;
+  --color-warning: #A15A06;
   --color-warning-soft: #FDF1E1;
   --color-danger: #B91C1C;
   --color-danger-soft: #FDE8E8;
@@ -50,6 +55,63 @@
   --text-caption--font-weight: 400;
   --shadow-*: initial;
   --shadow-card: 0px 4px 16px rgba(15, 23, 42, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --color-bg: #090B10;
+    --color-surface: #14171E;
+    --color-surface-muted: #1C2029;
+    --color-border: #2A303C;
+    --color-text: #F1F3F7;
+    --color-text-muted: #A2AABA;
+    --color-primary: #7FA6F5;
+    --color-primary-pressed: #9BB9F8;
+    --color-primary-soft: #16233D;
+    --color-on-primary: #06112A;
+    --color-accent: #F2C53D;
+    --color-accent-pressed: #F6D368;
+    --color-accent-soft: #2B2410;
+    --color-on-accent: #1C1500;
+    --color-ink: #F1F3F7;
+    --color-on-ink: #0A0C11;
+    --color-success: #3CCB95;
+    --color-success-soft: #0E2A20;
+    --color-warning: #F5A93A;
+    --color-warning-soft: #2E2210;
+    --color-danger: #F58A8A;
+    --color-danger-soft: #311617;
+    --color-female-only: #B49CFB;
+    --color-female-only-soft: #241B3B;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg: #090B10;
+  --color-surface: #14171E;
+  --color-surface-muted: #1C2029;
+  --color-border: #2A303C;
+  --color-text: #F1F3F7;
+  --color-text-muted: #A2AABA;
+  --color-primary: #7FA6F5;
+  --color-primary-pressed: #9BB9F8;
+  --color-primary-soft: #16233D;
+  --color-on-primary: #06112A;
+  --color-accent: #F2C53D;
+  --color-accent-pressed: #F6D368;
+  --color-accent-soft: #2B2410;
+  --color-on-accent: #1C1500;
+  --color-ink: #F1F3F7;
+  --color-on-ink: #0A0C11;
+  --color-success: #3CCB95;
+  --color-success-soft: #0E2A20;
+  --color-warning: #F5A93A;
+  --color-warning-soft: #2E2210;
+  --color-danger: #F58A8A;
+  --color-danger-soft: #311617;
+  --color-female-only: #B49CFB;
+  --color-female-only-soft: #241B3B;
 }
 
 :root {

@@ -13,98 +13,15 @@ bool reduceMotion(BuildContext context) => MediaQuery.maybeDisableAnimationsOf(c
 /// A duration that collapses to zero under reduced motion.
 Duration motion(BuildContext context, Duration d) => reduceMotion(context) ? Duration.zero : d;
 
-/// Two-option segmented control with a sliding thumb. Each option is a 48 dp button.
-class TaxiSegmented<T> extends StatelessWidget {
-  const TaxiSegmented({super.key, required this.label, required this.options, required this.value, required this.onChanged});
-
-  /// Read by screen readers for the whole group.
-  final String label;
-  final List<(T, String, IconData)> options;
-  final T value;
-  final ValueChanged<T> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final index = options.indexWhere((o) => o.$1 == value);
-    final rtl = Directionality.of(context) == TextDirection.rtl;
-    final x = options.length < 2 ? 0.0 : -1 + 2 * index / (options.length - 1);
-    return Semantics(
-      container: true,
-      label: label,
-      child: Container(
-        height: NaqlTouch.min + 8,
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: NaqlColors.surfaceMuted,
-          borderRadius: BorderRadius.circular(NaqlRadius.pill),
-          border: Border.all(color: NaqlColors.border),
-        ),
-        child: Stack(
-          children: [
-            AnimatedAlign(
-              duration: motion(context, NaqlMotion.fast),
-              curve: Curves.easeOutCubic,
-              alignment: Alignment(rtl ? -x : x, 0),
-              child: FractionallySizedBox(
-                widthFactor: 1 / options.length,
-                heightFactor: 1,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(color: NaqlColors.surface, borderRadius: BorderRadius.circular(NaqlRadius.pill), boxShadow: naqlCardShadow),
-                ),
-              ),
-            ),
-            Row(
-              children: [
-                for (final (v, text, icon) in options)
-                  Expanded(
-                    child: Semantics(
-                      selected: v == value,
-                      button: true,
-                      label: text,
-                      excludeSemantics: true,
-                      child: InkResponse(
-                        key: ValueKey('taxi-dir-$v'),
-                        onTap: v == value ? null : () => onChanged(v),
-                        containedInkWell: true,
-                        highlightShape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.circular(NaqlRadius.pill),
-                        child: Center(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(icon, size: 18, color: v == value ? NaqlColors.primary : NaqlColors.textMuted),
-                              const SizedBox(width: NaqlSpace.s2),
-                              Flexible(
-                                child: AnimatedDefaultTextStyle(
-                                  duration: motion(context, NaqlMotion.fast),
-                                  style: NaqlText.label.copyWith(
-                                    color: v == value ? NaqlColors.text : NaqlColors.textMuted,
-                                    fontWeight: v == value ? FontWeight.w600 : FontWeight.w500,
-                                  ),
-                                  child: Text(text, maxLines: 1, overflow: TextOverflow.ellipsis),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 /// Round (or rounded-square) map marker with a white ring and a screen-reader label.
 class TaxiMapPin extends StatelessWidget {
-  const TaxiMapPin({super.key, required this.icon, required this.label, required this.color, this.square = false});
+  const TaxiMapPin({super.key, required this.icon, required this.label, required this.color, this.onColor, this.square = false});
   final IconData icon;
   final String label;
   final Color color;
+
+  /// Icon colour; defaults to the on-primary colour.
+  final Color? onColor;
   final bool square;
 
   @override
@@ -117,9 +34,9 @@ class TaxiMapPin extends StatelessWidget {
           shape: square ? BoxShape.rectangle : BoxShape.circle,
           borderRadius: square ? BorderRadius.circular(14) : null,
           border: Border.all(color: NaqlColors.surface, width: 3),
-          boxShadow: naqlCardShadow,
+          boxShadow: naqlFloatShadow,
         ),
-        child: Icon(icon, color: NaqlColors.onPrimary, size: 22),
+        child: Icon(icon, color: onColor ?? NaqlColors.onPrimary, size: 22),
       ),
     );
   }
@@ -151,7 +68,7 @@ class TaxiCenterPin extends StatelessWidget {
                 width: lifted ? 14 : 10,
                 height: lifted ? 6 : 4,
                 decoration: BoxDecoration(
-                  color: NaqlColors.text.withValues(alpha: lifted ? 0.18 : 0.28),
+                  color: const Color(0xFF000000).withValues(alpha: lifted ? 0.22 : 0.35),
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
@@ -166,14 +83,14 @@ class TaxiCenterPin extends StatelessWidget {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: NaqlColors.primary,
+                        color: naqlIsDark ? NaqlColors.ink : NaqlColors.primary,
                         shape: BoxShape.circle,
-                        border: Border.all(color: NaqlColors.surface, width: 3),
-                        boxShadow: naqlCardShadow,
+                        border: Border.all(color: naqlIsDark ? NaqlColors.primary : NaqlColors.surface, width: 3),
+                        boxShadow: naqlFloatShadow,
                       ),
-                      child: const Icon(LucideIcons.mapPin, color: NaqlColors.onPrimary, size: 22),
+                      child: Icon(LucideIcons.mapPin, color: naqlIsDark ? NaqlColors.onInk : NaqlColors.onPrimary, size: 22),
                     ),
-                    Container(width: 3, height: 12, color: NaqlColors.primary),
+                    Container(width: 3, height: 12, color: naqlIsDark ? NaqlColors.ink : NaqlColors.primary),
                   ],
                 ),
               ),
@@ -354,13 +271,13 @@ class TaxiStepper extends StatelessWidget {
                             border: Border.all(color: i <= current ? NaqlColors.primary : NaqlColors.border, width: 2),
                           ),
                           child: i < current || (i == current && i == last)
-                              ? const Icon(LucideIcons.check, size: 14, color: NaqlColors.onPrimary)
+                              ? Icon(LucideIcons.check, size: 14, color: NaqlColors.onPrimary)
                               : i == current
                               ? Center(
                                   child: Container(
                                     width: 8,
                                     height: 8,
-                                    decoration: const BoxDecoration(color: NaqlColors.primary, shape: BoxShape.circle),
+                                    decoration: BoxDecoration(color: NaqlColors.primary, shape: BoxShape.circle),
                                   ),
                                 )
                               : null,
@@ -388,3 +305,106 @@ class TaxiStepper extends StatelessWidget {
 
 /// "3.2" — one decimal, Western digits.
 String formatKm(double km) => km.toStringAsFixed(1);
+
+/// Floating controls over the top of a full-bleed map: a round back button and the screen title
+/// in a pill, with optional [below] (a hint or a live pill) centred under them.
+class TaxiMapTop extends StatelessWidget {
+  const TaxiMapTop({super.key, required this.title, required this.onBack, required this.backLabel, this.below, this.trailing});
+  final String title;
+  final VoidCallback onBack;
+  final String backLabel;
+  final Widget? below;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final rtl = Directionality.of(context) == TextDirection.rtl;
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(NaqlSpace.s4, NaqlSpace.s2, NaqlSpace.s4, 0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                NaqlIconButton.floating(icon: rtl ? LucideIcons.arrowRight : LucideIcons.arrowLeft, onPressed: onBack, semanticLabel: backLabel),
+                const SizedBox(width: NaqlSpace.s2),
+                Expanded(
+                  child: Center(
+                    child: Container(
+                      height: NaqlTouch.min,
+                      padding: const EdgeInsets.symmetric(horizontal: NaqlSpace.s5),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: NaqlColors.surface.withValues(alpha: 0.94),
+                        borderRadius: BorderRadius.circular(NaqlRadius.pill),
+                        boxShadow: naqlFloatShadow,
+                      ),
+                      child: Semantics(header: true, child: Text(title, style: NaqlText.headline.copyWith(fontSize: 16), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: NaqlSpace.s2),
+                SizedBox(width: NaqlTouch.min, child: trailing),
+              ],
+            ),
+            if (below != null) ...[const SizedBox(height: NaqlSpace.s2), below!],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Small translucent hint over a map ("Move the map to set the pickup").
+class TaxiMapHint extends StatelessWidget {
+  const TaxiMapHint(this.text, {super.key});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: NaqlSpace.s3, vertical: 6),
+    decoration: BoxDecoration(color: NaqlColors.surface.withValues(alpha: 0.9), borderRadius: BorderRadius.circular(NaqlRadius.pill), boxShadow: naqlFloatShadow),
+    child: Text(text, style: NaqlText.caption.copyWith(color: NaqlColors.text), textAlign: TextAlign.center),
+  );
+}
+
+/// Map credit kept readable above a sheet that overlaps the map's bottom edge.
+class TaxiAttribution extends StatelessWidget {
+  const TaxiAttribution({super.key, required this.text, this.bottom = 0});
+  final String text;
+  final double bottom;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: EdgeInsets.only(bottom: bottom),
+    child: Align(
+      alignment: AlignmentDirectional.bottomEnd,
+      child: Container(
+        margin: const EdgeInsets.all(4),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: BoxDecoration(color: NaqlColors.surface.withValues(alpha: 0.85), borderRadius: BorderRadius.circular(6)),
+        child: Text(text, style: NaqlText.caption.copyWith(fontSize: 10, height: 1.3, color: NaqlColors.text), textDirection: TextDirection.ltr),
+      ),
+    ),
+  );
+}
+
+/// Non-map taxi phases: the usual top bar with a back button, then the content.
+class TaxiBarFrame extends StatelessWidget {
+  const TaxiBarFrame({super.key, required this.title, required this.onBack, required this.child});
+  final String title;
+  final VoidCallback onBack;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => SafeArea(
+    child: Column(
+      children: [
+        NaqlTopBar(title: title, onBack: onBack, backLabel: MaterialLocalizations.of(context).backButtonTooltip),
+        Expanded(child: child),
+      ],
+    ),
+  );
+}

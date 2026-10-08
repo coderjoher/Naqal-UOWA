@@ -286,7 +286,7 @@ function Kpi({
   tone: "primary" | "warning" | "success";
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-lg bg-surface p-4 shadow-sm">
+    <div className="flex items-center gap-3 rounded-lg bg-surface p-4 shadow-sm dark:border dark:border-border dark:shadow-none">
       <span
         className={clsx(
           "grid size-10 place-items-center rounded-pill",

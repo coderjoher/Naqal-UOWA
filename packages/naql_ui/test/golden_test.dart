@@ -16,8 +16,9 @@ void main() {
           NaqlButton(label: tr(d, 'Disabled', 'معطّل'), onPressed: null),
         ]),
         NaqlButton(label: tr(d, 'Start run', 'ابدأ الرحلة'), onPressed: () {}, size: NaqlButtonSize.large, expand: true),
+        NaqlButton(label: tr(d, 'Go online', 'ابدأ العمل'), onPressed: () {}, variant: NaqlButtonVariant.accent, icon: LucideIcons.power),
       ]);
-    }, size: const Size(420, 340));
+    }, size: const Size(420, 420), dark: true);
   });
 
   testWidgets('[T0-03] NaqlCard top-level and nested', (tester) async {
@@ -29,7 +30,7 @@ void main() {
           NaqlCard(nested: true, child: Text(tr(d, 'Tier B · expires 31 Oct', 'الفئة ب · ينتهي ٣١ تشرين الأول'), style: NaqlText.body)),
         ]),
       );
-    }, size: const Size(420, 220));
+    }, size: const Size(420, 220), dark: true);
   });
 
   testWidgets('[T0-03] NaqlField default and error', (tester) async {
@@ -131,5 +132,84 @@ void main() {
         NaqlInfoRow(label: tr(d, 'Gender', 'الجنس'), value: tr(d, 'Female', 'أنثى'), locked: true),
       ]);
     }, size: const Size(420, 420));
+  });
+
+  testWidgets('[T0-03] NaqlOptionCard, NaqlBadge and quick chips', (tester) async {
+    await expectGoldens(tester, 'option_card', (d) {
+      return Column(mainAxisSize: MainAxisSize.min, spacing: NaqlSpace.s3, children: [
+        NaqlOptionCard(icon: LucideIcons.carTaxiFront, title: tr(d, 'Taxi', 'تكسي'), subtitle: tr(d, 'Up to 4 · 6 min away', 'حتى ٤ ركاب · بعد ٦ دقائق'), badge: '3,000', selected: true, onTap: () {}),
+        NaqlOptionCard(icon: LucideIcons.busFront, title: tr(d, 'Campus bus', 'باص الجامعة'), subtitle: tr(d, 'Next wave 8:00', 'الرحلة القادمة ٨:٠٠'), badge: tr(d, 'Included', 'مشمول'), selected: false, onTap: () {}),
+        NaqlOptionCard(icon: LucideIcons.star, title: tr(d, 'Female only', 'للطالبات فقط'), selected: true, accent: true, onTap: () {}),
+        Wrap(spacing: NaqlSpace.s2, runSpacing: NaqlSpace.s2, children: [
+          NaqlChip(label: tr(d, 'Home', 'المنزل'), icon: LucideIcons.house, selected: false, onSelected: () {}),
+          NaqlChip(label: tr(d, 'Campus', 'الجامعة'), icon: LucideIcons.school, selected: true, onSelected: () {}),
+        ]),
+      ]);
+    }, size: const Size(420, 420), dark: true);
+  });
+
+  testWidgets('[T0-03] NaqlPersonCard, NaqlPlateBadge and NaqlLivePill', (tester) async {
+    await expectGoldens(tester, 'person_card', (d) {
+      return NaqlCard(
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, spacing: NaqlSpace.s4, children: [
+          Row(children: [
+            Expanded(child: Text(tr(d, 'Arriving', 'في الطريق إليك'), style: NaqlText.title)),
+            NaqlLivePill(label: tr(d, '17 min', '١٧ د')),
+          ]),
+          NaqlPersonCard(
+            name: tr(d, 'Ali Hassan', 'علي حسن'),
+            caption: tr(d, 'Your driver', 'سائقك'),
+            rating: '4.9',
+            below: const NaqlPlateBadge('12345 ب كربلاء'),
+            actions: [
+              NaqlPersonAction(icon: LucideIcons.messageCircle, label: tr(d, 'Message', 'رسالة'), onPressed: () {}),
+              NaqlPersonAction(icon: LucideIcons.phone, label: tr(d, 'Call', 'اتصال'), onPressed: () {}, primary: true),
+            ],
+          ),
+        ]),
+      );
+    }, size: const Size(420, 260), dark: true);
+  });
+
+  testWidgets('[T0-03] NaqlTripTimeline and NaqlSummaryRow', (tester) async {
+    await expectGoldens(tester, 'timeline', (d) {
+      return NaqlCard(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          NaqlTripTimeline(stops: [
+            NaqlTimelineStop(subtitle: tr(d, 'Pickup', 'الانطلاق'), title: tr(d, 'Al-Abbas Square', 'ساحة العباس'), time: '7:20'),
+            NaqlTimelineStop(subtitle: tr(d, 'Drop-off', 'الوصول'), title: tr(d, 'Main campus gate', 'بوابة الحرم الرئيسية'), time: '7:55'),
+          ]),
+          const SizedBox(height: NaqlSpace.s4),
+          NaqlSummaryRow(label: tr(d, 'Distance', 'المسافة'), value: '6.2 km'),
+          NaqlSummaryRow(label: tr(d, 'Fare', 'الأجرة'), value: '3,000'),
+          NaqlSummaryRow(label: tr(d, 'Total', 'المجموع'), value: '3,000 IQD', total: true),
+        ]),
+      );
+    }, size: const Size(420, 400), dark: true);
+  });
+
+  testWidgets('[T0-03] floating map overlays', (tester) async {
+    await expectGoldens(tester, 'map_overlays', (d) {
+      return Container(
+        height: 220,
+        padding: const EdgeInsets.all(NaqlSpace.s4),
+        decoration: BoxDecoration(color: naqlIsDark ? const Color(0xFF20242C) : const Color(0xFFE8EEE4), borderRadius: BorderRadius.circular(NaqlRadius.lg)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Row(children: [
+            NaqlIconButton.floating(icon: d == TextDirection.rtl ? LucideIcons.arrowRight : LucideIcons.arrowLeft, onPressed: () {}, semanticLabel: 'back'),
+            const Spacer(),
+            const NaqlLivePill(label: '17 min', floating: true),
+          ]),
+          const Spacer(),
+          Row(children: [
+            Flexible(child: NaqlLocationPill(caption: tr(d, 'Pickup', 'الانطلاق'), label: tr(d, 'Al-Abbas Square', 'ساحة العباس'))),
+            const Spacer(),
+            const NaqlMapMarker(icon: LucideIcons.carTaxiFront, accent: true),
+            const SizedBox(width: NaqlSpace.s3),
+            NaqlIconButton.floating(icon: LucideIcons.locateFixed, onPressed: () {}, semanticLabel: 'locate'),
+          ]),
+        ]),
+      );
+    }, size: const Size(420, 280), dark: true);
   });
 }

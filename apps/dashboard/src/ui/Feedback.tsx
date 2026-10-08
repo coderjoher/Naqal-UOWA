@@ -95,7 +95,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               exit={{ opacity: 0, y: 8, scale: 0.96 }}
               transition={spring}
               role={t.tone === 'danger' ? 'alert' : 'status'}
-              className="pointer-events-auto flex items-center gap-3 rounded-pill bg-ink px-5 py-3 text-label text-on-primary shadow-card"
+              className="pointer-events-auto flex items-center gap-3 rounded-pill bg-ink px-5 py-3 text-label text-on-ink shadow-card"
             >
               {t.tone === 'success' ? <CircleCheck className="size-5 text-success-soft" aria-hidden /> : <CircleAlert className="size-5 text-danger-soft" aria-hidden />}
               <span>{t.message}</span>

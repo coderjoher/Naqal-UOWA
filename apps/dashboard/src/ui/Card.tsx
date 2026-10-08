@@ -28,7 +28,7 @@ export function Card({ title, description, actions, nested, animated, className,
       {children}
     </>
   );
-  const classes = clsx('rounded-lg bg-surface p-6', nested ? 'border border-border' : 'shadow-card', className);
+  const classes = clsx('rounded-lg bg-surface p-6', nested ? 'border border-border' : 'shadow-card dark:border dark:border-border dark:shadow-none', className);
   if (animated) {
     return (
       <motion.section variants={itemVariants} className={classes} {...(rest as object)}>

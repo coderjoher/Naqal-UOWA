@@ -7,10 +7,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:naql_app/naql_app.dart';
+import 'package:naql_core/naql_core.dart';
 import 'package:naql_ui/naql_ui.dart';
 
+import '../data/rides.dart';
 import '../data/track.dart';
 import '../l10n/gen/app_localizations.dart';
+import 'taxi_widgets.dart';
 
 /// Older than this, a position is shown as "last known" (NF-10).
 const staleAfter = Duration(seconds: 30);
@@ -44,28 +47,34 @@ class _TrackScreenState extends ConsumerState<TrackScreen> {
     final t = AppLocalizations.of(context);
     final lang = ref.watch(localeProvider).languageCode;
     final track = ref.watch(trackProvider(widget.requestId));
+    // The assignment (driver, bus, plate) comes with the student's ride.
+    final assignment = ref.watch(ridesProvider).value?.where((r) => r.id == widget.requestId).firstOrNull?.assignment;
+    void back() => context.go('/home');
     return Scaffold(
-      body: SafeArea(
-        child: Column(children: [
-          NaqlTopBar(title: t.trackTitle, onBack: () => context.go('/home'), backLabel: MaterialLocalizations.of(context).backButtonTooltip),
-          Expanded(
-            child: track.when(
-              loading: () => const Padding(padding: EdgeInsets.all(NaqlSpace.s5), child: NaqlSkeleton(height: 320, radius: NaqlRadius.lg)),
-              error: (e, _) => Center(child: NaqlEmptyState(icon: LucideIcons.wifiOff, title: t.loadFailed)),
-              data: (s) => _Body(state: s, lang: lang, tiles: ref.watch(mapTilesProvider)),
-            ),
-          ),
-        ]),
+      body: track.when(
+        loading: () => TaxiBarFrame(
+          title: t.trackTitle,
+          onBack: back,
+          child: const Padding(padding: EdgeInsets.all(NaqlSpace.s5), child: NaqlSkeleton(height: 320, radius: NaqlRadius.lg)),
+        ),
+        error: (e, _) => TaxiBarFrame(
+          title: t.trackTitle,
+          onBack: back,
+          child: Center(child: NaqlEmptyState(icon: LucideIcons.wifiOff, title: t.loadFailed)),
+        ),
+        data: (s) => _Body(state: s, lang: lang, tiles: ref.watch(mapTilesProvider), assignment: assignment, onBack: back),
       ),
     );
   }
 }
 
 class _Body extends StatelessWidget {
-  const _Body({required this.state, required this.lang, required this.tiles});
+  const _Body({required this.state, required this.lang, required this.tiles, required this.onBack, this.assignment});
   final TrackState state;
   final String lang;
   final bool tiles;
+  final VoidCallback onBack;
+  final RideAssignment? assignment;
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +86,8 @@ class _Body extends StatelessWidget {
     final age = bus == null ? null : now.difference(bus.at);
     final stale = bus != null && (!state.connected || age! > staleAfter);
     final eta = bus == null || info.stopSeq == null ? null : bus.etas[info.stopSeq];
+    final a = assignment;
+    const overlap = 28.0;
 
     final (String headline, NaqlTone tone) = switch (info) {
       _ when info.boarded => (t.onBus, NaqlTone.success),
@@ -86,61 +97,70 @@ class _Body extends StatelessWidget {
       _ => (t.notStarted, NaqlTone.neutral),
     };
 
-    return Column(children: [
-      Expanded(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: NaqlSpace.s5),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(NaqlRadius.lg),
-            child: ColoredBox(
-              color: NaqlColors.surfaceMuted,
-              child: stop == null && bus == null
-                  ? const SizedBox.expand()
-                  : FlutterMap(
-                      key: const ValueKey('track-map'),
-                      options: MapOptions(
-                        initialCameraFit: bus != null && stop != null
-                            ? CameraFit.bounds(bounds: LatLngBounds(LatLng(bus.lat, bus.lng), stop), padding: const EdgeInsets.all(56), maxZoom: 16)
-                            : null,
-                        initialCenter: stop ?? LatLng(bus!.lat, bus.lng),
-                        initialZoom: 14,
-                        interactionOptions: const InteractionOptions(flags: InteractiveFlag.all & ~InteractiveFlag.rotate),
-                      ),
-                      children: [
-                        if (tiles)
-                          TileLayer(urlTemplate: mapTilesUrl, userAgentPackageName: 'iq.edu.uowa.naql.student'),
-                        MarkerLayer(markers: [
-                          if (stop != null) Marker(point: stop, width: 44, height: 44, child: _Pin(key: const ValueKey('stop-pin'), icon: LucideIcons.mapPin, label: t.yourStop, color: NaqlColors.ink)),
-                        ]),
-                        if (bus != null) _AnimatedBus(to: LatLng(bus.lat, bus.lng), label: t.busLabel, stale: stale),
-                        if (tiles) const SimpleAttributionWidget(source: Text(mapAttribution)),
-                      ],
-                    ),
-            ),
-          ),
+    final map = Stack(children: [
+      Positioned.fill(
+        child: ColoredBox(
+          color: NaqlColors.surfaceMuted,
+          child: stop == null && bus == null
+              ? const SizedBox.expand()
+              : FlutterMap(
+                  key: const ValueKey('track-map'),
+                  options: MapOptions(
+                    backgroundColor: NaqlColors.surfaceMuted,
+                    initialCameraFit: bus != null && stop != null
+                        ? CameraFit.bounds(bounds: LatLngBounds(LatLng(bus.lat, bus.lng), stop), padding: const EdgeInsets.fromLTRB(56, 120, 56, 56 + overlap), maxZoom: 16)
+                        : null,
+                    initialCenter: stop ?? LatLng(bus!.lat, bus.lng),
+                    initialZoom: 14,
+                    interactionOptions: const InteractionOptions(flags: InteractiveFlag.all & ~InteractiveFlag.rotate),
+                  ),
+                  children: [
+                    if (tiles) NaqlMapTint(child: TileLayer(urlTemplate: mapTilesUrl, userAgentPackageName: 'iq.edu.uowa.naql.student')),
+                    MarkerLayer(markers: [
+                      if (stop != null)
+                        Marker(point: stop, width: 44, height: 44, child: _Pin(key: const ValueKey('stop-pin'), icon: LucideIcons.mapPin, label: t.yourStop, color: NaqlColors.ink, onColor: NaqlColors.onInk)),
+                    ]),
+                    if (bus != null) _AnimatedBus(to: LatLng(bus.lat, bus.lng), label: t.busLabel, stale: stale),
+                    if (tiles) const TaxiAttribution(text: mapAttribution, bottom: overlap),
+                  ],
+                ),
         ),
       ),
-      Padding(
-        padding: const EdgeInsets.fromLTRB(NaqlSpace.s5, NaqlSpace.s4, NaqlSpace.s5, NaqlSpace.s5),
-        child: NaqlCard(
+      Positioned(
+        top: 0,
+        left: 0,
+        right: 0,
+        child: TaxiMapTop(
+          title: t.trackTitle,
+          onBack: onBack,
+          backLabel: MaterialLocalizations.of(context).backButtonTooltip,
+          below: eta != null && !info.boarded && info.moving && !stale ? NaqlLivePill(label: t.taxiMinutes((eta / 60).ceil()), semanticLabel: headline, floating: true) : null,
+        ),
+      ),
+    ]);
+
+    final sheet = NaqlMapSheet(
+      child: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Row(children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(color: tone.bg, shape: BoxShape.circle),
-                child: Icon(LucideIcons.busFront, color: tone.fg),
-              ),
-              const SizedBox(width: NaqlSpace.s3),
+            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   AnimatedSwitcher(
-                    duration: NaqlMotion.fast,
-                    child: Text(headline, key: ValueKey(headline), style: NaqlText.title.copyWith(fontSize: 22)),
+                    duration: naqlMotion(context),
+                    child: Text(headline, key: ValueKey(headline), style: NaqlText.title.copyWith(fontSize: 24)),
                   ),
                   if (info.stopName != null)
                     Text('${t.yourStop}: ${lang == 'ar' && info.stopNameAr != null ? info.stopNameAr : info.stopName}', style: NaqlText.body.copyWith(color: NaqlColors.textMuted)),
                 ]),
+              ),
+              const SizedBox(width: NaqlSpace.s3),
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(color: tone.bg, borderRadius: BorderRadius.circular(NaqlRadius.md)),
+                child: Icon(LucideIcons.busFront, color: tone.fg),
               ),
             ]),
             if (age != null) ...[
@@ -155,10 +175,36 @@ class _Body extends StatelessWidget {
                 ),
               ),
             ],
+            if (a != null) ...[
+              const SizedBox(height: NaqlSpace.s4),
+              // Person card (the driver) and vehicle card (type and plate).
+              NaqlCard(nested: true, padding: const EdgeInsets.all(NaqlSpace.s3), child: NaqlPersonCard(name: a.driverName, caption: t.driverCaption)),
+              if (a.vehicleType != null || a.plate != null) ...[
+                const SizedBox(height: NaqlSpace.s2),
+                NaqlCard(
+                  nested: true,
+                  padding: const EdgeInsets.all(NaqlSpace.s3),
+                  child: Row(children: [
+                    const NaqlIconTile(LucideIcons.busFront, size: 52),
+                    const SizedBox(width: NaqlSpace.s3),
+                    Expanded(
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(t.vehicleCaption, style: NaqlText.caption),
+                        if (a.vehicleType != null) Text(a.vehicleType!, style: NaqlText.headline.copyWith(fontSize: 17)),
+                      ]),
+                    ),
+                    if (a.plate != null) NaqlPlateBadge(a.plate!),
+                  ]),
+                ),
+              ],
+            ],
+            // Room for the floating tab bar (this screen lives inside the Home tab).
+            const SizedBox(height: 88),
           ]),
         ),
       ),
-    ]);
+    );
+    return NaqlMapScaffold(map: map, sheet: sheet, overlap: overlap, maxSheetFraction: 0.55);
   }
 
   static String _ago(AppLocalizations t, Duration d) => d.inSeconds < 60 ? t.agoSeconds(d.inSeconds < 0 ? 0 : d.inSeconds) : t.agoMinutes(d.inMinutes);
@@ -175,10 +221,17 @@ class _AnimatedBus extends StatelessWidget {
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<LatLng>(
       tween: _LatLngTween(end: to),
-      duration: const Duration(milliseconds: 900),
+      duration: naqlMotion(context, const Duration(milliseconds: 900)),
       curve: Curves.easeOutCubic,
       builder: (_, p, _) => MarkerLayer(markers: [
-        Marker(point: p, width: 48, height: 48, child: _Pin(key: const ValueKey('bus-pin'), icon: LucideIcons.busFront, label: label, color: stale ? NaqlColors.textMuted : NaqlColors.primary, square: true)),
+        Marker(point: p, width: 48, height: 48, child: _Pin(
+            key: const ValueKey('bus-pin'),
+            icon: LucideIcons.busFront,
+            label: label,
+            color: stale ? NaqlColors.textMuted : NaqlColors.accent,
+            onColor: stale ? NaqlColors.surface : NaqlColors.onAccent,
+            square: true,
+          )),
       ]),
     );
   }
@@ -191,10 +244,11 @@ class _LatLngTween extends Tween<LatLng> {
 }
 
 class _Pin extends StatelessWidget {
-  const _Pin({super.key, required this.icon, required this.label, required this.color, this.square = false});
+  const _Pin({super.key, required this.icon, required this.label, required this.color, this.onColor, this.square = false});
   final IconData icon;
   final String label;
   final Color color;
+  final Color? onColor;
   final bool square;
 
   @override
@@ -207,8 +261,9 @@ class _Pin extends StatelessWidget {
           shape: square ? BoxShape.rectangle : BoxShape.circle,
           borderRadius: square ? BorderRadius.circular(14) : null,
           border: Border.all(color: NaqlColors.surface, width: 3),
+          boxShadow: naqlFloatShadow,
         ),
-        child: Icon(icon, color: NaqlColors.onPrimary, size: 22),
+        child: Icon(icon, color: onColor ?? NaqlColors.onPrimary, size: 22),
       ),
     );
   }

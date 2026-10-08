@@ -84,7 +84,7 @@ class RunCard extends StatelessWidget {
         Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(t.departAt, style: NaqlText.caption),
-            Text(run.departAt == null ? '—' : formatClock(run.departAt!), style: NaqlText.title.copyWith(fontSize: 32), textDirection: TextDirection.ltr),
+            Text(run.departAt == null ? '—' : formatClock(run.departAt!), style: NaqlText.title.copyWith(fontSize: 34, height: 1.15), textDirection: TextDirection.ltr),
           ]),
           const SizedBox(width: NaqlSpace.s4),
           Expanded(
@@ -98,16 +98,27 @@ class RunCard extends StatelessWidget {
               ),
             ),
           ),
-          Icon(Directionality.of(context) == TextDirection.rtl ? LucideIcons.chevronLeft : LucideIcons.chevronRight, color: NaqlColors.textMuted),
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(color: naqlIsDark ? NaqlColors.ink : NaqlColors.primary, shape: BoxShape.circle),
+            child: Icon(
+              Directionality.of(context) == TextDirection.rtl ? LucideIcons.arrowLeft : LucideIcons.arrowRight,
+              size: 20,
+              color: naqlIsDark ? NaqlColors.onInk : NaqlColors.onPrimary,
+            ),
+          ),
         ]),
-        const Padding(padding: EdgeInsets.symmetric(vertical: NaqlSpace.s4), child: Divider(height: 1, color: NaqlColors.border)),
-        Row(children: [
-          _Fact(icon: LucideIcons.mapPin, text: t.runStops(run.stops.length)),
-          const SizedBox(width: NaqlSpace.s4),
-          _Fact(icon: LucideIcons.users, text: t.runSeats(run.booked, run.capacity)),
-          const Spacer(),
-          if (run.cashToCollect > 0) _Fact(icon: LucideIcons.banknote, text: formatIqd(run.cashToCollect, lang), strong: true),
-        ]),
+        const SizedBox(height: NaqlSpace.s4),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: NaqlSpace.s4, vertical: NaqlSpace.s3),
+          decoration: BoxDecoration(color: NaqlColors.surfaceMuted, borderRadius: BorderRadius.circular(NaqlRadius.md)),
+          child: Wrap(spacing: NaqlSpace.s4, runSpacing: NaqlSpace.s2, alignment: WrapAlignment.spaceBetween, children: [
+            _Fact(icon: LucideIcons.mapPin, text: t.runStops(run.stops.length)),
+            _Fact(icon: LucideIcons.users, text: t.runSeats(run.booked, run.capacity)),
+            if (run.cashToCollect > 0) _Fact(icon: LucideIcons.banknote, text: formatIqd(run.cashToCollect, lang), strong: true),
+          ]),
+        ),
       ]),
     );
   }

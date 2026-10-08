@@ -46,8 +46,8 @@ class UniversityScreen extends ConsumerWidget {
                       leading: Container(
                         width: 40,
                         height: 40,
-                        decoration: const BoxDecoration(color: NaqlColors.primarySoft, shape: BoxShape.circle),
-                        child: const Icon(LucideIcons.graduationCap, size: 20, color: NaqlColors.primary),
+                        decoration: BoxDecoration(color: NaqlColors.primarySoft, shape: BoxShape.circle),
+                        child: Icon(LucideIcons.graduationCap, size: 20, color: NaqlColors.primary),
                       ),
                       selected: selected == u.slug,
                       onTap: () {

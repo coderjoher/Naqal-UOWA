@@ -49,7 +49,7 @@ class EarningsScreen extends ConsumerWidget {
                       padding: const EdgeInsets.all(NaqlSpace.s4),
                       decoration: BoxDecoration(color: NaqlColors.warningSoft, borderRadius: BorderRadius.circular(NaqlRadius.md)),
                       child: Row(children: [
-                        const Icon(LucideIcons.triangleAlert, color: NaqlColors.warning),
+                        Icon(LucideIcons.triangleAlert, color: NaqlColors.warning),
                         const SizedBox(width: NaqlSpace.s3),
                         Expanded(child: Text(t.earningsFlagged('${e.flagged}'), key: const ValueKey('flagged'), style: NaqlText.body.copyWith(color: NaqlColors.warning))),
                       ]),
@@ -80,7 +80,12 @@ class EarningsScreen extends ConsumerWidget {
                     NaqlCard(
                       key: ValueKey('past-${p.month}'),
                       child: Row(children: [
-                        const Icon(LucideIcons.badgeCheck, color: NaqlColors.success),
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(color: NaqlColors.successSoft, borderRadius: BorderRadius.circular(NaqlRadius.sm + 2)),
+                          child: Icon(LucideIcons.badgeCheck, color: NaqlColors.success, size: 20),
+                        ),
                         const SizedBox(width: NaqlSpace.s3),
                         Expanded(
                           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -125,18 +130,20 @@ class _Summary extends StatelessWidget {
         const SizedBox(height: NaqlSpace.s4),
         TweenAnimationBuilder<double>(
           tween: Tween(begin: 0, end: e.estimate.toDouble()),
-          duration: NaqlMotion.sheet,
+          duration: naqlMotion(context, NaqlMotion.sheet),
           curve: Curves.easeOutCubic,
           builder: (_, v, _) => Text(
             formatIqd(v.round(), lang),
             key: const ValueKey('estimate'),
-            style: NaqlText.title.copyWith(fontSize: 34, color: e.estimate < 0 ? NaqlColors.danger : NaqlColors.text),
+            style: NaqlText.hero.copyWith(fontSize: 40, height: 1.15, color: e.estimate < 0 ? NaqlColors.danger : NaqlColors.text),
             textDirection: TextDirection.ltr,
             textAlign: TextAlign.start,
           ),
         ),
         if (e.estimate < 0) Text(t.earningsOwe, style: NaqlText.caption.copyWith(color: NaqlColors.danger)),
-        const SizedBox(height: NaqlSpace.s4),
+        const SizedBox(height: NaqlSpace.s3),
+        Divider(height: 1, color: NaqlColors.border),
+        const SizedBox(height: NaqlSpace.s2),
         _Figure(icon: LucideIcons.route, label: t.earningsRuns, value: '${e.runs}', valueKey: 'runs'),
         _Figure(icon: LucideIcons.banknote, label: t.earningsCash, value: formatIqd(e.cash, lang)),
         _Figure(icon: LucideIcons.percent, label: t.earningsCashCommission, value: e.cashCommission == 0 ? formatIqd(0, lang) : '−${formatIqd(e.cashCommission, lang)}'),
@@ -156,13 +163,14 @@ class _Figure extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Same look as NaqlSummaryRow, with a key on the value for tests.
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: NaqlSpace.s1),
+      padding: const EdgeInsets.symmetric(vertical: NaqlSpace.s2),
       child: Row(children: [
         Icon(icon, size: 18, color: NaqlColors.textMuted),
         const SizedBox(width: NaqlSpace.s2),
         Expanded(child: Text(label, style: NaqlText.body.copyWith(color: NaqlColors.textMuted))),
-        Text(value, key: valueKey == null ? null : ValueKey<String>(valueKey!), style: NaqlText.label, textDirection: TextDirection.ltr),
+        Text(value, key: valueKey == null ? null : ValueKey<String>(valueKey!), style: NaqlText.body.copyWith(fontWeight: FontWeight.w600), textDirection: TextDirection.ltr),
       ]),
     );
   }
@@ -222,12 +230,7 @@ class _TaxiMonth extends ConsumerWidget {
           NaqlCard(
             key: const ValueKey('taxi-month'),
             child: Row(children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: const BoxDecoration(color: NaqlColors.primarySoft, shape: BoxShape.circle),
-                child: const Icon(LucideIcons.carTaxiFront, color: NaqlColors.primary),
-              ),
+              const NaqlIconTile(LucideIcons.carTaxiFront, accent: true, size: 48),
               const SizedBox(width: NaqlSpace.s3),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

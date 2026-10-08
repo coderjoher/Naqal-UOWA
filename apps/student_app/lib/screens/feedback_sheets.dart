@@ -19,7 +19,7 @@ class StarRow extends StatelessWidget {
     return Row(mainAxisSize: MainAxisSize.min, children: [
       for (var i = 1; i <= 5; i++)
         onChanged == null
-            ? Icon(i <= value ? Icons.star_rounded : Icons.star_outline_rounded, size: size, color: i <= value ? NaqlColors.warning : NaqlColors.border)
+            ? Icon(i <= value ? Icons.star_rounded : Icons.star_outline_rounded, size: size, color: i <= value ? NaqlColors.accent : NaqlColors.border)
             : Semantics(
                 button: true,
                 selected: i <= value,
@@ -33,7 +33,7 @@ class StarRow extends StatelessWidget {
                     child: AnimatedScale(
                       scale: i <= value ? 1.1 : 1,
                       duration: NaqlMotion.fast,
-                      child: Icon(i <= value ? Icons.star_rounded : Icons.star_outline_rounded, size: size, color: i <= value ? NaqlColors.warning : NaqlColors.textMuted),
+                      child: Icon(i <= value ? Icons.star_rounded : Icons.star_outline_rounded, size: size, color: i <= value ? NaqlColors.accent : NaqlColors.textMuted),
                     ),
                   ),
                 ),

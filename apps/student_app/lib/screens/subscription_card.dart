@@ -25,10 +25,10 @@ class SubscriptionCard extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           AnimatedContainer(
-            duration: NaqlMotion.fast,
+            duration: naqlMotion(context),
             width: 44,
             height: 44,
-            decoration: BoxDecoration(color: tone.bg, shape: BoxShape.circle),
+            decoration: BoxDecoration(color: tone.bg, borderRadius: BorderRadius.circular(NaqlRadius.sm + 4)),
             child: Icon(LucideIcons.ticket, color: tone.fg, size: 22),
           ),
           const SizedBox(width: NaqlSpace.s3),
@@ -36,7 +36,7 @@ class SubscriptionCard extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 Expanded(child: Text(t.subMonthly, style: NaqlText.caption)),
-                AnimatedSwitcher(duration: NaqlMotion.fast, child: StatusPill(key: ValueKey(info.status), label: label, tone: tone, icon: icon)),
+                AnimatedSwitcher(duration: naqlMotion(context), child: StatusPill(key: ValueKey(info.status), label: label, tone: tone, icon: icon)),
               ]),
               const SizedBox(height: NaqlSpace.s1),
               Text(
@@ -65,7 +65,7 @@ class SubscriptionCard extends StatelessWidget {
             padding: const EdgeInsets.all(NaqlSpace.s3),
             decoration: BoxDecoration(color: NaqlColors.surfaceMuted, borderRadius: BorderRadius.circular(NaqlRadius.md)),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Icon(LucideIcons.building2, size: 18, color: NaqlColors.textMuted),
+              Icon(LucideIcons.building2, size: 18, color: NaqlColors.textMuted),
               const SizedBox(width: NaqlSpace.s2),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

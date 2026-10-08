@@ -1,10 +1,11 @@
 import { clsx } from 'clsx';
-import { Bus, Languages, LogOut } from 'lucide-react';
+import { Bus, Languages, LogOut, Monitor, Moon, Sun } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { NavLink, useLocation, useOutlet } from 'react-router';
 import { useAuth } from '../lib/auth';
 import { useI18n } from '../lib/i18n';
 import { useCurrentUniversity } from '../lib/queries';
+import { useTheme } from '../lib/theme';
 import { pageVariants, spring } from '../ui/motion';
 import { NAV } from './nav';
 
@@ -17,13 +18,15 @@ export function Shell() {
   const uni = useCurrentUniversity(isOffice);
   const uniName = uni.data ? (lang === 'ar' && uni.data.nameAr) || uni.data.name : null;
   const initials = (session?.user.name ?? '?').trim().slice(0, 1);
+  const theme = useTheme();
+  const ThemeIcon = theme.choice === 'dark' ? Moon : theme.choice === 'light' ? Sun : Monitor;
 
   return (
     <div className="flex min-h-full">
       <aside className="sticky top-0 flex h-screen w-72 shrink-0 flex-col gap-6 border-e border-border bg-surface px-4 py-6">
         <div className="flex items-center gap-3 px-2">
           <motion.span
-            className="grid size-11 place-items-center rounded-md bg-primary text-on-primary"
+            className="grid size-11 place-items-center rounded-md bg-accent text-on-accent"
             initial={{ rotate: -8, scale: 0.8, opacity: 0 }}
             animate={{ rotate: 0, scale: 1, opacity: 1 }}
             transition={spring}
@@ -48,7 +51,11 @@ export function Shell() {
                   <NavLink key={n.to} to={n.to} end={n.to === '/'} className="relative block rounded-md">
                     {({ isActive }) => (
                       <>
-                        {isActive ? <motion.span layoutId="nav-active" className="absolute inset-0 rounded-md bg-primary-soft" transition={spring} /> : null}
+                        {isActive ? (
+                          <motion.span layoutId="nav-active" className="absolute inset-0 rounded-md bg-primary-soft" transition={spring}>
+                            <span className="absolute inset-y-2 start-0 w-1 rounded-pill bg-accent" aria-hidden />
+                          </motion.span>
+                        ) : null}
                         <span
                           className={clsx(
                             'relative flex h-11 items-center gap-3 rounded-md px-3 text-label transition-colors duration-200',
@@ -91,6 +98,17 @@ export function Shell() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-10 flex h-16 items-center justify-end gap-3 border-b border-border bg-bg/90 px-8 backdrop-blur-sm">
+          <motion.button
+            type="button"
+            onClick={theme.cycle}
+            whileHover={{ y: -1 }}
+            whileTap={{ scale: 0.95 }}
+            aria-label={t(`theme.${theme.choice}`)}
+            title={t(`theme.${theme.choice}`)}
+            className="grid size-10 place-items-center rounded-pill border border-border bg-surface text-text hover:bg-surface-muted"
+          >
+            <ThemeIcon className="size-4" aria-hidden />
+          </motion.button>
           <motion.button
             type="button"
             onClick={toggle}

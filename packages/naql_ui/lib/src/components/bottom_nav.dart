@@ -29,7 +29,12 @@ class NaqlBottomNav extends StatelessWidget {
         child: Container(
           height: 64,
           padding: const EdgeInsets.all(NaqlSpace.s2),
-          decoration: BoxDecoration(color: NaqlColors.surface, borderRadius: BorderRadius.circular(NaqlRadius.pill), boxShadow: naqlCardShadow),
+          decoration: BoxDecoration(
+            color: naqlIsDark ? NaqlColors.surfaceMuted.withValues(alpha: 0.96) : NaqlColors.surface,
+            borderRadius: BorderRadius.circular(NaqlRadius.pill),
+            border: naqlIsDark ? Border.all(color: NaqlColors.border) : null,
+            boxShadow: naqlFloatShadow,
+          ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -40,12 +45,13 @@ class NaqlBottomNav extends StatelessWidget {
                     onPressed: () => onTap(i),
                     semanticLabel: items[i].label,
                     child: AnimatedContainer(
-                      duration: NaqlMotion.fast,
+                      duration: naqlMotion(context),
+                      curve: Curves.easeOutCubic,
                       width: 48,
                       height: 48,
                       margin: const EdgeInsets.symmetric(horizontal: NaqlSpace.s1),
-                      decoration: BoxDecoration(color: i == currentIndex ? NaqlColors.primary : Colors.transparent, shape: BoxShape.circle),
-                      child: Icon(items[i].icon, size: 22, color: i == currentIndex ? NaqlColors.onPrimary : NaqlColors.text),
+                      decoration: BoxDecoration(color: i == currentIndex ? (naqlIsDark ? NaqlColors.ink : NaqlColors.primary) : Colors.transparent, shape: BoxShape.circle),
+                      child: Icon(items[i].icon, size: 22, color: i == currentIndex ? (naqlIsDark ? NaqlColors.onInk : NaqlColors.onPrimary) : NaqlColors.text),
                     ),
                   ),
                 ),

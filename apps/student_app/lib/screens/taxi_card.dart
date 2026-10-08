@@ -75,12 +75,7 @@ class _Entry extends StatelessWidget {
         onTap: onTap,
         child: Row(
           children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(color: NaqlColors.primarySoft, borderRadius: BorderRadius.circular(NaqlRadius.md)),
-              child: const Icon(LucideIcons.carTaxiFront, color: NaqlColors.primary, size: 26),
-            ),
+            const NaqlIconTile(LucideIcons.carTaxiFront, accent: true, size: 52),
             const SizedBox(width: NaqlSpace.s4),
             Expanded(
               child: Column(
@@ -96,7 +91,12 @@ class _Entry extends StatelessWidget {
               ),
             ),
             const SizedBox(width: NaqlSpace.s2),
-            Icon(rtl ? LucideIcons.chevronLeft : LucideIcons.chevronRight, color: NaqlColors.textMuted, size: 20),
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(color: naqlIsDark ? NaqlColors.ink : NaqlColors.primary, shape: BoxShape.circle),
+              child: Icon(rtl ? LucideIcons.arrowLeft : LucideIcons.arrowRight, color: naqlIsDark ? NaqlColors.onInk : NaqlColors.onPrimary, size: 18),
+            ),
           ],
         ),
       ),
@@ -128,7 +128,7 @@ class _Live extends StatelessWidget {
               Container(
                 width: 52,
                 height: 52,
-                decoration: BoxDecoration(color: tone.bg, shape: BoxShape.circle),
+                decoration: BoxDecoration(color: tone.bg, borderRadius: BorderRadius.circular(NaqlRadius.md)),
                 child: Icon(icon, color: tone.fg, size: 24),
               ),
               const SizedBox(width: NaqlSpace.s4),

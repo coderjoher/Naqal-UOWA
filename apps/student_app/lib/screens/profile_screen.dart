@@ -64,6 +64,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       Expanded(
         child: ListView(padding: const EdgeInsets.fromLTRB(NaqlSpace.s5, NaqlSpace.s2, NaqlSpace.s5, 120), children: [
           NaqlEntrance(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: NaqlSpace.s5),
+              child: Row(children: [
+                NaqlAvatar(name: user.displayName(lang), size: 64),
+                const SizedBox(width: NaqlSpace.s4),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(user.displayName(lang), style: NaqlText.title, maxLines: 2, overflow: TextOverflow.ellipsis),
+                    Text(user.studentId, style: NaqlText.caption, textDirection: TextDirection.ltr),
+                  ]),
+                ),
+              ]),
+            ),
+          ),
+          NaqlEntrance(
             child: NaqlCard(
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                 Text(t.personalInfo, style: NaqlText.headline),
@@ -105,7 +120,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             child: NaqlListRow(
               title: t.defaultPoint,
               subtitle: user.defaultPoint?.displayName(lang) ?? t.notSet,
-              leading: const Icon(LucideIcons.mapPin, color: NaqlColors.primary),
+              leading: const NaqlIconTile(LucideIcons.mapPin, size: 40),
               onTap: () => context.go('/profile/point'),
             ),
           ),
@@ -115,7 +130,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             child: NaqlListRow(
               title: t.language,
               subtitle: lang == 'ar' ? t.arabic : t.english,
-              leading: const Icon(LucideIcons.languages, color: NaqlColors.primary),
+              leading: const NaqlIconTile(LucideIcons.languages, size: 40),
               onTap: () => ref.read(localeProvider.notifier).toggle(),
             ),
           ),
@@ -125,7 +140,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             child: NaqlListRow(
               title: t.reportProblem,
               subtitle: t.reportProblemHint,
-              leading: const Icon(LucideIcons.messageSquareWarning, color: NaqlColors.primary),
+              leading: const NaqlIconTile(LucideIcons.messageSquareWarning, size: 40),
               onTap: () => showProblemSheet(context),
             ),
           ),
