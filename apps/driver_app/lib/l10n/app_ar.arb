@@ -93,7 +93,7 @@
   "editApplication": "تعديل الطلب",
   "refresh": "تحديث الحالة",
   "signOut": "تسجيل الخروج",
-  "tabSchedule": "جدولي",
+  "tabSchedule": "الجدول",
   "scheduleTitle": "متى ستعمل؟",
   "scheduleBody": "اختر المواعيد التي ستعمل فيها خلال الأسبوع. يُقفل الموعد بعد توزيع الحافلات.",
   "dayToday": "اليوم",
@@ -405,5 +405,112 @@
   "accountDocumentsHint": "المستمسكات التي طلبها مكتب النقل. لتحديث أي منها راجع المكتب.",
   "accountDocUploaded": "مرفوع",
   "accountDocMissing": "غير مرفوع",
-  "accountClose": "إغلاق"
+  "accountClose": "إغلاق",
+  "greetMorning": "صباح الخير",
+  "greetEvening": "مساء الخير",
+  "tabHome": "الرئيسية",
+  "kpiTaxiToday": "مشاوير اليوم",
+  "kpiCash": "نقداً",
+  "kpiMonth": "هذا الشهر",
+  "kpiRiders": "ركاب اليوم",
+  "taxiOnlineSub": "تصلك طلبات التكسي القريبة · اضغط للإيقاف",
+  "watermarkOn": "ON",
+  "taxiSkipOffer": "تجاهل الطلب",
+  "taxiOfferLine": "{direction} · {km} كم",
+  "@taxiOfferLine": {
+    "placeholders": {
+      "direction": {
+        "type": "String"
+      },
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "nextRunTitle": "رحلتك القادمة",
+  "laterToday": "لاحقاً اليوم",
+  "runRidersCount": "{n} راكب",
+  "@runRidersCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "stopOfTotal": "المحطة {n} من {total}",
+  "@stopOfTotal": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "riderCash": "{amount} نقداً",
+  "@riderCash": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "distanceM": "{m} م",
+  "@distanceM": {
+    "placeholders": {
+      "m": {
+        "type": "String"
+      }
+    }
+  },
+  "distanceKmShort": "{km} كم",
+  "@distanceKmShort": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "headTo": "توجّه إلى {place}",
+  "@headTo": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "leaveAt": "انطلق الساعة {time}",
+  "@leaveAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "arriveAround": "الوصول نحو {time}",
+  "@arriveAround": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "ridersHere": "الركاب في هذه المحطة",
+  "noRidersHere": "لا ركاب في هذه المحطة",
+  "studentCaption": "الطالب",
+  "pickupPlace": "مكان الركوب",
+  "dropoffPlace": "مكان النزول",
+  "openNavigation": "فتح الملاحة",
+  "runProgress": "خُدمت {done} من {total} محطات",
+  "@runProgress": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  }
 }

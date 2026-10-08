@@ -29,7 +29,7 @@ class NaqlListRow extends StatelessWidget {
         semanticLabel: title,
         pressedScale: 0.98,
         child: AnimatedContainer(
-          duration: NaqlMotion.fast,
+          duration: naqlMotion(context),
           padding: const EdgeInsets.symmetric(horizontal: NaqlSpace.s4, vertical: NaqlSpace.s3),
           decoration: BoxDecoration(
             color: selected ? NaqlColors.primarySoft : NaqlColors.surface,

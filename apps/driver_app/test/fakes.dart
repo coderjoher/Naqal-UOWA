@@ -7,6 +7,7 @@ import 'package:driver_app/data/image_document_picker.dart';
 import 'package:driver_app/data/run_controller.dart';
 import 'package:driver_app/data/session.dart';
 import 'package:driver_app/data/taxi.dart';
+import 'package:driver_app/screens/drive_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -411,6 +412,7 @@ class FakeDriverBackend {
         apiProvider.overrideWithValue(ApiClient(baseUrl: Uri.parse('http://api.test/'), tokens: tokens, httpClient: client)),
         documentPickerProvider.overrideWithValue(camera ?? FakeCamera()),
         locationSourceProvider.overrideWithValue(location),
+        driverMapTilesProvider.overrideWithValue(false),
         liveFeedProvider.overrideWith((ref) async => feed),
         taxiEventsProvider.overrideWith((ref) async => taxiEvents),
         urlLauncherProvider.overrideWithValue((uri) async {
@@ -422,6 +424,10 @@ class FakeDriverBackend {
     );
   }
 }
+
+/// Runs [body] at a fixed moment (Thursday 8 October 2026, 19:00 on the test machine's clock),
+/// so greetings and countdowns in goldens do not change with the time the tests run.
+Future<void> atFixedTime(Future<void> Function() body) => withClock(Clock.fixed(DateTime(2026, 10, 8, 19)), body);
 
 void usePhone(WidgetTester tester) {
   tester.view.devicePixelRatio = 2.0;

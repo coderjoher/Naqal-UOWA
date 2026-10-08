@@ -718,4 +718,108 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountClose => 'Close';
+
+  @override
+  String get greetMorning => 'Good morning';
+
+  @override
+  String get greetEvening => 'Good evening';
+
+  @override
+  String get tabHome => 'Home';
+
+  @override
+  String get kpiTaxiToday => 'Today\'s trips';
+
+  @override
+  String get kpiCash => 'Cash';
+
+  @override
+  String get kpiMonth => 'This month';
+
+  @override
+  String get kpiRiders => 'Today\'s riders';
+
+  @override
+  String get taxiOnlineSub => 'Nearby taxi requests reach you · tap to stop';
+
+  @override
+  String get watermarkOn => 'ON';
+
+  @override
+  String get taxiSkipOffer => 'Skip this request';
+
+  @override
+  String taxiOfferLine(String direction, String km) {
+    return '$direction · $km km';
+  }
+
+  @override
+  String get nextRunTitle => 'Your next run';
+
+  @override
+  String get laterToday => 'Later today';
+
+  @override
+  String runRidersCount(int n) {
+    return '$n riders';
+  }
+
+  @override
+  String stopOfTotal(int n, String total) {
+    return 'Stop $n of $total';
+  }
+
+  @override
+  String riderCash(String amount) {
+    return '$amount cash';
+  }
+
+  @override
+  String distanceM(String m) {
+    return '$m m';
+  }
+
+  @override
+  String distanceKmShort(String km) {
+    return '$km km';
+  }
+
+  @override
+  String headTo(String place) {
+    return 'Head to $place';
+  }
+
+  @override
+  String leaveAt(String time) {
+    return 'Leave at $time';
+  }
+
+  @override
+  String arriveAround(String time) {
+    return 'Arrive around $time';
+  }
+
+  @override
+  String get ridersHere => 'Riders at this stop';
+
+  @override
+  String get noRidersHere => 'No riders at this stop';
+
+  @override
+  String get studentCaption => 'Student';
+
+  @override
+  String get pickupPlace => 'Pickup';
+
+  @override
+  String get dropoffPlace => 'Drop-off';
+
+  @override
+  String get openNavigation => 'Open navigation';
+
+  @override
+  String runProgress(String done, String total) {
+    return '$done of $total stops served';
+  }
 }

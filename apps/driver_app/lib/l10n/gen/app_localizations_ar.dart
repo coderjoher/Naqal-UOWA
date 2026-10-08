@@ -229,7 +229,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get signOut => 'تسجيل الخروج';
 
   @override
-  String get tabSchedule => 'جدولي';
+  String get tabSchedule => 'الجدول';
 
   @override
   String get scheduleTitle => 'متى ستعمل؟';
@@ -716,4 +716,108 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get accountClose => 'إغلاق';
+
+  @override
+  String get greetMorning => 'صباح الخير';
+
+  @override
+  String get greetEvening => 'مساء الخير';
+
+  @override
+  String get tabHome => 'الرئيسية';
+
+  @override
+  String get kpiTaxiToday => 'مشاوير اليوم';
+
+  @override
+  String get kpiCash => 'نقداً';
+
+  @override
+  String get kpiMonth => 'هذا الشهر';
+
+  @override
+  String get kpiRiders => 'ركاب اليوم';
+
+  @override
+  String get taxiOnlineSub => 'تصلك طلبات التكسي القريبة · اضغط للإيقاف';
+
+  @override
+  String get watermarkOn => 'ON';
+
+  @override
+  String get taxiSkipOffer => 'تجاهل الطلب';
+
+  @override
+  String taxiOfferLine(String direction, String km) {
+    return '$direction · $km كم';
+  }
+
+  @override
+  String get nextRunTitle => 'رحلتك القادمة';
+
+  @override
+  String get laterToday => 'لاحقاً اليوم';
+
+  @override
+  String runRidersCount(int n) {
+    return '$n راكب';
+  }
+
+  @override
+  String stopOfTotal(int n, String total) {
+    return 'المحطة $n من $total';
+  }
+
+  @override
+  String riderCash(String amount) {
+    return '$amount نقداً';
+  }
+
+  @override
+  String distanceM(String m) {
+    return '$m م';
+  }
+
+  @override
+  String distanceKmShort(String km) {
+    return '$km كم';
+  }
+
+  @override
+  String headTo(String place) {
+    return 'توجّه إلى $place';
+  }
+
+  @override
+  String leaveAt(String time) {
+    return 'انطلق الساعة $time';
+  }
+
+  @override
+  String arriveAround(String time) {
+    return 'الوصول نحو $time';
+  }
+
+  @override
+  String get ridersHere => 'الركاب في هذه المحطة';
+
+  @override
+  String get noRidersHere => 'لا ركاب في هذه المحطة';
+
+  @override
+  String get studentCaption => 'الطالب';
+
+  @override
+  String get pickupPlace => 'مكان الركوب';
+
+  @override
+  String get dropoffPlace => 'مكان النزول';
+
+  @override
+  String get openNavigation => 'فتح الملاحة';
+
+  @override
+  String runProgress(String done, String total) {
+    return 'خُدمت $done من $total محطات';
+  }
 }

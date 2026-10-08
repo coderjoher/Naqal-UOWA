@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:naql_ui/naql_ui.dart';
+
 import 'fakes.dart';
 
 void main() {
@@ -33,9 +35,11 @@ void main() {
     await tester.tap(find.text('اعتماد النقطة'));
     await tester.pumpAndSettle();
 
-    expect(find.text('أهلاً، زينب'), findsOneWidget);
-    expect(find.text('ساحة العباس'), findsOneWidget);
-    expect(find.bySemanticsLabel('رحلاتي'), findsOneWidget);
+    // Home: greeting, the chosen point (in the place pill and the quick destinations) and the
+    // account button that leads to every other page.
+    expect(find.text(greeting('زينب')), findsOneWidget);
+    expect(find.text('ساحة العباس'), findsWidgets);
+    expect(find.bySemanticsLabel('حسابي'), findsOneWidget);
   });
 
   testWidgets('activation with the office code signs the student in', (tester) async {
@@ -64,13 +68,19 @@ void main() {
     expect(api.requests.any((r) => r.url.path == '/auth/student/activate'), isTrue);
   });
 
-  testWidgets('a signed-in student with a point lands on home; bottom nav switches tabs', (tester) async {
+  testWidgets('a signed-in student with a point lands on home; the account menu opens trips and back leads home', (tester) async {
     usePhone(tester);
     await tester.pumpWidget(await FakeBackend(signedIn: true, withPoint: true).app());
     await tester.pumpAndSettle();
-    expect(find.text('أهلاً، زينب'), findsOneWidget);
-    await tester.tap(find.bySemanticsLabel('رحلاتي'));
-    await tester.pumpAndSettle();
+    expect(find.text(greeting('زينب')), findsOneWidget);
+    // No tab bar any more: Home is the hub.
+    expect(find.byType(NaqlBottomNav), findsNothing);
+    await openFromMenu(tester, 'رحلاتي');
     expect(find.text('لا رحلات سابقة'), findsOneWidget);
+    await tester.tap(find.bySemanticsLabel('رجوع').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('رجوع').first);
+    await tester.pumpAndSettle();
+    expect(find.text(greeting('زينب')), findsOneWidget);
   });
 }

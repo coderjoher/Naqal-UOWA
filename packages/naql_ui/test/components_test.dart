@@ -251,8 +251,70 @@ void main() {
       dir: TextDirection.rtl,
     ));
     expect(tester.widget<Text>(find.text('7:20')).textDirection, TextDirection.ltr);
-    final plate = find.ancestor(of: find.text('12345 ب كربلاء'), matching: find.byType(Directionality)).first;
+    // Iraqi layout: the number on top, the province under it; the plate itself stays LTR.
+    final plate = find.ancestor(of: find.text('12345'), matching: find.byType(Directionality)).first;
     expect(tester.widget<Directionality>(plate).textDirection, TextDirection.ltr);
+    expect(find.text('ب كربلاء'), findsOneWidget);
+    expect(find.bySemanticsLabel('12345 ب كربلاء'), findsOneWidget);
+    // A plate without a province is shown as written, on one line.
+    expect(NaqlPlateBadge.split('45 K 12345'), isNull);
+    expect(NaqlPlateBadge.split('12340 كربلاء أجرة'), ('12340', 'كربلاء أجرة'));
+  });
+
+  testWidgets('service cards and slot tiles are selectable, labelled and at least 48 dp', (tester) async {
+    var picked = 'bus';
+    await tester.pumpWidget(harness(StatefulBuilder(
+      builder: (_, set) => Column(mainAxisSize: MainAxisSize.min, children: [
+        Row(children: [
+          Expanded(child: NaqlServiceCard(key: const ValueKey('bus'), title: 'Bus', badge: 'Included', subtitle: 'Next 07:30', watermark: 'BUS', art: const NaqlVehicleArt.bus(), selected: picked == 'bus', onTap: () => set(() => picked = 'bus'))),
+          const SizedBox(width: 12),
+          Expanded(child: NaqlServiceCard(key: const ValueKey('taxi'), title: 'Taxi', badge: '4 min', badgeStyle: NaqlBadgeStyle.success, art: const NaqlVehicleArt.taxi(), selected: picked == 'taxi', onTap: () => set(() => picked = 'taxi'))),
+        ]),
+        SizedBox(width: 120, child: NaqlSlotTile(key: const ValueKey('slot'), time: '06:45', caption: 'Full', state: NaqlSlotState.full, onTap: () {})),
+      ]),
+    )));
+    expect(find.bySemanticsLabel('Bus, Included, Next 07:30'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('taxi')));
+    await tester.pumpAndSettle();
+    expect(picked, 'taxi');
+    expect(tester.getSemantics(find.bySemanticsLabel('Taxi, 4 min')), isSemantics(isSelected: true));
+    expect(tester.getSize(find.byKey(const ValueKey('slot'))).height, greaterThanOrEqualTo(NaqlTouch.min));
+  });
+
+  testWidgets('toggle card is a switch; tab bar items are 56 dp and labelled; countdown ring reads its seconds', (tester) async {
+    var on = false;
+    var tab = 0;
+    await tester.pumpWidget(harness(StatefulBuilder(
+      builder: (_, set) => Column(mainAxisSize: MainAxisSize.min, children: [
+        NaqlToggleCard(key: const ValueKey('toggle'), on: on, title: on ? 'Online' : 'Offline', subtitle: 'tap', cta: 'Go online', onTap: () => set(() => on = !on)),
+        const NaqlCountdownRing(seconds: 42, fraction: 0.7, semanticLabel: '42 seconds left'),
+        NaqlTabBar(currentIndex: tab, onTap: (i) => set(() => tab = i), items: const [NaqlTabItem(icon: LucideIcons.house, label: 'Home'), NaqlTabItem(icon: LucideIcons.wallet, label: 'Earnings')]),
+      ]),
+    )));
+    expect(find.text('Go online'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('toggle')));
+    await tester.pumpAndSettle();
+    expect(find.text('Online'), findsOneWidget);
+    expect(find.text('Go online'), findsNothing);
+    expect(find.bySemanticsLabel('42 seconds left'), findsOneWidget);
+    expect(tester.getSize(find.bySemanticsLabel('Earnings')).height, greaterThanOrEqualTo(NaqlTouch.driver));
+    await tester.tap(find.bySemanticsLabel('Earnings'));
+    await tester.pumpAndSettle();
+    expect(tab, 1);
+  });
+
+  testWidgets('new components settle instantly when the platform asks for reduced motion', (tester) async {
+    var selected = false;
+    await tester.pumpWidget(MediaQuery(
+      data: const MediaQueryData(disableAnimations: true),
+      child: harness(StatefulBuilder(
+        builder: (_, set) => NaqlServiceCard(title: 'Bus', art: const NaqlVehicleArt.bus(), selected: selected, onTap: () => set(() => selected = true)),
+      )),
+    ));
+    await tester.tap(find.text('Bus'));
+    await tester.pump();
+    // No frames left to animate: the selection shows at once.
+    expect(tester.binding.hasScheduledFrame, isFalse);
   });
 }
 

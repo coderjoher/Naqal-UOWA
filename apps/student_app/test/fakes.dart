@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +11,7 @@ import 'package:naql_app/naql_app.dart';
 import 'package:naql_core/naql_core.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:student_app/app.dart';
+import 'package:student_app/data/home.dart';
 import 'package:student_app/data/taxi.dart';
 import 'package:student_app/data/track.dart';
 
@@ -193,12 +195,15 @@ class FakeBackend {
     return _json({'items': items, 'next': more ? items.last['id'] : null});
   }
 
+  /// While true POST /rides fails like a phone without coverage.
+  bool rideRequestFails = false;
+
   /// What GET /rides/me returns; tests change it to simulate dispatch (server side).
   List<Map<String, Object?>> rides = [];
 
   /// Baghdad civil dates, so "today" labels and goldens do not depend on when tests run.
   static String day([int plus = 0]) {
-    final d = DateTime.now().toUtc().add(Duration(hours: 3, days: plus));
+    final d = clock.now().toUtc().add(Duration(hours: 3, days: plus));
     return '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
   }
 
@@ -248,8 +253,8 @@ class FakeBackend {
       };
 
   final points = [
-    {'id': 'p1', 'name': 'Al-Abbas Square', 'nameAr': 'ساحة العباس', 'tierId': 't-b', 'tier': {'id': 't-b', 'name': 'B'}, 'distanceKm': 4.8, 'active': true},
-    {'id': 'p2', 'name': 'Bab Baghdad', 'nameAr': 'باب بغداد', 'tierId': 't-a', 'tier': {'id': 't-a', 'name': 'A'}, 'distanceKm': 2.7, 'active': true},
+    {'id': 'p1', 'name': 'Al-Abbas Square', 'nameAr': 'ساحة العباس', 'tierId': 't-b', 'tier': {'id': 't-b', 'name': 'B'}, 'distanceKm': 4.8, 'lat': 32.6165, 'lng': 44.0322, 'active': true},
+    {'id': 'p2', 'name': 'Bab Baghdad', 'nameAr': 'باب بغداد', 'tierId': 't-a', 'tier': {'id': 't-a', 'name': 'A'}, 'distanceKm': 2.7, 'lat': 32.6120, 'lng': 44.0290, 'active': true},
   ];
 
   final Map<String, Object?> profile = {
@@ -310,8 +315,16 @@ class FakeBackend {
         taxiActive = r;
         return _json(r, 201);
       case 'POST /rides':
+        if (rideRequestFails) throw http.ClientException('offline');
         final slot = slots.firstWhere((x) => x['waveId'] == body['waveId'] && x['date'] == body['date']);
-        final r = ride(id: 'r${rides.length + 1}', date: slot['date'] as String, time: slot['time'] as String, type: slot['type'] as String);
+        final r = ride(
+          id: 'r${rides.length + 1}',
+          status: slot['seatsLeft'] == 0 ? 'waitlisted' : 'open',
+          waitlistedUntil: slot['seatsLeft'] == 0 ? clock.now().add(const Duration(minutes: 20)) : null,
+          date: slot['date'] as String,
+          time: slot['time'] as String,
+          type: slot['type'] as String,
+        );
         rides = [r, ...rides];
         return _json(r, 201);
     }
@@ -364,6 +377,7 @@ class FakeBackend {
         mapTilesProvider.overrideWithValue(false),
         taxiLiveProvider.overrideWith((ref) async => taxiLive),
         taxiLocatorProvider.overrideWithValue(() async => myLocation),
+        homeLocatorProvider.overrideWithValue(() async => myLocation),
         taxiDialerProvider.overrideWithValue((uri) async {
           dialed.add(uri);
           return true;
@@ -372,6 +386,45 @@ class FakeBackend {
       child: const StudentApp(),
     );
   }
+}
+
+/// The time-of-day greeting Home shows for [name] (Arabic).
+String greeting(String name) => baghdadMorning() ? 'صباح الخير، $name' : 'مساء الخير، $name';
+
+/// From Home, opens the account page and then one of its entries (e.g. 'رحلاتي').
+Future<void> openFromMenu(WidgetTester tester, String entry) async {
+  await tester.tap(find.bySemanticsLabel('حسابي'));
+  await tester.pumpAndSettle();
+  await tester.tap(find.bySemanticsLabel(RegExp('^$entry')).first);
+  await tester.pumpAndSettle();
+}
+
+/// From Home, picks the taxi service card and opens the taxi screen with the call to action.
+Future<void> openTaxiFromHome(WidgetTester tester) async {
+  await tester.tap(find.byKey(const ValueKey('service-taxi')));
+  await tester.pumpAndSettle();
+  await tester.tap(find.byKey(const ValueKey('home-cta-false')));
+  await tester.pumpAndSettle();
+}
+
+/// Runs [body] at a fixed moment (Thursday 8 October 2026, 07:20 on the test machine's clock), so greetings,
+/// dates and countdowns in goldens do not change with the time the tests run.
+Future<void> atFixedTime(Future<void> Function() body) => withClock(Clock.fixed(DateTime(2026, 10, 8, 7, 20)), body);
+
+/// Wave times like a real morning: a full early wave, two open ones, and three returns.
+void useFullTimetable(FakeBackend api) {
+  final today = FakeBackend.day();
+  api.slots
+    ..clear()
+    ..addAll([
+      {'waveId': 'w645', 'date': today, 'type': 'morning', 'minuteOfDay': 405, 'time': '06:45', 'today': true, 'seatsLeft': 0},
+      {'waveId': 'w730', 'date': today, 'type': 'morning', 'minuteOfDay': 450, 'time': '07:30', 'today': true, 'seatsLeft': 6},
+      {'waveId': 'w815', 'date': today, 'type': 'morning', 'minuteOfDay': 495, 'time': '08:15', 'today': true},
+      {'waveId': 'w1330', 'date': today, 'type': 'return', 'minuteOfDay': 810, 'time': '13:30', 'today': true},
+      {'waveId': 'w1430', 'date': today, 'type': 'return', 'minuteOfDay': 870, 'time': '14:30', 'today': true},
+      {'waveId': 'w1600', 'date': today, 'type': 'return', 'minuteOfDay': 960, 'time': '16:00', 'today': true},
+      {'waveId': 'w730', 'date': FakeBackend.day(1), 'type': 'morning', 'minuteOfDay': 450, 'time': '07:30', 'today': false},
+    ]);
 }
 
 /// Phone-sized surface for screen goldens and flows.

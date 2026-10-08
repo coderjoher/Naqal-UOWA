@@ -515,7 +515,7 @@ abstract class AppLocalizations {
   /// No description provided for @tabSchedule.
   ///
   /// In ar, this message translates to:
-  /// **'جدولي'**
+  /// **'الجدول'**
   String get tabSchedule;
 
   /// No description provided for @scheduleTitle.
@@ -1369,6 +1369,174 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'إغلاق'**
   String get accountClose;
+
+  /// No description provided for @greetMorning.
+  ///
+  /// In ar, this message translates to:
+  /// **'صباح الخير'**
+  String get greetMorning;
+
+  /// No description provided for @greetEvening.
+  ///
+  /// In ar, this message translates to:
+  /// **'مساء الخير'**
+  String get greetEvening;
+
+  /// No description provided for @tabHome.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرئيسية'**
+  String get tabHome;
+
+  /// No description provided for @kpiTaxiToday.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشاوير اليوم'**
+  String get kpiTaxiToday;
+
+  /// No description provided for @kpiCash.
+  ///
+  /// In ar, this message translates to:
+  /// **'نقداً'**
+  String get kpiCash;
+
+  /// No description provided for @kpiMonth.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذا الشهر'**
+  String get kpiMonth;
+
+  /// No description provided for @kpiRiders.
+  ///
+  /// In ar, this message translates to:
+  /// **'ركاب اليوم'**
+  String get kpiRiders;
+
+  /// No description provided for @taxiOnlineSub.
+  ///
+  /// In ar, this message translates to:
+  /// **'تصلك طلبات التكسي القريبة · اضغط للإيقاف'**
+  String get taxiOnlineSub;
+
+  /// No description provided for @watermarkOn.
+  ///
+  /// In ar, this message translates to:
+  /// **'ON'**
+  String get watermarkOn;
+
+  /// No description provided for @taxiSkipOffer.
+  ///
+  /// In ar, this message translates to:
+  /// **'تجاهل الطلب'**
+  String get taxiSkipOffer;
+
+  /// No description provided for @taxiOfferLine.
+  ///
+  /// In ar, this message translates to:
+  /// **'{direction} · {km} كم'**
+  String taxiOfferLine(String direction, String km);
+
+  /// No description provided for @nextRunTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'رحلتك القادمة'**
+  String get nextRunTitle;
+
+  /// No description provided for @laterToday.
+  ///
+  /// In ar, this message translates to:
+  /// **'لاحقاً اليوم'**
+  String get laterToday;
+
+  /// No description provided for @runRidersCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} راكب'**
+  String runRidersCount(int n);
+
+  /// No description provided for @stopOfTotal.
+  ///
+  /// In ar, this message translates to:
+  /// **'المحطة {n} من {total}'**
+  String stopOfTotal(int n, String total);
+
+  /// No description provided for @riderCash.
+  ///
+  /// In ar, this message translates to:
+  /// **'{amount} نقداً'**
+  String riderCash(String amount);
+
+  /// No description provided for @distanceM.
+  ///
+  /// In ar, this message translates to:
+  /// **'{m} م'**
+  String distanceM(String m);
+
+  /// No description provided for @distanceKmShort.
+  ///
+  /// In ar, this message translates to:
+  /// **'{km} كم'**
+  String distanceKmShort(String km);
+
+  /// No description provided for @headTo.
+  ///
+  /// In ar, this message translates to:
+  /// **'توجّه إلى {place}'**
+  String headTo(String place);
+
+  /// No description provided for @leaveAt.
+  ///
+  /// In ar, this message translates to:
+  /// **'انطلق الساعة {time}'**
+  String leaveAt(String time);
+
+  /// No description provided for @arriveAround.
+  ///
+  /// In ar, this message translates to:
+  /// **'الوصول نحو {time}'**
+  String arriveAround(String time);
+
+  /// No description provided for @ridersHere.
+  ///
+  /// In ar, this message translates to:
+  /// **'الركاب في هذه المحطة'**
+  String get ridersHere;
+
+  /// No description provided for @noRidersHere.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا ركاب في هذه المحطة'**
+  String get noRidersHere;
+
+  /// No description provided for @studentCaption.
+  ///
+  /// In ar, this message translates to:
+  /// **'الطالب'**
+  String get studentCaption;
+
+  /// No description provided for @pickupPlace.
+  ///
+  /// In ar, this message translates to:
+  /// **'مكان الركوب'**
+  String get pickupPlace;
+
+  /// No description provided for @dropoffPlace.
+  ///
+  /// In ar, this message translates to:
+  /// **'مكان النزول'**
+  String get dropoffPlace;
+
+  /// No description provided for @openNavigation.
+  ///
+  /// In ar, this message translates to:
+  /// **'فتح الملاحة'**
+  String get openNavigation;
+
+  /// No description provided for @runProgress.
+  ///
+  /// In ar, this message translates to:
+  /// **'خُدمت {done} من {total} محطات'**
+  String runProgress(String done, String total);
 }
 
 class _AppLocalizationsDelegate

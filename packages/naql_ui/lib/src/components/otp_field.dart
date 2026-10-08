@@ -58,7 +58,7 @@ class _NaqlOtpFieldState extends State<NaqlOtpField> {
                     if (i > 0) const SizedBox(width: NaqlSpace.s2),
                     Expanded(
                       child: AnimatedContainer(
-                        duration: NaqlMotion.fast,
+                        duration: naqlMotion(context),
                         height: 56,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
@@ -74,7 +74,7 @@ class _NaqlOtpFieldState extends State<NaqlOtpField> {
                           ),
                         ),
                         child: AnimatedSwitcher(
-                          duration: NaqlMotion.fast,
+                          duration: naqlMotion(context),
                           transitionBuilder: (c, a) => ScaleTransition(scale: a, child: c),
                           child: Text(i < text.length ? text[i] : '', key: ValueKey('$i${i < text.length ? text[i] : ''}'), style: NaqlText.title),
                         ),

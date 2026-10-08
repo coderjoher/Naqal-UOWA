@@ -18,7 +18,7 @@ void main() {
     expect(find.text('07801112233'), findsOneWidget);
     expect(find.text('معتمد'), findsOneWidget);
     expect(find.text('كوستر'), findsOneWidget);
-    expect(find.text('12340 كربلاء'), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('رقم اللوحة: 12340 كربلاء\\.')), findsOneWidget);
     expect(find.text('14'), findsOneWidget);
     expect(find.text('2019'), findsOneWidget);
     expect(find.text('مستمسكان مرفوعان'), findsOneWidget);

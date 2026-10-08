@@ -1585,6 +1585,318 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الأجرة'**
   String get rideFare;
+
+  /// No description provided for @greetMorning.
+  ///
+  /// In ar, this message translates to:
+  /// **'صباح الخير، {name}'**
+  String greetMorning(String name);
+
+  /// No description provided for @greetEvening.
+  ///
+  /// In ar, this message translates to:
+  /// **'مساء الخير، {name}'**
+  String greetEvening(String name);
+
+  /// No description provided for @greetMorningPlain.
+  ///
+  /// In ar, this message translates to:
+  /// **'صباح الخير'**
+  String get greetMorningPlain;
+
+  /// No description provided for @greetEveningPlain.
+  ///
+  /// In ar, this message translates to:
+  /// **'مساء الخير'**
+  String get greetEveningPlain;
+
+  /// No description provided for @whereTo.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلى أين اليوم؟'**
+  String get whereTo;
+
+  /// No description provided for @serviceBus.
+  ///
+  /// In ar, this message translates to:
+  /// **'حافلة الجامعة'**
+  String get serviceBus;
+
+  /// No description provided for @serviceTaxi.
+  ///
+  /// In ar, this message translates to:
+  /// **'تكسي'**
+  String get serviceTaxi;
+
+  /// No description provided for @serviceIncluded.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشمول'**
+  String get serviceIncluded;
+
+  /// No description provided for @serviceCash.
+  ///
+  /// In ar, this message translates to:
+  /// **'نقداً'**
+  String get serviceCash;
+
+  /// No description provided for @serviceNext.
+  ///
+  /// In ar, this message translates to:
+  /// **'القادمة {time}'**
+  String serviceNext(String time);
+
+  /// No description provided for @serviceNoTimes.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا مواعيد متاحة'**
+  String get serviceNoTimes;
+
+  /// No description provided for @serviceFrom.
+  ///
+  /// In ar, this message translates to:
+  /// **'من {amount}'**
+  String serviceFrom(String amount);
+
+  /// No description provided for @serviceTaxiSub.
+  ///
+  /// In ar, this message translates to:
+  /// **'أجرة معروفة مسبقاً'**
+  String get serviceTaxiSub;
+
+  /// No description provided for @watermarkBus.
+  ///
+  /// In ar, this message translates to:
+  /// **'BUS'**
+  String get watermarkBus;
+
+  /// No description provided for @watermarkTaxi.
+  ///
+  /// In ar, this message translates to:
+  /// **'TAXI'**
+  String get watermarkTaxi;
+
+  /// No description provided for @homeBookBus.
+  ///
+  /// In ar, this message translates to:
+  /// **'احجز مقعدي في حافلة {time}'**
+  String homeBookBus(String time);
+
+  /// No description provided for @homeBookBusAny.
+  ///
+  /// In ar, this message translates to:
+  /// **'احجز مقعدي في الحافلة'**
+  String get homeBookBusAny;
+
+  /// No description provided for @chipHome.
+  ///
+  /// In ar, this message translates to:
+  /// **'البيت'**
+  String get chipHome;
+
+  /// No description provided for @subTierDaysLeft.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفئة {tier} · باقي {days} يوماً'**
+  String subTierDaysLeft(String tier, int days);
+
+  /// No description provided for @subPayShort.
+  ///
+  /// In ar, this message translates to:
+  /// **'ادفع نقداً في مكتب النقل'**
+  String get subPayShort;
+
+  /// No description provided for @mySubscription.
+  ///
+  /// In ar, this message translates to:
+  /// **'اشتراكي'**
+  String get mySubscription;
+
+  /// No description provided for @notificationsUnread.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإشعارات، {n} غير مقروءة'**
+  String notificationsUnread(int n);
+
+  /// No description provided for @bookPickTime.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر الموعد'**
+  String get bookPickTime;
+
+  /// No description provided for @bookReturnTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'العودة من الجامعة'**
+  String get bookReturnTitle;
+
+  /// No description provided for @bookReturnSlot.
+  ///
+  /// In ar, this message translates to:
+  /// **'عودة {time}'**
+  String bookReturnSlot(String time);
+
+  /// No description provided for @bookSeatsLeft.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} مقاعد متاحة'**
+  String bookSeatsLeft(int n);
+
+  /// No description provided for @bookOpen.
+  ///
+  /// In ar, this message translates to:
+  /// **'متاحة'**
+  String get bookOpen;
+
+  /// No description provided for @bookFull.
+  ///
+  /// In ar, this message translates to:
+  /// **'ممتلئة'**
+  String get bookFull;
+
+  /// No description provided for @bookFullHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'الموعد ممتلئ: ننضمّك إلى قائمة الانتظار ونحجز لك فور تحرّر مقعد.'**
+  String get bookFullHint;
+
+  /// No description provided for @bookWhere.
+  ///
+  /// In ar, this message translates to:
+  /// **'من أين تصعد؟'**
+  String get bookWhere;
+
+  /// No description provided for @bookPointSub.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفئة {tier} · {km} كم عن الجامعة'**
+  String bookPointSub(String tier, String km);
+
+  /// No description provided for @bookCost.
+  ///
+  /// In ar, this message translates to:
+  /// **'التكلفة'**
+  String get bookCost;
+
+  /// No description provided for @bookCovered.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشمولة باشتراكك'**
+  String get bookCovered;
+
+  /// No description provided for @bookPayDriver.
+  ///
+  /// In ar, this message translates to:
+  /// **'تُدفع نقداً للسائق'**
+  String get bookPayDriver;
+
+  /// No description provided for @bookConfirm.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد الحجز'**
+  String get bookConfirm;
+
+  /// No description provided for @bookNoDay.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد مواعيد في هذا اليوم.'**
+  String get bookNoDay;
+
+  /// No description provided for @liveMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'مراسلة السائق'**
+  String get liveMessage;
+
+  /// No description provided for @liveCallDriver.
+  ///
+  /// In ar, this message translates to:
+  /// **'اتصال بالسائق'**
+  String get liveCallDriver;
+
+  /// No description provided for @liveYourTaxi.
+  ///
+  /// In ar, this message translates to:
+  /// **'سيارتك'**
+  String get liveYourTaxi;
+
+  /// No description provided for @liveTaxiName.
+  ///
+  /// In ar, this message translates to:
+  /// **'تكسي الجامعة'**
+  String get liveTaxiName;
+
+  /// No description provided for @receiptTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفاصيل الرحلة'**
+  String get receiptTitle;
+
+  /// No description provided for @receiptTrip.
+  ///
+  /// In ar, this message translates to:
+  /// **'رحلتك من {from} إلى {to}'**
+  String receiptTrip(String from, String to);
+
+  /// No description provided for @receiptPaidCash.
+  ///
+  /// In ar, this message translates to:
+  /// **'دُفعت نقداً للسائق'**
+  String get receiptPaidCash;
+
+  /// No description provided for @receiptCovered.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشمولة باشتراكك'**
+  String get receiptCovered;
+
+  /// No description provided for @receiptNotPaid.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم تُستوفَ أجرة'**
+  String get receiptNotPaid;
+
+  /// No description provided for @receiptBusWord.
+  ///
+  /// In ar, this message translates to:
+  /// **'حافلة'**
+  String get receiptBusWord;
+
+  /// No description provided for @receiptTaxiWord.
+  ///
+  /// In ar, this message translates to:
+  /// **'تكسي'**
+  String get receiptTaxiWord;
+
+  /// No description provided for @receiptYouRated.
+  ///
+  /// In ar, this message translates to:
+  /// **'قيّمتها {n} من 5'**
+  String receiptYouRated(int n);
+
+  /// No description provided for @receiptOpen.
+  ///
+  /// In ar, this message translates to:
+  /// **'عرض تفاصيل الرحلة'**
+  String get receiptOpen;
+
+  /// No description provided for @receiptMissing.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم نجد هذه الرحلة'**
+  String get receiptMissing;
+
+  /// No description provided for @menuAccount.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحساب'**
+  String get menuAccount;
+
+  /// No description provided for @menuMore.
+  ///
+  /// In ar, this message translates to:
+  /// **'المزيد'**
+  String get menuMore;
 }
 
 class _AppLocalizationsDelegate

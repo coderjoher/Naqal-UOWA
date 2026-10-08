@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../foundation/theme.dart';
 import '../foundation/tokens.g.dart';
 
 /// Press feedback used by every tappable component: a small scale-down plus haptic tick,
@@ -64,7 +65,7 @@ class _NaqlPressableState extends State<NaqlPressable> {
             constraints: BoxConstraints(minWidth: widget.minSize, minHeight: widget.minSize),
             child: AnimatedScale(
               scale: _down ? widget.pressedScale : 1,
-              duration: const Duration(milliseconds: 120),
+              duration: naqlMotion(context, const Duration(milliseconds: 120)),
               curve: Curves.easeOut,
               child: DecoratedBox(
                 position: DecorationPosition.foreground,

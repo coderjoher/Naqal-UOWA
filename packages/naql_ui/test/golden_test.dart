@@ -212,4 +212,48 @@ void main() {
       );
     }, size: const Size(420, 280), dark: true);
   });
+
+  testWidgets('vehicle illustrations, service cards and slot tiles', (tester) async {
+    await expectGoldens(tester, 'service_cards', (d) {
+      return Column(mainAxisSize: MainAxisSize.min, spacing: NaqlSpace.s3, children: [
+        Row(children: [
+          Expanded(child: NaqlServiceCard(title: tr(d, 'Campus bus', 'حافلة الجامعة'), badge: tr(d, 'Included', 'مشمول'), subtitle: tr(d, 'Next 07:30', 'القادمة 07:30'), watermark: 'BUS', art: const NaqlVehicleArt.bus(width: 120), selected: true, onTap: () {})),
+          const SizedBox(width: NaqlSpace.s3),
+          Expanded(child: NaqlServiceCard(title: tr(d, 'Taxi', 'تكسي'), badge: tr(d, '4 min', '4 د'), badgeStyle: NaqlBadgeStyle.success, subtitle: tr(d, 'From 3,000 IQD', 'من 3,000 د.ع'), watermark: 'TAXI', art: const NaqlVehicleArt.taxi(width: 120), selected: false, onTap: () {})),
+        ]),
+        Row(spacing: 10, children: [
+          Expanded(child: NaqlSlotTile(time: '06:45', caption: tr(d, 'Full', 'ممتلئة'), state: NaqlSlotState.full, onTap: () {})),
+          Expanded(child: NaqlSlotTile(time: '07:30', caption: tr(d, '6 seats left', '6 مقاعد متاحة'), state: NaqlSlotState.selected, onTap: () {})),
+          Expanded(child: NaqlSlotTile(time: '08:15', caption: tr(d, 'Open', 'متاحة'), state: NaqlSlotState.available, onTap: () {})),
+        ]),
+        const Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [NaqlVehicleArt.bus(hero: true, width: 170), NaqlVehicleArt.taxi(hero: true, width: 170)]),
+      ]);
+    }, size: const Size(420, 520), dark: true);
+  });
+
+  testWidgets('driver pieces: toggle card, figures, offer ring, instruction card, step bar, tab bar', (tester) async {
+    await expectGoldens(tester, 'driver_pieces', (d) {
+      return Column(mainAxisSize: MainAxisSize.min, spacing: NaqlSpace.s3, children: [
+        NaqlInstructionCard(headline: tr(d, '200 m', '200 م'), body: tr(d, 'Head to Al-Abbas Square', 'توجّه إلى ساحة العباس')),
+        NaqlToggleCard(on: true, title: tr(d, 'You are online', 'أنت متصل'), subtitle: tr(d, 'Nearby requests reach you', 'تصلك طلبات التكسي القريبة'), watermark: 'ON', onTap: () {}),
+        Row(spacing: 10, children: [
+          Expanded(child: NaqlKpiTile(label: tr(d, 'Trips today', 'مشاوير اليوم'), value: '7')),
+          Expanded(child: NaqlKpiTile(label: tr(d, 'Cash', 'نقداً'), value: '27,500', small: true)),
+          Expanded(child: NaqlKpiTile(label: tr(d, 'Rating', 'التقييم'), value: '4.9', star: true)),
+        ]),
+        Row(children: [
+          const NaqlCountdownRing(seconds: 42, fraction: 0.7),
+          const SizedBox(width: NaqlSpace.s4),
+          const Expanded(child: NaqlStepBar(total: 4, done: 2)),
+          const SizedBox(width: NaqlSpace.s4),
+          NaqlTag(tr(d, 'Subscriber', 'مشترك'), tone: NaqlTone.success),
+        ]),
+        NaqlTabBar(currentIndex: 0, onTap: (_) {}, items: [
+          NaqlTabItem(icon: LucideIcons.house, label: tr(d, 'Home', 'الرئيسية')),
+          NaqlTabItem(icon: LucideIcons.wallet, label: tr(d, 'Earnings', 'الأرباح')),
+          NaqlTabItem(icon: LucideIcons.circleUser, label: tr(d, 'Account', 'حسابي')),
+        ]),
+      ]);
+    }, size: const Size(420, 640), dark: true);
+  });
 }

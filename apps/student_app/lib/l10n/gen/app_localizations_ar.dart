@@ -822,4 +822,185 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get rideFare => 'الأجرة';
+
+  @override
+  String greetMorning(String name) {
+    return 'صباح الخير، $name';
+  }
+
+  @override
+  String greetEvening(String name) {
+    return 'مساء الخير، $name';
+  }
+
+  @override
+  String get greetMorningPlain => 'صباح الخير';
+
+  @override
+  String get greetEveningPlain => 'مساء الخير';
+
+  @override
+  String get whereTo => 'إلى أين اليوم؟';
+
+  @override
+  String get serviceBus => 'حافلة الجامعة';
+
+  @override
+  String get serviceTaxi => 'تكسي';
+
+  @override
+  String get serviceIncluded => 'مشمول';
+
+  @override
+  String get serviceCash => 'نقداً';
+
+  @override
+  String serviceNext(String time) {
+    return 'القادمة $time';
+  }
+
+  @override
+  String get serviceNoTimes => 'لا مواعيد متاحة';
+
+  @override
+  String serviceFrom(String amount) {
+    return 'من $amount';
+  }
+
+  @override
+  String get serviceTaxiSub => 'أجرة معروفة مسبقاً';
+
+  @override
+  String get watermarkBus => 'BUS';
+
+  @override
+  String get watermarkTaxi => 'TAXI';
+
+  @override
+  String homeBookBus(String time) {
+    return 'احجز مقعدي في حافلة $time';
+  }
+
+  @override
+  String get homeBookBusAny => 'احجز مقعدي في الحافلة';
+
+  @override
+  String get chipHome => 'البيت';
+
+  @override
+  String subTierDaysLeft(String tier, int days) {
+    return 'الفئة $tier · باقي $days يوماً';
+  }
+
+  @override
+  String get subPayShort => 'ادفع نقداً في مكتب النقل';
+
+  @override
+  String get mySubscription => 'اشتراكي';
+
+  @override
+  String notificationsUnread(int n) {
+    return 'الإشعارات، $n غير مقروءة';
+  }
+
+  @override
+  String get bookPickTime => 'اختر الموعد';
+
+  @override
+  String get bookReturnTitle => 'العودة من الجامعة';
+
+  @override
+  String bookReturnSlot(String time) {
+    return 'عودة $time';
+  }
+
+  @override
+  String bookSeatsLeft(int n) {
+    return '$n مقاعد متاحة';
+  }
+
+  @override
+  String get bookOpen => 'متاحة';
+
+  @override
+  String get bookFull => 'ممتلئة';
+
+  @override
+  String get bookFullHint =>
+      'الموعد ممتلئ: ننضمّك إلى قائمة الانتظار ونحجز لك فور تحرّر مقعد.';
+
+  @override
+  String get bookWhere => 'من أين تصعد؟';
+
+  @override
+  String bookPointSub(String tier, String km) {
+    return 'الفئة $tier · $km كم عن الجامعة';
+  }
+
+  @override
+  String get bookCost => 'التكلفة';
+
+  @override
+  String get bookCovered => 'مشمولة باشتراكك';
+
+  @override
+  String get bookPayDriver => 'تُدفع نقداً للسائق';
+
+  @override
+  String get bookConfirm => 'تأكيد الحجز';
+
+  @override
+  String get bookNoDay => 'لا توجد مواعيد في هذا اليوم.';
+
+  @override
+  String get liveMessage => 'مراسلة السائق';
+
+  @override
+  String get liveCallDriver => 'اتصال بالسائق';
+
+  @override
+  String get liveYourTaxi => 'سيارتك';
+
+  @override
+  String get liveTaxiName => 'تكسي الجامعة';
+
+  @override
+  String get receiptTitle => 'تفاصيل الرحلة';
+
+  @override
+  String receiptTrip(String from, String to) {
+    return 'رحلتك من $from إلى $to';
+  }
+
+  @override
+  String get receiptPaidCash => 'دُفعت نقداً للسائق';
+
+  @override
+  String get receiptCovered => 'مشمولة باشتراكك';
+
+  @override
+  String get receiptNotPaid => 'لم تُستوفَ أجرة';
+
+  @override
+  String get receiptBusWord => 'حافلة';
+
+  @override
+  String get receiptTaxiWord => 'تكسي';
+
+  @override
+  String receiptYouRated(int n) {
+    return 'قيّمتها $n من 5';
+  }
+
+  @override
+  String get receiptOpen => 'عرض تفاصيل الرحلة';
+
+  @override
+  String get receiptMissing => 'لم نجد هذه الرحلة';
+
+  @override
+  String get menuAccount => 'الحساب';
+
+  @override
+  String get menuMore => 'المزيد';
 }

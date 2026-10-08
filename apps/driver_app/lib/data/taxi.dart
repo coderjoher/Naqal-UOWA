@@ -293,6 +293,17 @@ class TaxiController extends Notifier<TaxiState> {
   /// Mirrors `state.online` (state cannot be read while disposing).
   bool _online = false;
 
+  /// Offers the driver dismissed: they do not come back with the next heartbeat or event.
+  final _skipped = <String>{};
+
+  bool _wanted(TaxiOffer o, DateTime now) => !o.expired(now) && !_skipped.contains(o.id);
+
+  /// The driver is not taking this one; it stays open for the other taxis.
+  void skip(String offerId) {
+    _skipped.add(offerId);
+    _drop(offerId);
+  }
+
   ApiClient get _api => ref.read(apiProvider);
 
   @override
@@ -387,7 +398,7 @@ class TaxiController extends Notifier<TaxiState> {
       final now = clock.now();
       // The ride vanished without a socket event (the student cancelled while we were offline).
       if (state.active != null && res.active == null && state.busy == null) _notify(TaxiNotice.studentCancelled);
-      _set(state.copyWith(online: true, switching: false, active: () => res.active, offers: res.active == null ? res.offers.where((o) => !o.expired(now)).toList() : const []));
+      _set(state.copyWith(online: true, switching: false, active: () => res.active, offers: res.active == null ? res.offers.where((o) => _wanted(o, now)).toList() : const []));
       return true;
     } on ApiException catch (e) {
       if (_disposed) return false;
@@ -422,14 +433,14 @@ class TaxiController extends Notifier<TaxiState> {
     try {
       final offers = await _api.taxiOffers();
       final now = clock.now();
-      _set(state.copyWith(offers: offers.where((o) => !o.expired(now)).toList()));
+      _set(state.copyWith(offers: offers.where((o) => _wanted(o, now)).toList()));
     } catch (_) {
       /* keep what we have */
     }
   }
 
   void _onOffer(TaxiOffer o) {
-    if (!state.online || state.active != null || o.expired(clock.now())) return;
+    if (!state.online || state.active != null || !_wanted(o, clock.now())) return;
     _set(state.copyWith(offers: [...state.offers.where((x) => x.id != o.id), o]));
   }
 

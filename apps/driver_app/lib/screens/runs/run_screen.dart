@@ -5,16 +5,20 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:naql_app/naql_app.dart';
 import 'package:naql_core/naql_core.dart';
 import 'package:naql_ui/naql_ui.dart';
 
 import '../../data/run_controller.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../drive_layout.dart';
 import 'today_screen.dart';
 
-/// DR-03/04: one run — what to do now on top, the stops in driving order below. Every row and
-/// button is at least 56 dp tall so it can be used in the vehicle.
+/// DR-03/04: one run, while driving. A map with a blue instruction card on top; the sheet shows
+/// progress, the next stop big with a navigate button, who boards there, and every stop in
+/// driving order; one big gold action is pinned at the bottom: start → arrive → board → leave
+/// → … → finish. Every row and button is at least 56 dp tall so it can be used in the vehicle.
 class RunScreen extends ConsumerWidget {
   const RunScreen({super.key, required this.runId});
   final String runId;
@@ -24,103 +28,33 @@ class RunScreen extends ConsumerWidget {
     final t = AppLocalizations.of(context);
     final lang = ref.watch(localeProvider).languageCode;
     final view = ref.watch(runControllerProvider(runId)).value;
-    final pending = ref.watch(pendingSyncProvider).value ?? 0;
-    return Scaffold(
-      body: SafeArea(
-        child: Column(children: [
-          NaqlTopBar(
-            title: view == null ? t.todayRuns : waveName(t, view.base.waveType, view.base.waveTime),
-            onBack: () => context.go('/today'),
-            backLabel: MaterialLocalizations.of(context).backButtonTooltip,
-          ),
-          AnimatedSwitcher(
-            duration: NaqlMotion.fast,
-            child: pending > 0
-                ? Padding(
-                    key: const ValueKey('pending'),
-                    padding: const EdgeInsets.fromLTRB(NaqlSpace.s5, 0, NaqlSpace.s5, NaqlSpace.s2),
-                    child: StatusPill(label: t.pendingSync(pending), tone: NaqlTone.warning, icon: LucideIcons.cloudOff),
-                  )
-                : const SizedBox.shrink(key: ValueKey('synced')),
-          ),
-          Expanded(
-            child: view == null
-                ? const Padding(padding: EdgeInsets.all(NaqlSpace.s5), child: NaqlSkeleton(height: 200, radius: NaqlRadius.lg))
-                : ListView(
-                    padding: const EdgeInsets.fromLTRB(NaqlSpace.s5, NaqlSpace.s2, NaqlSpace.s5, NaqlSpace.s8),
-                    children: [
-                      NaqlEntrance(child: _Summary(view: view, lang: lang)),
-                      const SizedBox(height: NaqlSpace.s4),
-                      NaqlEntrance(index: 1, child: ActionPanel(runId: runId, view: view, lang: lang)),
-                      const SizedBox(height: NaqlSpace.s5),
-                      Text(t.stopsTitle, style: NaqlText.headline),
-                      const SizedBox(height: NaqlSpace.s3),
-                      if (!view.morning) _CampusRow(label: t.leaveCampus, time: view.base.waveTime, first: true, last: view.base.stops.isEmpty, done: view.status != 'planned'),
-                      for (final (i, s) in view.base.stops.indexed)
-                        NaqlEntrance(
-                          index: i + 2,
-                          child: StopTile(
-                            stop: s,
-                            view: view,
-                            lang: lang,
-                            first: i == 0 && view.morning,
-                            last: i == view.base.stops.length - 1 && !view.morning,
-                          ),
-                        ),
-                      if (view.morning) _CampusRow(label: t.arriveBy(view.base.waveTime), time: view.base.waveTime, first: view.base.stops.isEmpty, last: true, done: view.status == 'done'),
-                    ],
-                  ),
-          ),
-        ]),
-      ),
-    );
-  }
-}
-
-class _Summary extends StatelessWidget {
-  const _Summary({required this.view, required this.lang});
-  final RunView view;
-  final String lang;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
-    final run = view.base;
-    Widget cell(String label, String value, {Color? color}) => Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(label, style: NaqlText.caption),
-            const SizedBox(height: NaqlSpace.s1),
-            Text(value, style: NaqlText.title.copyWith(fontSize: 20, color: color), textDirection: TextDirection.ltr),
+    void back() => context.canPop() ? context.pop() : context.go('/today');
+    if (view == null) {
+      return Scaffold(
+        body: SafeArea(
+          child: Column(children: [
+            NaqlTopBar(title: t.todayRuns, onBack: back, backLabel: MaterialLocalizations.of(context).backButtonTooltip),
+            const Padding(padding: EdgeInsets.all(NaqlSpace.s5), child: NaqlSkeleton(height: 200, radius: NaqlRadius.lg)),
           ]),
-        );
-    return NaqlCard(
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        if (run.femaleOnly) ...[
-          Align(alignment: AlignmentDirectional.centerStart, child: StatusPill(label: t.femaleOnly, tone: NaqlTone.femaleOnly, icon: LucideIcons.users)),
-          const SizedBox(height: NaqlSpace.s3),
-        ],
-        Row(children: [
-          cell(t.departAt, run.departAt == null ? '—' : formatClock(run.departAt!)),
-          cell(t.seatsLabel, '${run.booked}/${run.capacity}'),
-          cell(t.cashToCollect, formatIqd(run.cashToCollect, lang), color: run.cashToCollect > 0 ? NaqlColors.success : null),
-        ]),
-      ]),
-    );
+        ),
+      );
+    }
+    return _RunBody(runId: runId, view: view, lang: lang, onBack: back);
   }
 }
 
-/// The one thing to do now, as a big button: start → arrive → board → leave → … → finish.
-class ActionPanel extends ConsumerStatefulWidget {
-  const ActionPanel({super.key, required this.runId, required this.view, required this.lang});
+class _RunBody extends ConsumerStatefulWidget {
+  const _RunBody({required this.runId, required this.view, required this.lang, required this.onBack});
   final String runId;
   final RunView view;
   final String lang;
+  final VoidCallback onBack;
 
   @override
-  ConsumerState<ActionPanel> createState() => _ActionPanelState();
+  ConsumerState<_RunBody> createState() => _RunBodyState();
 }
 
-class _ActionPanelState extends ConsumerState<ActionPanel> {
+class _RunBodyState extends ConsumerState<_RunBody> {
   Timer? _tick;
   final _campusBoarded = <String>{};
 
@@ -145,193 +79,253 @@ class _ActionPanelState extends ConsumerState<ActionPanel> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final v = widget.view;
+    final lang = widget.lang;
+    final run = v.base;
     final next = v.nextStop;
+    final status = v.status;
+    final pending = ref.watch(pendingSyncProvider).value ?? 0;
     final error = ref.watch(runControllerProvider(widget.runId).notifier).lastError;
+    final here = v.here == null ? null : LatLng(v.here!.lat, v.here!.lng);
+    final served = run.stops.where(v.isServed).length;
+    final left = v.waitLeft(clock.now());
+    final missing = next != null && v.morning ? next.passengers.where((p) => !v.isBoarded(p) && !v.isNoShow(p)).length : 0;
+    final tiles = ref.watch(driverMapTilesProvider);
 
-    final Widget body = switch (v.status) {
-      'planned' when v.morning => _Big(
-          key: const ValueKey('start'),
-          title: next == null ? t.startRun : t.nextStop,
-          subtitle: next?.point(widget.lang),
-          trailing: next == null ? null : _NavButton(stop: next),
-          action: NaqlButton(label: t.startRun, icon: LucideIcons.play, size: NaqlButtonSize.large, expand: true, onPressed: () => _ctl.start()),
+    // The blue card: what to do next, in as few words as possible.
+    final (String headline, String body, IconData icon) = switch (status) {
+      'planned' when v.morning => (run.departAt == null ? '—' : formatClock(run.departAt!), next == null ? t.startRun : t.headTo(next.point(lang)), LucideIcons.clock),
+      'planned' => (run.departAt == null ? run.waveTime : formatClock(run.departAt!), t.leaveCampus, LucideIcons.school),
+      'started' when next != null => (
+          here == null ? formatClock(next.eta) : _distance(t, here, LatLng(next.lat, next.lng)),
+          t.headTo(next.point(lang)),
+          LucideIcons.navigation,
         ),
-      'planned' => _Big(
-          key: const ValueKey('campus'),
-          title: t.boardAtCampus,
-          rows: [
-            for (final p in v.allPassengers)
-              _RiderRow(
-                passenger: p,
-                state: _campusBoarded.contains(p.requestId) ? _Rider.onBoard : _Rider.waiting,
-                lang: widget.lang,
-                onTap: () => setState(() => _campusBoarded.contains(p.requestId) ? _campusBoarded.remove(p.requestId) : _campusBoarded.add(p.requestId)),
-              ),
-          ],
-          action: NaqlButton(label: t.leaveCampusNow, icon: LucideIcons.play, size: NaqlButtonSize.large, expand: true, onPressed: () => _ctl.start(boarded: [..._campusBoarded])),
-        ),
-      'started' when next != null => _Big(
-          key: ValueKey('drive-${next.seq}'),
-          title: v.morning ? t.nextStop : t.dropOff,
-          subtitle: '${next.seq}. ${next.point(widget.lang)}',
-          trailing: _NavButton(stop: next),
-          action: NaqlButton(label: t.imHere, icon: LucideIcons.mapPinCheck, size: NaqlButtonSize.large, expand: true, onPressed: () => _ctl.arrive()),
-        ),
-      'started' => _Big(
-          key: const ValueKey('end'),
-          title: v.morning ? t.endTitleMorning : t.endTitleReturn,
-          icon: v.morning ? LucideIcons.school : LucideIcons.circleCheck,
-          action: NaqlButton(label: v.morning ? t.arrivedCampus : t.finishRun, icon: LucideIcons.flag, size: NaqlButtonSize.large, expand: true, onPressed: () => _ctl.end()),
-        ),
-      'at_stop' when next != null => _atStop(context, v, next),
-      'done' => _Big(key: const ValueKey('done'), title: t.runDone, subtitle: t.runDoneBody, icon: LucideIcons.circleCheck, tone: NaqlTone.success),
-      _ => const SizedBox.shrink(),
+      'started' => (v.morning ? t.endTitleMorning : t.endTitleReturn, waveName(t, run.waveType, run.waveTime), v.morning ? LucideIcons.school : LucideIcons.circleCheck),
+      'at_stop' when next != null => (t.atStop, next.point(lang), LucideIcons.mapPinCheck),
+      _ => (waveName(t, run.waveType, run.waveTime), t.runDoneBody, LucideIcons.circleCheck),
     };
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      if (error != null)
-        Padding(
-          padding: const EdgeInsets.only(bottom: NaqlSpace.s3),
-          child: Container(
-            padding: const EdgeInsets.all(NaqlSpace.s3),
-            decoration: BoxDecoration(color: NaqlColors.dangerSoft, borderRadius: BorderRadius.circular(NaqlRadius.sm)),
-            child: Text(error, style: NaqlText.body.copyWith(color: NaqlColors.danger)),
-          ),
+    final Widget? action = switch (status) {
+      'planned' when v.morning => _BigAction(key: const ValueKey('start'), label: t.startRun, icon: LucideIcons.play, onPressed: () => _ctl.start()),
+      'planned' => _BigAction(key: const ValueKey('campus'), label: t.leaveCampusNow, icon: LucideIcons.play, onPressed: () => _ctl.start(boarded: [..._campusBoarded])),
+      'started' when next != null => _BigAction(key: ValueKey('arrive-${next.seq}'), label: t.imHere, icon: LucideIcons.check, onPressed: () => _ctl.arrive()),
+      'started' => _BigAction(key: const ValueKey('end'), label: v.morning ? t.arrivedCampus : t.finishRun, icon: LucideIcons.flag, onPressed: () => _ctl.end()),
+      'at_stop' when next != null => _BigAction(
+          key: ValueKey('depart-${next.seq}'),
+          label: missing > 0 && left == 0 ? t.departMissing(missing) : t.departStop,
+          icon: LucideIcons.arrowRightFromLine,
+          quiet: missing > 0 && left == 0,
+          onPressed: left > 0 ? null : () => _ctl.depart(),
         ),
-      AnimatedSwitcher(
-        duration: NaqlMotion.sheet,
-        switchInCurve: Curves.easeOutCubic,
-        transitionBuilder: (c, a) => FadeTransition(opacity: a, child: SlideTransition(position: Tween(begin: const Offset(0, 0.04), end: Offset.zero).animate(a), child: c)),
-        child: body,
-      ),
-    ]);
-  }
+      _ => null,
+    };
 
-  Widget _atStop(BuildContext context, RunView v, RunStopInfo stop) {
-    final t = AppLocalizations.of(context);
-    final left = v.waitLeft(clock.now());
-    final missing = v.morning ? stop.passengers.where((p) => !v.isBoarded(p) && !v.isNoShow(p)).length : 0;
-    return _Big(
-      key: ValueKey('stop-${stop.seq}'),
-      title: '${t.atStop} · ${stop.seq}. ${stop.point(widget.lang)}',
-      subtitle: v.morning && stop.passengers.isNotEmpty ? t.boardHint : null,
-      rows: [
-        if (v.morning)
-          for (final p in stop.passengers)
+    final riders = switch (status) {
+      'planned' when !v.morning => [
+          for (final p in v.allPassengers)
             _RiderRow(
               passenger: p,
-              state: v.isBoarded(p) ? _Rider.onBoard : _Rider.waiting,
-              lang: widget.lang,
+              lang: lang,
+              onBoard: _campusBoarded.contains(p.requestId),
+              onTap: () => setState(() => _campusBoarded.contains(p.requestId) ? _campusBoarded.remove(p.requestId) : _campusBoarded.add(p.requestId)),
+            ),
+        ],
+      'at_stop' when next != null && v.morning => [
+          for (final p in next.passengers)
+            _RiderRow(
+              passenger: p,
+              lang: lang,
+              onBoard: v.isBoarded(p),
               paid: v.isPaid(p),
               onTap: v.isBoarded(p) ? null : () => _ctl.board([p.requestId]),
               onCollect: v.isBoarded(p) && p.fare > 0 && !v.isPaid(p) ? () => _ctl.collectFare(p.requestId) : null,
             ),
-        if (left > 0) ...[
-          const SizedBox(height: NaqlSpace.s2),
-          Row(children: [
-            Icon(LucideIcons.hourglass, size: 18, color: NaqlColors.warning),
-            const SizedBox(width: NaqlSpace.s2),
-            Text(t.waitLeft(formatCountdown(Duration(seconds: left))), key: const ValueKey('wait'), style: NaqlText.label.copyWith(color: NaqlColors.warning)),
-          ]),
         ],
-      ],
-      action: NaqlButton(
-        label: missing > 0 && left == 0 ? t.departMissing(missing) : t.departStop,
-        icon: LucideIcons.arrowRightFromLine,
-        size: NaqlButtonSize.large,
-        expand: true,
-        variant: missing > 0 && left == 0 ? NaqlButtonVariant.secondary : NaqlButtonVariant.primary,
-        onPressed: left > 0 ? null : () => _ctl.depart(),
+      _ when next != null => [for (final p in next.passengers) _RiderRow(passenger: p, lang: lang, onBoard: v.isBoarded(p), noShow: v.isNoShow(p))],
+      _ => <Widget>[],
+    };
+
+    final (String caption, String title) = switch (status) {
+      'planned' when !v.morning => (waveName(t, run.waveType, run.waveTime), t.campus),
+      _ when next != null => ('${t.stopOfTotal(next.seq, '${run.stops.length}')} · ${formatClock(next.eta)}', next.point(lang)),
+      _ => (t.runProgress('$served', '${run.stops.length}'), v.morning && status != 'done' ? t.campus : waveName(t, run.waveType, run.waveTime)),
+    };
+
+    final points = [
+      for (final s in run.stops) DrivePoint(LatLng(s.lat, s.lng), label: s.point(lang), number: '${s.seq}', current: s == next && status != 'done', done: v.isServed(s)),
+    ];
+
+    return DriveScaffold(
+      onBack: widget.onBack,
+      map: DriveMap(points: points, here: here, tiles: tiles, hereLabel: t.bus),
+      instruction: AnimatedSwitcher(
+        duration: naqlMotion(context),
+        child: NaqlInstructionCard(key: ValueKey('$status-${next?.seq}'), icon: icon, headline: headline, body: body),
       ),
+      action: action == null
+          ? null
+          : AnimatedSwitcher(
+              duration: naqlMotion(context, NaqlMotion.sheet),
+              switchInCurve: naqlEaseOut,
+              transitionBuilder: (c, a) => FadeTransition(opacity: a, child: SlideTransition(position: Tween(begin: const Offset(0, 0.15), end: Offset.zero).animate(a), child: c)),
+              child: action,
+            ),
+      children: [
+        AnimatedSize(
+          duration: naqlMotion(context),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            if (pending > 0)
+              Padding(
+                key: const ValueKey('pending'),
+                padding: const EdgeInsets.only(bottom: NaqlSpace.s3),
+                child: Align(alignment: AlignmentDirectional.centerStart, child: StatusPill(label: t.pendingSync(pending), tone: NaqlTone.warning, icon: LucideIcons.cloudOff)),
+              ),
+            if (error != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: NaqlSpace.s3),
+                child: Container(
+                  padding: const EdgeInsets.all(NaqlSpace.s3),
+                  decoration: BoxDecoration(color: NaqlColors.dangerSoft, borderRadius: BorderRadius.circular(NaqlRadius.sm)),
+                  child: Text(error, style: NaqlText.body.copyWith(color: NaqlColors.danger)),
+                ),
+              ),
+          ]),
+        ),
+        NaqlStepBar(total: run.stops.length, done: served, semanticLabel: t.runProgress('$served', '${run.stops.length}')),
+        const SizedBox(height: NaqlSpace.s3),
+        Row(children: [
+          Expanded(child: DriveHeading(caption: caption, title: title, navigate: next == null || status == 'done' ? null : _NavButton(stop: next))),
+        ]),
+        if (run.femaleOnly) ...[
+          const SizedBox(height: NaqlSpace.s2),
+          Align(alignment: AlignmentDirectional.centerStart, child: StatusPill(label: t.femaleOnly, tone: NaqlTone.femaleOnly, icon: LucideIcons.users)),
+        ],
+        const SizedBox(height: NaqlSpace.s3),
+        if (status == 'done')
+          NaqlPanel(
+            child: Row(children: [
+              Container(width: 48, height: 48, decoration: BoxDecoration(color: NaqlColors.successSoft, borderRadius: BorderRadius.circular(NaqlRadius.md)), child: Icon(LucideIcons.circleCheck, color: NaqlColors.success)),
+              const SizedBox(width: NaqlSpace.s3),
+              Expanded(child: Text(t.runDone, style: NaqlText.title.copyWith(fontSize: 22))),
+            ]),
+          )
+        else ...[
+          if (status == 'planned' && !v.morning) Padding(padding: const EdgeInsets.only(bottom: NaqlSpace.s2), child: Text(t.boardAtCampus, style: NaqlText.headline)),
+          if (status == 'at_stop' && v.morning && next != null && next.passengers.isNotEmpty) Padding(padding: const EdgeInsets.only(bottom: NaqlSpace.s2), child: Text(t.boardHint, style: NaqlText.label.copyWith(color: NaqlColors.textMuted))),
+          if (riders.isNotEmpty)
+            NaqlPanel(
+              padding: EdgeInsets.zero,
+              clip: true,
+              child: Column(children: [
+                for (final (i, r) in riders.indexed) ...[if (i > 0) Divider(height: 1, color: NaqlColors.border), r],
+              ]),
+            )
+          else if (next != null)
+            Text(t.noRidersHere, style: NaqlText.label.copyWith(color: NaqlColors.textMuted)),
+          if (left > 0) ...[
+            const SizedBox(height: NaqlSpace.s3),
+            Row(children: [
+              Icon(LucideIcons.hourglass, size: 18, color: NaqlColors.warning),
+              const SizedBox(width: NaqlSpace.s2),
+              Text(t.waitLeft(formatCountdown(Duration(seconds: left))), key: const ValueKey('wait'), style: NaqlText.label.copyWith(color: NaqlColors.warning)),
+            ]),
+          ],
+        ],
+        const SizedBox(height: NaqlSpace.s6),
+        Text(t.stopsTitle, style: NaqlText.headline),
+        const SizedBox(height: NaqlSpace.s3),
+        if (!v.morning) _CampusRow(label: t.leaveCampus, time: run.waveTime, first: true, last: run.stops.isEmpty, done: status != 'planned'),
+        for (final (i, s) in run.stops.indexed)
+          StopTile(stop: s, view: v, lang: lang, first: i == 0 && v.morning, last: i == run.stops.length - 1 && !v.morning),
+        if (v.morning) _CampusRow(label: t.arriveBy(run.waveTime), time: run.waveTime, first: run.stops.isEmpty, last: true, done: status == 'done'),
+      ],
     );
+  }
+
+  static String _distance(AppLocalizations t, LatLng from, LatLng to) {
+    final (value, metres) = driveDistance(from, to);
+    return metres ? t.distanceM(value) : t.distanceKmShort(value);
   }
 }
 
-class _Big extends StatelessWidget {
-  const _Big({super.key, required this.title, this.subtitle, this.trailing, this.rows = const [], this.action, this.icon, this.tone = NaqlTone.primary});
-  final String title;
-  final String? subtitle;
-  final Widget? trailing;
-  final List<Widget> rows;
-  final Widget? action;
-  final IconData? icon;
-  final NaqlTone tone;
+/// The big gold action pinned at the bottom of the sheet (64 dp).
+class _BigAction extends StatelessWidget {
+  const _BigAction({super.key, required this.label, required this.icon, required this.onPressed, this.quiet = false});
+  final String label;
+  final IconData icon;
+  final VoidCallback? onPressed;
+
+  /// Leaving with someone missing: a calmer button, the driver should think twice.
+  final bool quiet;
 
   @override
-  Widget build(BuildContext context) {
-    return NaqlCard(
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Row(children: [
-          if (icon != null) ...[
-            Container(width: 48, height: 48, decoration: BoxDecoration(color: tone.bg, borderRadius: BorderRadius.circular(NaqlRadius.md)), child: Icon(icon, color: tone.fg)),
-            const SizedBox(width: NaqlSpace.s3),
-          ],
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title, style: NaqlText.title.copyWith(fontSize: 22)),
-              if (subtitle != null) ...[const SizedBox(height: 2), Text(subtitle!, style: NaqlText.body.copyWith(color: NaqlColors.textMuted))],
-            ]),
-          ),
-          ?trailing,
-        ]),
-        if (rows.isNotEmpty) ...[const SizedBox(height: NaqlSpace.s3), ...rows],
-        if (action != null) ...[const SizedBox(height: NaqlSpace.s4), action!],
-      ]),
-    );
-  }
+  Widget build(BuildContext context) => NaqlButton(
+        label: label,
+        icon: icon,
+        size: NaqlButtonSize.huge,
+        expand: true,
+        variant: quiet ? NaqlButtonVariant.secondary : NaqlButtonVariant.accent,
+        onPressed: onPressed,
+      );
 }
 
-enum _Rider { waiting, onBoard }
-
-/// 56 dp rider row: tap to mark on board; cash button for pay-per-ride riders.
+/// A rider at the stop: initial, name, and a tag (subscriber / cash amount); tap to mark on
+/// board, then take the cash for pay-per-ride riders. 56 dp tall.
 class _RiderRow extends StatelessWidget {
-  const _RiderRow({required this.passenger, required this.state, required this.lang, this.onTap, this.onCollect, this.paid = false});
+  const _RiderRow({required this.passenger, required this.lang, required this.onBoard, this.onTap, this.onCollect, this.paid = false, this.noShow = false});
   final RunPassenger passenger;
-  final _Rider state;
   final String lang;
+  final bool onBoard;
   final VoidCallback? onTap;
   final VoidCallback? onCollect;
   final bool paid;
+  final bool noShow;
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final on = state == _Rider.onBoard;
-    return Padding(
-      padding: const EdgeInsets.only(top: NaqlSpace.s2),
-      child: NaqlPressable(
-        onPressed: onTap,
-        semanticLabel: passenger.name,
-        child: AnimatedContainer(
-          key: ValueKey('rider-${passenger.requestId}'),
-          duration: naqlMotion(context),
-          constraints: const BoxConstraints(minHeight: NaqlTouch.driver),
-          padding: const EdgeInsets.symmetric(horizontal: NaqlSpace.s3),
-          decoration: BoxDecoration(
-            color: on ? NaqlColors.successSoft : NaqlColors.surfaceMuted,
-            borderRadius: BorderRadius.circular(NaqlRadius.md),
-          ),
-          child: Row(children: [
-            AnimatedSwitcher(
-              duration: NaqlMotion.fast,
-              transitionBuilder: (c, a) => ScaleTransition(scale: a, child: c),
-              child: Icon(on ? LucideIcons.circleCheck : LucideIcons.circle, key: ValueKey(on), color: on ? NaqlColors.success : NaqlColors.border, size: 26),
+    final p = passenger;
+    final amount = formatIqd(p.fare, lang).split(' ').first;
+    final Widget tag = onBoard && p.fare > 0
+        ? (paid
+            ? NaqlTag(t.paidLabel, tone: NaqlTone.success, icon: LucideIcons.banknote)
+            : NaqlButton(key: ValueKey('fare-${p.requestId}'), label: t.collectFare(formatIqd(p.fare, lang)), variant: NaqlButtonVariant.secondary, onPressed: onCollect))
+        : onBoard
+            ? NaqlTag(t.onBoard, tone: NaqlTone.success, icon: LucideIcons.check)
+            : noShow
+                ? NaqlTag(t.noShowLabel)
+                : (p.subscriber && p.fare == 0 ? NaqlTag(t.subscriber, tone: NaqlTone.success) : NaqlTag(t.riderCash(amount), tone: NaqlTone.accent));
+    return NaqlPressable(
+      onPressed: onTap,
+      semanticLabel: p.name,
+      pressedScale: 0.98,
+      child: AnimatedContainer(
+        key: ValueKey('rider-${p.requestId}'),
+        duration: naqlMotion(context),
+        curve: naqlEaseOut,
+        constraints: const BoxConstraints(minHeight: NaqlTouch.driver + 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: NaqlSpace.s2),
+        color: onBoard ? NaqlColors.successSoft.withValues(alpha: 0.6) : null,
+        child: Row(children: [
+          AnimatedSwitcher(
+            duration: naqlMotion(context),
+            transitionBuilder: (c, a) => ScaleTransition(scale: a, child: c),
+            child: Container(
+              key: ValueKey(onBoard),
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(color: onBoard ? NaqlColors.success : NaqlColors.surfaceMuted, borderRadius: BorderRadius.circular(12)),
+              child: onBoard
+                  ? Icon(LucideIcons.check, size: 20, color: naqlIsDark ? NaqlColors.bg : NaqlColors.onPrimary)
+                  : Text(p.name.trim().isEmpty ? '' : p.name.trim().characters.first, style: NaqlText.label.copyWith(fontWeight: FontWeight.w600)),
             ),
-            const SizedBox(width: NaqlSpace.s3),
-            Expanded(child: Text(passenger.name, style: NaqlText.label)),
-            if (passenger.fare > 0 && on)
-              paid
-                  ? StatusPill(label: t.paidLabel, tone: NaqlTone.success, icon: LucideIcons.banknote)
-                  : TextButton(
-                      key: ValueKey('fare-${passenger.requestId}'),
-                      onPressed: onCollect,
-                      style: TextButton.styleFrom(minimumSize: const Size(0, 48), foregroundColor: NaqlColors.success, textStyle: NaqlText.label.copyWith(fontWeight: FontWeight.w600)),
-                      child: Text(t.collectFare(formatIqd(passenger.fare, lang))),
-                    )
-            else if (!on)
-              Text(t.waiting, style: NaqlText.caption),
-          ]),
-        ),
+          ),
+          const SizedBox(width: NaqlSpace.s3),
+          Expanded(child: Text(p.name, style: NaqlText.body.copyWith(fontWeight: FontWeight.w500))),
+          const SizedBox(width: NaqlSpace.s2),
+          tag,
+        ]),
       ),
     );
   }
@@ -345,11 +339,9 @@ class _NavButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = AppLocalizations.of(context);
-    return NaqlButton(
+    return NavigateButton(
       key: const ValueKey('navigate'),
-      label: t.navigate,
-      icon: LucideIcons.navigation,
-      variant: NaqlButtonVariant.secondary,
+      label: t.openNavigation,
       onPressed: () => showNaqlSheet<void>(
         context,
         builder: (c) => Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -419,7 +411,7 @@ class _StopTileState extends State<StopTile> {
           child: Padding(
             padding: const EdgeInsets.only(bottom: NaqlSpace.s3),
             child: AnimatedOpacity(
-              duration: NaqlMotion.sheet,
+              duration: naqlMotion(context, NaqlMotion.sheet),
               opacity: served ? 0.6 : 1,
               child: NaqlCard(
                 padding: EdgeInsets.zero,
@@ -442,14 +434,14 @@ class _StopTileState extends State<StopTile> {
                         const SizedBox(width: NaqlSpace.s2),
                         AnimatedRotation(
                           turns: _open ? 0.5 : 0,
-                          duration: NaqlMotion.fast,
+                          duration: naqlMotion(context, NaqlMotion.fast),
                           child: Icon(LucideIcons.chevronDown, size: 20, color: NaqlColors.textMuted),
                         ),
                       ]),
                     ),
                   ),
                   AnimatedSize(
-                    duration: NaqlMotion.sheet,
+                    duration: naqlMotion(context, NaqlMotion.sheet),
                     curve: Curves.easeOutCubic,
                     alignment: Alignment.topCenter,
                     child: !_open
@@ -544,7 +536,7 @@ class _Rail extends StatelessWidget {
       child: Column(children: [
         Container(width: 2, height: 14, color: first ? Colors.transparent : NaqlColors.border),
         AnimatedContainer(
-          duration: NaqlMotion.sheet,
+          duration: naqlMotion(context, NaqlMotion.sheet),
           width: 36,
           height: 36,
           alignment: Alignment.center,

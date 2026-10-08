@@ -73,4 +73,20 @@ void main() {
     expect(runs.single.stops.single.passengers.map((p) => p.name), ['زينب', 'مريم']);
     expect(methods, ['GET /drivers/me/availability', 'PUT /drivers/me/availability', 'GET /drivers/me/runs']);
   });
+
+  test('ride options read seat availability when the server sends it, and stay open when it does not', () {
+    final o = RideOptions.fromJson({
+      'slots': [
+        {'waveId': 'w1', 'date': '2026-10-08', 'type': 'morning', 'time': '06:45', 'today': true, 'seatsLeft': 0},
+        {'waveId': 'w2', 'date': '2026-10-08', 'type': 'morning', 'time': '07:30', 'today': true, 'seatsLeft': 6},
+        {'waveId': 'w3', 'date': '2026-10-08', 'type': 'return', 'time': '14:00', 'today': true},
+        {'waveId': 'w4', 'date': '2026-10-09', 'type': 'morning', 'time': '08:00', 'today': false, 'full': true},
+      ],
+      'defaultPointId': 'p1',
+    });
+    expect([for (final s in o.slots) s.full], [true, false, false, true]);
+    expect([for (final s in o.slots) s.seatsLeft], [0, 6, null, null]);
+    expect(o.slots[2].type, WaveType.ret);
+  });
 }
+

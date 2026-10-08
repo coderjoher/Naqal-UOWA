@@ -1,193 +1,149 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:clock/clock.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:naql_app/naql_app.dart';
 import 'package:naql_ui/naql_ui.dart';
 
 import '../../data/run_controller.dart';
 import '../../data/taxi.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../drive_layout.dart';
+import '../home_header.dart';
 
 /// Motion: quick ease-out for things arriving, a little faster ease-in for things leaving.
 const _enter = Duration(milliseconds: 240);
 const _exit = Duration(milliseconds: 180);
-const _easeOut = Cubic(0.165, 0.84, 0.44, 1); // ease-out-quart
+const _easeOut = naqlEaseOut;
 
 bool _reduceMotion(BuildContext context) => MediaQuery.maybeDisableAnimationsOf(context) ?? false;
 
 /// "4.2" — one decimal, Western digits (as on Iraqi price lists).
 String _km(double km) => km.toStringAsFixed(1);
 
-/// TX-04: the taxi driver's home. A big online switch, live offers while online, then one ride
-/// from pickup to cash. Everything is sized for use in the car (56 dp+ targets, big numbers).
+/// TX-04: the taxi driver's Home. Greeting and plate, a huge online switch, today's figures,
+/// and live offers while online. An accepted ride takes the whole screen (map, instruction,
+/// one big gold step), then a short "done" moment with the cash. 56 dp+ targets throughout.
 class TaxiHomeScreen extends ConsumerWidget {
   const TaxiHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = AppLocalizations.of(context);
     final s = ref.watch(taxiControllerProvider);
     final reduce = _reduceMotion(context);
-
     final Widget body;
     if (s.done != null) {
       body = _DoneView(key: ValueKey('done-${s.done!.id}'), ride: s.done!);
     } else if (s.active != null) {
-      body = _ActiveRide(key: ValueKey('ride-${s.active!.id}'), ride: s.active!, busy: s.busy);
-    } else if (s.online) {
-      body = _OfferList(key: const ValueKey('offers'), offers: s.offers, busy: s.busy);
+      body = _TaxiDrive(key: ValueKey('ride-${s.active!.id}'), ride: s.active!, busy: s.busy);
     } else {
-      body = Padding(
-        key: const ValueKey('offline'),
-        padding: const EdgeInsets.only(top: NaqlSpace.s8),
-        child: NaqlEmptyState(icon: LucideIcons.moon, title: t.taxiOfflineTitle, message: t.taxiOfflineBody),
-      );
+      body = _Idle(key: const ValueKey('idle'), state: s);
     }
-
-    final idle = s.active == null && s.done == null;
-    return Column(
-      children: [
-        NaqlTopBar(title: t.taxiTitle),
-        Expanded(
-          child: RefreshIndicator(
-            color: NaqlColors.primary,
-            onRefresh: () => ref.read(taxiControllerProvider.notifier).refreshOffers(),
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(NaqlSpace.s5, NaqlSpace.s2, NaqlSpace.s5, 120),
-              children: [
-                AnimatedSize(
-                  duration: reduce ? Duration.zero : _enter,
-                  curve: _easeOut,
-                  alignment: Alignment.topCenter,
-                  child: idle
-                      ? Padding(
-                          padding: const EdgeInsets.only(bottom: NaqlSpace.s4),
-                          child: _OnlineSwitch(online: s.online, switching: s.switching),
-                        )
-                      : const SizedBox(width: double.infinity),
-                ),
-                _NoticeBanner(notice: s.notice),
-                AnimatedSwitcher(
-                  duration: reduce ? Duration.zero : _enter,
-                  reverseDuration: reduce ? Duration.zero : _exit,
-                  switchInCurve: _easeOut,
-                  switchOutCurve: Curves.easeIn,
-                  transitionBuilder: (child, a) => FadeTransition(
-                    opacity: a,
-                    child: SlideTransition(
-                      position: Tween(begin: const Offset(0, 0.04), end: Offset.zero).animate(a),
-                      child: child,
-                    ),
-                  ),
-                  layoutBuilder: (current, previous) => Stack(alignment: Alignment.topCenter, children: [...previous, ?current]),
-                  child: body,
-                ),
-              ],
-            ),
-          ),
+    return AnimatedSwitcher(
+      duration: reduce ? Duration.zero : _enter,
+      reverseDuration: reduce ? Duration.zero : _exit,
+      switchInCurve: _easeOut,
+      switchOutCurve: Curves.easeIn,
+      transitionBuilder: (child, a) => FadeTransition(
+        opacity: a,
+        child: SlideTransition(
+          position: Tween(begin: const Offset(0, 0.03), end: Offset.zero).animate(a),
+          child: child,
         ),
-      ],
+      ),
+      child: body,
     );
   }
 }
 
-/// The online/offline switch: a wide 88 dp pill whose knob slides across; online turns it gold
-/// (the university's accent), offline it is a quiet surface with a blue (ink in dark mode) knob.
-class _OnlineSwitch extends ConsumerWidget {
-  const _OnlineSwitch({required this.online, required this.switching});
-  final bool online;
-  final bool switching;
+/// No ride: the switch, the figures and the offers.
+class _Idle extends ConsumerWidget {
+  const _Idle({super.key, required this.state});
+  final TaxiState state;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = AppLocalizations.of(context);
-    final reduce = _reduceMotion(context);
-    final d = reduce ? Duration.zero : _enter;
-    final fg = online ? NaqlColors.onAccent : NaqlColors.text;
-    final knob = naqlIsDark ? NaqlColors.ink : NaqlColors.primary;
-    final onKnob = naqlIsDark ? NaqlColors.onInk : NaqlColors.onPrimary;
-    final title = online ? t.taxiOnline : t.taxiOffline;
-    final hint = switching ? t.taxiConnecting : (online ? t.taxiOnlineHint : t.taxiOfflineHint);
-    return Semantics(
-      toggled: online,
-      hint: online ? t.taxiGoOffline : t.taxiGoOnline,
-      child: NaqlPressable(
-        key: const ValueKey('taxi-online'),
-        semanticLabel: title,
-        pressedScale: 0.98,
-        minSize: 88,
-        onPressed: switching
-            ? null
-            : () {
-                HapticFeedback.mediumImpact();
-                ref.read(taxiControllerProvider.notifier).toggle();
-              },
-        child: AnimatedContainer(
-          duration: d,
-          curve: _easeOut,
-          height: 88,
-          padding: const EdgeInsets.all(NaqlSpace.s2),
-          decoration: BoxDecoration(
-            color: online ? NaqlColors.accent : NaqlColors.surface,
-            borderRadius: BorderRadius.circular(NaqlRadius.pill),
-            border: Border.all(color: online ? NaqlColors.accent : NaqlColors.border, width: 1.5),
-            boxShadow: online ? [BoxShadow(color: NaqlColors.accent.withValues(alpha: 0.35), blurRadius: 24, offset: const Offset(0, 8))] : naqlCardShadow,
-          ),
-          child: Stack(
-            children: [
-              // The words sit on the side the knob is not on.
-              AnimatedPadding(
-                duration: d,
-                curve: _easeOut,
-                padding: EdgeInsetsDirectional.only(start: online ? NaqlSpace.s5 : 88, end: online ? 88 : NaqlSpace.s5),
-                child: Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: NaqlText.title.copyWith(color: fg),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        hint,
-                        style: NaqlText.label.copyWith(color: online ? NaqlColors.onAccent.withValues(alpha: 0.8) : NaqlColors.textMuted),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              AnimatedAlign(
-                duration: d,
-                curve: _easeOut,
-                alignment: online ? AlignmentDirectional.centerEnd : AlignmentDirectional.centerStart,
-                child: AnimatedContainer(
-                  duration: d,
-                  curve: _easeOut,
-                  width: 72,
-                  height: 72,
-                  decoration: BoxDecoration(color: online ? NaqlColors.onAccent : knob, shape: BoxShape.circle),
-                  child: AnimatedOpacity(
-                    opacity: switching ? 0.4 : 1,
-                    duration: d,
-                    child: Icon(LucideIcons.power, size: 32, color: online ? NaqlColors.accent : onKnob),
-                  ),
-                ),
-              ),
-            ],
-          ),
+    final s = state;
+    final on = s.online;
+    return SafeArea(
+      bottom: false,
+      child: RefreshIndicator(
+        color: NaqlColors.primary,
+        onRefresh: () async {
+          ref.invalidate(taxiHistoryProvider);
+          await ref.read(taxiControllerProvider.notifier).refreshOffers();
+        },
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(NaqlSpace.s4, NaqlSpace.s5, NaqlSpace.s4, 120),
+          children: [
+            DriverHomeHeader(service: t.taxiTitle),
+            const SizedBox(height: 14),
+            NaqlToggleCard(
+              key: const ValueKey('taxi-online'),
+              on: on,
+              title: on ? t.taxiOnline : t.taxiOffline,
+              subtitle: s.switching ? t.taxiConnecting : (on ? t.taxiOnlineSub : t.taxiOfflineHint),
+              cta: t.taxiGoOnline,
+              watermark: t.watermarkOn,
+              busy: s.switching,
+              semanticHint: on ? t.taxiGoOffline : t.taxiGoOnline,
+              onTap: s.switching
+                  ? null
+                  : () {
+                      HapticFeedback.mediumImpact();
+                      ref.read(taxiControllerProvider.notifier).toggle();
+                    },
+            ),
+            const SizedBox(height: 14),
+            const _TaxiKpis(),
+            const SizedBox(height: NaqlSpace.s4),
+            _NoticeBanner(notice: s.notice),
+            AnimatedSwitcher(
+              duration: _reduceMotion(context) ? Duration.zero : _enter,
+              switchInCurve: _easeOut,
+              child: on
+                  ? _OfferList(key: const ValueKey('offers'), offers: s.offers, busy: s.busy)
+                  : Padding(
+                      key: const ValueKey('offline'),
+                      padding: const EdgeInsets.only(top: NaqlSpace.s4),
+                      child: NaqlEmptyState(icon: LucideIcons.moon, title: t.taxiOfflineTitle, message: t.taxiOfflineBody),
+                    ),
+            ),
+          ],
         ),
       ),
+    );
+  }
+}
+
+/// Today's taxi trips and cash, and this month's trips, from the driver's own history.
+class _TaxiKpis extends ConsumerWidget {
+  const _TaxiKpis();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = AppLocalizations.of(context);
+    final lang = ref.watch(localeProvider).languageCode;
+    final h = ref.watch(taxiHistoryProvider).value;
+    final now = clock.now().toUtc().add(const Duration(hours: 3));
+    bool today(DateTime? d) {
+      if (d == null) return false;
+      final b = d.toUtc().add(const Duration(hours: 3));
+      return b.year == now.year && b.month == now.month && b.day == now.day;
+    }
+
+    final done = h?.rides.where((r) => r.status == 'done' && today(r.endedAt)).toList();
+    return KpiRow(
+      tiles: [
+        NaqlKpiTile(label: t.kpiTaxiToday, value: done == null ? '—' : '${done.length}'),
+        NaqlKpiTile(label: t.kpiCash, value: done == null ? '—' : formatIqd(done.fold(0, (n, r) => n + r.fare), lang).split(' ').first, small: true),
+        NaqlKpiTile(label: t.kpiMonth, value: h == null ? '—' : '${h.trips}'),
+      ],
     );
   }
 }
@@ -330,9 +286,14 @@ class _OfferListState extends ConsumerState<_OfferList> {
         AnimatedSwitcher(
           duration: _reduceMotion(context) ? Duration.zero : _enter,
           child: visible
-              ? const SizedBox(width: double.infinity)
+              ? Padding(
+                  padding: const EdgeInsets.only(bottom: NaqlSpace.s3),
+                  child: Row(
+                    children: [Expanded(child: Text(t.taxiNewRequest, style: NaqlText.headline.copyWith(fontSize: 17)))],
+                  ),
+                )
               : Padding(
-                  padding: const EdgeInsets.only(top: NaqlSpace.s6),
+                  padding: const EdgeInsets.only(top: NaqlSpace.s5),
                   child: NaqlEmptyState(icon: LucideIcons.radar, title: t.taxiWaitingTitle, message: t.taxiWaitingBody),
                 ),
         ),
@@ -429,44 +390,82 @@ class _OfferCard extends ConsumerWidget {
     final toCampus = offer.direction == TaxiDirection.toCampus;
     final left = offer.expiresAt.difference(now);
     final total = offer.expiresAt.difference(firstSeen);
-    return NaqlCard(
+    final secs = left.isNegative ? 0 : (left.inMilliseconds / 1000).ceil();
+    final frac = total.inMilliseconds <= 0 ? 0.0 : left.inMilliseconds / total.inMilliseconds;
+    final fare = formatIqd(offer.fare, lang);
+    final dir = toCampus ? t.taxiToCampus : t.taxiFromCampus;
+    return Container(
       key: ValueKey('offer-${offer.id}'),
+      padding: const EdgeInsets.all(NaqlSpace.s4),
+      decoration: BoxDecoration(
+        color: NaqlColors.surface,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: naqlSelectColor, width: 1.5),
+        boxShadow: naqlCardShadow,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              StatusPill(label: toCampus ? t.taxiToCampus : t.taxiFromCampus, tone: toCampus ? NaqlTone.primary : NaqlTone.accent, icon: toCampus ? LucideIcons.school : LucideIcons.house),
-              const Spacer(),
-              _CountdownRing(left: left, total: total),
+              NaqlCountdownRing(seconds: secs, fraction: frac, semanticLabel: t.taxiSecondsLeft(secs)),
+              const SizedBox(width: NaqlSpace.s3),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Icon(toCampus ? LucideIcons.school : LucideIcons.house, size: 15, color: NaqlColors.textMuted),
+                        const SizedBox(width: 4),
+                        Text(
+                          dir,
+                          style: NaqlText.label.copyWith(color: NaqlColors.textMuted, fontWeight: FontWeight.w400),
+                        ),
+                        Text(' · ', style: NaqlText.label.copyWith(color: NaqlColors.textMuted)),
+                        Text(
+                          t.taxiTripKm(_km(offer.distanceKm)),
+                          style: NaqlText.label.copyWith(color: NaqlColors.textMuted, fontWeight: FontWeight.w400),
+                        ),
+                      ],
+                    ),
+                    if (offer.awayKm != null) Text(t.taxiAwayKm(_km(offer.awayKm!)), style: NaqlText.body.copyWith(fontSize: 15, fontWeight: FontWeight.w500)),
+                  ],
+                ),
+              ),
+              const SizedBox(width: NaqlSpace.s2),
+              Text(
+                fare,
+                style: NaqlText.title.copyWith(fontSize: 22, fontWeight: FontWeight.w700),
+                textDirection: TextDirection.ltr,
+              ),
             ],
           ),
           const SizedBox(height: NaqlSpace.s3),
-          Text(t.taxiFare, style: NaqlText.label.copyWith(color: NaqlColors.textMuted)),
-          Text(
-            formatIqd(offer.fare, lang),
-            style: NaqlText.display.copyWith(fontSize: 38, height: 1.15, fontWeight: FontWeight.w700),
-            textDirection: TextDirection.ltr,
-            textAlign: TextAlign.start,
-          ),
-          const SizedBox(height: NaqlSpace.s3),
-          Wrap(
-            spacing: NaqlSpace.s5,
-            runSpacing: NaqlSpace.s2,
+          Row(
             children: [
-              _Fact(icon: LucideIcons.route, text: t.taxiTripKm(_km(offer.distanceKm))),
-              if (offer.awayKm != null) _Fact(icon: LucideIcons.mapPin, text: t.taxiAwayKm(_km(offer.awayKm!))),
+              Expanded(
+                child: NaqlButton(
+                  key: ValueKey('accept-${offer.id}'),
+                  label: t.taxiAccept,
+                  // The whole offer is read out on the button, with the time left.
+                  semanticLabel: '${t.taxiSecondsLeft(secs)}، $dir، ${t.taxiTripKm(_km(offer.distanceKm))}، $fare، ${t.taxiAccept}',
+                  size: NaqlButtonSize.huge,
+                  expand: true,
+                  loading: busy,
+                  onPressed: locked && !busy ? null : () => ref.read(taxiControllerProvider.notifier).accept(offer.id),
+                ),
+              ),
+              const SizedBox(width: 10),
+              NaqlIconButton(
+                key: ValueKey('skip-${offer.id}'),
+                icon: LucideIcons.x,
+                semanticLabel: t.taxiSkipOffer,
+                size: 64,
+                onPressed: locked ? null : () => ref.read(taxiControllerProvider.notifier).skip(offer.id),
+              ),
             ],
-          ),
-          const SizedBox(height: NaqlSpace.s4),
-          NaqlButton(
-            key: ValueKey('accept-${offer.id}'),
-            label: t.taxiAccept,
-            icon: LucideIcons.check,
-            size: NaqlButtonSize.large,
-            expand: true,
-            loading: busy,
-            onPressed: locked && !busy ? null : () => ref.read(taxiControllerProvider.notifier).accept(offer.id),
           ),
         ],
       ),
@@ -474,99 +473,10 @@ class _OfferCard extends ConsumerWidget {
   }
 }
 
-class _Fact extends StatelessWidget {
-  const _Fact({required this.icon, required this.text});
-  final IconData icon;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Icon(icon, size: 20, color: NaqlColors.textMuted),
-      const SizedBox(width: NaqlSpace.s1),
-      Text(text, style: NaqlText.body.copyWith(color: NaqlColors.textMuted)),
-    ],
-  );
-}
-
-/// Seconds left to accept, as a ring that empties (amber in the last 15 s).
-class _CountdownRing extends StatelessWidget {
-  const _CountdownRing({required this.left, required this.total});
-  final Duration left;
-  final Duration total;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
-    final secs = left.isNegative ? 0 : (left.inMilliseconds / 1000).ceil();
-    final frac = total.inMilliseconds <= 0 ? 0.0 : (left.inMilliseconds / total.inMilliseconds).clamp(0.0, 1.0);
-    final color = secs <= 15 ? NaqlColors.warning : NaqlColors.primary;
-    return Semantics(
-      label: t.taxiSecondsLeft(secs),
-      excludeSemantics: true,
-      child: SizedBox(
-        width: 52,
-        height: 52,
-        child: TweenAnimationBuilder<double>(
-          tween: Tween(end: frac),
-          // Glides between the once-a-second ticks.
-          duration: _reduceMotion(context) ? Duration.zero : const Duration(seconds: 1),
-          builder: (_, v, _) => CustomPaint(
-            painter: _RingPainter(value: v, color: color),
-            child: Center(
-              child: Text(
-                '$secs',
-                style: NaqlText.label.copyWith(fontWeight: FontWeight.w700, color: color),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _RingPainter extends CustomPainter {
-  const _RingPainter({required this.value, required this.color});
-  final double value;
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    const stroke = 5.0;
-    final rect = Offset.zero & size;
-    final r = rect.deflate(stroke / 2);
-    canvas.drawArc(
-      r,
-      0,
-      math.pi * 2,
-      false,
-      Paint()
-        ..color = NaqlColors.surfaceMuted
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = stroke,
-    );
-    canvas.drawArc(
-      r,
-      -math.pi / 2,
-      math.pi * 2 * value,
-      false,
-      Paint()
-        ..color = color
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeWidth = stroke,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_RingPainter old) => old.value != value || old.color != color;
-}
-
-/// The accepted ride: who, where, and the one next step as a big button.
-class _ActiveRide extends ConsumerWidget {
-  const _ActiveRide({super.key, required this.ride, required this.busy});
+/// The accepted ride, full screen while driving: where to go (blue card), the map, the step
+/// bar, the student, call and navigate, the fare, and the one next step as a big gold button.
+class _TaxiDrive extends ConsumerWidget {
+  const _TaxiDrive({super.key, required this.ride, required this.busy});
   final TaxiRide ride;
   final String? busy;
 
@@ -613,150 +523,102 @@ class _ActiveRide extends ConsumerWidget {
     final (label, actionIcon) = switch (ride.status) {
       'arrived' => (t.taxiStartTrip, LucideIcons.play),
       'on_trip' => (t.taxiEndTrip(amount), LucideIcons.banknote),
-      _ => (t.taxiArrived, LucideIcons.mapPinCheck),
+      _ => (t.taxiArrived, LucideIcons.check),
     };
     final phone = ride.studentPhone;
     void call() => ref.read(urlLauncherProvider)(Uri(scheme: 'tel', path: phone));
     final canCancel = ride.status == 'accepted' || ride.status == 'arrived';
     final stepBusy = busy == 'arrive' || busy == 'start' || busy == 'end';
+    final spot = ride.label?.isNotEmpty == true ? ride.label! : t.pickupPlace;
+    final pickup = DrivePoint(LatLng(ride.pickup.lat, ride.pickup.lng), label: t.pickupPlace, current: ride.status != 'on_trip');
+    final dropoff = DrivePoint(LatLng(ride.dropoff.lat, ride.dropoff.lng), label: t.dropoffPlace, current: ride.status == 'on_trip', done: false);
 
-    return NaqlCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _StepBar(step: step),
-          const SizedBox(height: NaqlSpace.s4),
-          AnimatedSwitcher(
-            duration: _reduceMotion(context) ? Duration.zero : NaqlMotion.fast,
-            child: Row(
-              key: ValueKey(ride.status),
-              children: [
-                Icon(icon, size: 22, color: NaqlColors.primary),
-                const SizedBox(width: NaqlSpace.s2),
-                Expanded(
-                  child: Text(stage, style: NaqlText.headline.copyWith(color: NaqlColors.primary)),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: NaqlSpace.s3),
-          NaqlCard(
-            nested: true,
-            padding: const EdgeInsets.all(NaqlSpace.s3),
-            child: NaqlPersonCard(
-              name: ride.studentName,
-              caption: ride.label != null && ride.label!.isNotEmpty ? ride.label! : null,
-              large: true,
-            ),
-          ),
-          const SizedBox(height: NaqlSpace.s4),
-          Row(
+    return DriveScaffold(
+      map: DriveMap(points: [pickup, dropoff], tiles: ref.watch(driverMapTilesProvider), hereLabel: t.taxi),
+      instruction: AnimatedSwitcher(
+        duration: _reduceMotion(context) ? Duration.zero : NaqlMotion.fast,
+        child: NaqlInstructionCard(key: ValueKey(ride.status), icon: icon, headline: stage, body: ride.status == 'on_trip' ? (toCampus ? t.campus : spot) : spot),
+      ),
+      action: NaqlButton(
+        key: const ValueKey('taxi-step'),
+        label: label,
+        icon: actionIcon,
+        size: NaqlButtonSize.huge,
+        variant: NaqlButtonVariant.accent,
+        expand: true,
+        loading: stepBusy,
+        onPressed: busy != null && !stepBusy
+            ? null
+            : () async {
+                if (ride.status == 'on_trip') {
+                  final ok = await _confirm(context, title: t.taxiEndConfirmTitle(amount), body: t.taxiEndConfirmBody, yes: t.taxiEndConfirmYes, no: t.taxiNotYet);
+                  if (!ok) return;
+                }
+                HapticFeedback.mediumImpact();
+                await ctl.step();
+              },
+      ),
+      children: [
+        NaqlStepBar(total: 3, done: step, semanticLabel: t.taxiStep(step)),
+        const SizedBox(height: NaqlSpace.s3),
+        DriveHeading(
+          caption: '${t.taxiStep(step)} · ${t.taxiKm(_km(ride.distanceKm))}',
+          title: ride.studentName,
+          navigate: NavigateButton(key: const ValueKey('taxi-navigate'), label: t.navigate, onPressed: () => _navigate(ref)),
+        ),
+        const SizedBox(height: NaqlSpace.s3),
+        NaqlPanel(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(
-                // Read out as "Call <name>"; the visible label stays short.
-                child: Semantics(
-                  label: t.taxiCallStudent(ride.studentName),
-                  button: true,
-                  enabled: phone != null,
-                  excludeSemantics: true,
-                  onTap: phone == null ? null : call,
-                  child: NaqlButton(
-                    key: const ValueKey('taxi-call'),
-                    label: t.taxiCall,
-                    icon: LucideIcons.phone,
-                    size: NaqlButtonSize.large,
-                    variant: NaqlButtonVariant.secondary,
-                    expand: true,
-                    onPressed: phone == null ? null : call,
-                  ),
-                ),
+              NaqlTripTimeline(
+                dense: true,
+                stops: [
+                  NaqlTimelineStop(title: toCampus ? spot : t.campus),
+                  NaqlTimelineStop(title: toCampus ? t.campus : spot),
+                ],
               ),
-              const SizedBox(width: NaqlSpace.s3),
-              Expanded(
-                child: NaqlButton(
-                  key: const ValueKey('taxi-navigate'),
-                  label: t.navigate,
-                  icon: LucideIcons.navigation,
-                  size: NaqlButtonSize.large,
-                  variant: NaqlButtonVariant.secondary,
-                  expand: true,
-                  onPressed: () => _navigate(ref),
-                ),
-              ),
+              const SizedBox(height: NaqlSpace.s2),
+              NaqlSummaryRow(label: t.taxiFare, value: amount, icon: LucideIcons.banknote),
             ],
           ),
-          const SizedBox(height: NaqlSpace.s4),
-          NaqlSummaryRow(label: t.taxiDistance, value: t.taxiKm(_km(ride.distanceKm)), icon: LucideIcons.route),
-          NaqlSummaryRow(label: t.taxiFare, value: amount, total: true),
-          const SizedBox(height: NaqlSpace.s4),
+        ),
+        const SizedBox(height: NaqlSpace.s3),
+        // Read out as "Call <name>"; the visible label stays short.
+        Semantics(
+          label: t.taxiCallStudent(ride.studentName),
+          button: true,
+          enabled: phone != null,
+          excludeSemantics: true,
+          onTap: phone == null ? null : call,
+          child: NaqlButton(
+            key: const ValueKey('taxi-call'),
+            label: t.taxiCall,
+            icon: LucideIcons.phone,
+            size: NaqlButtonSize.large,
+            variant: NaqlButtonVariant.secondary,
+            expand: true,
+            onPressed: phone == null ? null : call,
+          ),
+        ),
+        if (canCancel) ...[
+          const SizedBox(height: NaqlSpace.s2),
           NaqlButton(
-            key: const ValueKey('taxi-step'),
-            label: label,
-            icon: actionIcon,
+            key: const ValueKey('taxi-cancel'),
+            label: t.taxiCancelRide,
+            variant: NaqlButtonVariant.ghost,
             size: NaqlButtonSize.large,
             expand: true,
-            loading: stepBusy,
-            onPressed: busy != null && !stepBusy
+            loading: busy == 'cancel',
+            onPressed: busy != null
                 ? null
                 : () async {
-                    if (ride.status == 'on_trip') {
-                      final ok = await _confirm(context, title: t.taxiEndConfirmTitle(amount), body: t.taxiEndConfirmBody, yes: t.taxiEndConfirmYes, no: t.taxiNotYet);
-                      if (!ok) return;
-                    }
-                    HapticFeedback.mediumImpact();
-                    await ctl.step();
+                    final ok = await _confirm(context, title: t.taxiCancelConfirmTitle, body: t.taxiCancelConfirmBody, yes: t.taxiCancelYes, no: t.taxiKeepRide, danger: true);
+                    if (ok) await ctl.cancel();
                   },
           ),
-          if (canCancel) ...[
-            const SizedBox(height: NaqlSpace.s2),
-            NaqlButton(
-              key: const ValueKey('taxi-cancel'),
-              label: t.taxiCancelRide,
-              variant: NaqlButtonVariant.ghost,
-              size: NaqlButtonSize.large,
-              expand: true,
-              loading: busy == 'cancel',
-              onPressed: busy != null
-                  ? null
-                  : () async {
-                      final ok = await _confirm(context, title: t.taxiCancelConfirmTitle, body: t.taxiCancelConfirmBody, yes: t.taxiCancelYes, no: t.taxiKeepRide, danger: true);
-                      if (ok) await ctl.cancel();
-                    },
-            ),
-          ],
         ],
-      ),
-    );
-  }
-}
-
-/// Three segments: to pickup → waiting → on the trip.
-class _StepBar extends StatelessWidget {
-  const _StepBar({required this.step});
-  final int step;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
-    final d = _reduceMotion(context) ? Duration.zero : _enter;
-    return Semantics(
-      label: t.taxiStep(step),
-      excludeSemantics: true,
-      child: Row(
-        children: [
-          for (var i = 1; i <= 3; i++) ...[
-            if (i > 1) const SizedBox(width: NaqlSpace.s1),
-            Expanded(
-              child: AnimatedContainer(
-                duration: d,
-                curve: _easeOut,
-                height: 6,
-                decoration: BoxDecoration(color: i <= step ? NaqlColors.accent : NaqlColors.border, borderRadius: BorderRadius.circular(NaqlRadius.pill)),
-              ),
-            ),
-          ],
-        ],
-      ),
+      ],
     );
   }
 }
@@ -771,55 +633,62 @@ class _DoneView extends ConsumerWidget {
     final t = AppLocalizations.of(context);
     final lang = ref.watch(localeProvider).languageCode;
     final reduce = _reduceMotion(context);
-    return NaqlCard(
-      child: Column(
-        children: [
-          const SizedBox(height: NaqlSpace.s2),
-          TweenAnimationBuilder<double>(
-            tween: Tween(begin: reduce ? 1 : 0.6, end: 1),
-            duration: reduce ? Duration.zero : const Duration(milliseconds: 420),
-            curve: Curves.easeOutBack,
-            builder: (_, v, child) => Transform.scale(scale: v, child: child),
-            child: Container(
-              width: 96,
-              height: 96,
-              decoration: BoxDecoration(color: NaqlColors.successSoft, shape: BoxShape.circle),
-              child: Icon(LucideIcons.circleCheck, size: 52, color: NaqlColors.success),
+    return SafeArea(
+      child: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(NaqlSpace.s4),
+          child: NaqlCard(
+            child: Column(
+              children: [
+                const SizedBox(height: NaqlSpace.s2),
+                TweenAnimationBuilder<double>(
+                  tween: Tween(begin: reduce ? 1 : 0.6, end: 1),
+                  duration: reduce ? Duration.zero : const Duration(milliseconds: 420),
+                  curve: Curves.easeOutBack,
+                  builder: (_, v, child) => Transform.scale(scale: v, child: child),
+                  child: Container(
+                    width: 96,
+                    height: 96,
+                    decoration: BoxDecoration(color: NaqlColors.successSoft, shape: BoxShape.circle),
+                    child: Icon(LucideIcons.circleCheck, size: 52, color: NaqlColors.success),
+                  ),
+                ),
+                const SizedBox(height: NaqlSpace.s4),
+                Semantics(
+                  liveRegion: true,
+                  child: Text(t.taxiDoneTitle, style: NaqlText.title, textAlign: TextAlign.center),
+                ),
+                const SizedBox(height: NaqlSpace.s4),
+                Text(t.taxiCashCollected, style: NaqlText.label.copyWith(color: NaqlColors.textMuted)),
+                TweenAnimationBuilder<double>(
+                  tween: Tween(begin: reduce ? ride.fare.toDouble() : 0, end: ride.fare.toDouble()),
+                  duration: reduce ? Duration.zero : NaqlMotion.sheet * 2,
+                  curve: Curves.easeOutCubic,
+                  builder: (_, v, _) => Text(
+                    formatIqd(v.round(), lang),
+                    key: const ValueKey('taxi-done-cash'),
+                    style: NaqlText.display.copyWith(fontSize: 42, height: 1.15, fontWeight: FontWeight.w700, color: NaqlColors.success),
+                    textDirection: TextDirection.ltr,
+                  ),
+                ),
+                const SizedBox(height: NaqlSpace.s2),
+                Text(
+                  t.taxiDoneBody,
+                  style: NaqlText.body.copyWith(color: NaqlColors.textMuted),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: NaqlSpace.s5),
+                NaqlButton(
+                  label: t.taxiBackToRequests,
+                  size: NaqlButtonSize.large,
+                  variant: NaqlButtonVariant.secondary,
+                  expand: true,
+                  onPressed: () => ref.read(taxiControllerProvider.notifier).finishDone(),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: NaqlSpace.s4),
-          Semantics(
-            liveRegion: true,
-            child: Text(t.taxiDoneTitle, style: NaqlText.title, textAlign: TextAlign.center),
-          ),
-          const SizedBox(height: NaqlSpace.s4),
-          Text(t.taxiCashCollected, style: NaqlText.label.copyWith(color: NaqlColors.textMuted)),
-          TweenAnimationBuilder<double>(
-            tween: Tween(begin: reduce ? ride.fare.toDouble() : 0, end: ride.fare.toDouble()),
-            duration: reduce ? Duration.zero : NaqlMotion.sheet * 2,
-            curve: Curves.easeOutCubic,
-            builder: (_, v, _) => Text(
-              formatIqd(v.round(), lang),
-              key: const ValueKey('taxi-done-cash'),
-              style: NaqlText.display.copyWith(fontSize: 42, height: 1.15, fontWeight: FontWeight.w700, color: NaqlColors.success),
-              textDirection: TextDirection.ltr,
-            ),
-          ),
-          const SizedBox(height: NaqlSpace.s2),
-          Text(
-            t.taxiDoneBody,
-            style: NaqlText.body.copyWith(color: NaqlColors.textMuted),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: NaqlSpace.s5),
-          NaqlButton(
-            label: t.taxiBackToRequests,
-            size: NaqlButtonSize.large,
-            variant: NaqlButtonVariant.secondary,
-            expand: true,
-            onPressed: () => ref.read(taxiControllerProvider.notifier).finishDone(),
-          ),
-        ],
+        ),
       ),
     );
   }

@@ -9,16 +9,29 @@ WaveType _wave(Object? v) => v == 'return' ? WaveType.ret : WaveType.morning;
 
 /// A wave on a date the student can still request.
 class RideSlot {
-  const RideSlot({required this.waveId, required this.date, required this.type, required this.time, required this.today});
+  const RideSlot({required this.waveId, required this.date, required this.type, required this.time, required this.today, this.seatsLeft, this.full = false});
 
-  factory RideSlot.fromJson(Map<String, dynamic> j) =>
-      RideSlot(waveId: j['waveId'] as String, date: j['date'] as String, type: _wave(j['type']), time: j['time'] as String, today: j['today'] as bool? ?? true);
+  factory RideSlot.fromJson(Map<String, dynamic> j) => RideSlot(
+        waveId: j['waveId'] as String,
+        date: j['date'] as String,
+        type: _wave(j['type']),
+        time: j['time'] as String,
+        today: j['today'] as bool? ?? true,
+        seatsLeft: (j['seatsLeft'] as num?)?.toInt(),
+        full: j['full'] as bool? ?? ((j['seatsLeft'] as num?) == 0),
+      );
 
   final String waveId;
   final String date;
   final WaveType type;
   final String time;
   final bool today;
+
+  /// Seats still free on this wave, when the server says (older servers do not: null).
+  final int? seatsLeft;
+
+  /// No free seat: a request joins the waitlist (ST-07).
+  final bool full;
 }
 
 class RideOptions {

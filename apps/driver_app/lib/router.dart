@@ -47,7 +47,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (home != null) return loc == home ? null : home;
       if (_onboarding.contains(loc) || loc == '/splash' || loc == '/apply' || loc == '/status') return '/today';
       // P10: taxi drivers have no bus waves (the server refuses them) and no bus runs.
-      if (ref.read(isTaxiDriverProvider) && (loc == '/schedule' || loc.startsWith('/today/run/'))) return '/today';
+      if (ref.read(isTaxiDriverProvider) && (loc == '/schedule' || loc.startsWith('/run/'))) return '/today';
       return null;
     },
     routes: [
@@ -58,15 +58,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/code', builder: (_, _) => const CodeScreen()),
       GoRoute(path: '/apply', builder: (_, _) => const ApplicationScreen()),
       GoRoute(path: '/status', builder: (_, _) => const StatusScreen()),
+      // While driving a run the screen belongs to the road: no tab bar, back returns Home.
+      GoRoute(path: '/run/:id', builder: (_, s) => RunScreen(runId: s.pathParameters['id']!)),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => _Shell(shell: shell),
         branches: [
           StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/today',
-              builder: (_, _) => const _TodayTab(),
-              routes: [GoRoute(path: 'run/:id', builder: (_, s) => RunScreen(runId: s.pathParameters['id']!))],
-            ),
+            GoRoute(path: '/today', builder: (_, _) => const _TodayTab()),
           ]),
           StatefulShellBranch(routes: [GoRoute(path: '/schedule', builder: (_, _) => const ScheduleScreen())]),
           StatefulShellBranch(routes: [GoRoute(path: '/earnings', builder: (_, _) => const EarningsScreen())]),
@@ -85,9 +83,11 @@ class _TodayTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => ref.watch(isTaxiDriverProvider) ? const TaxiHomeScreen() : const TodayScreen();
 }
 
-/// Shell branches, in order: today, schedule, earnings, profile.
+/// Shell branches, in order: home, schedule, earnings, profile.
 const _scheduleBranch = 1;
 
+/// Pages scroll under the floating tab bar. Taxi drivers have no Schedule; while a taxi ride
+/// (or its "done" moment) fills the Home tab, the tab bar steps aside.
 class _Shell extends ConsumerWidget {
   const _Shell({required this.shell});
   final StatefulNavigationShell shell;
@@ -96,21 +96,28 @@ class _Shell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = AppLocalizations.of(context);
     final taxi = ref.watch(isTaxiDriverProvider);
-    // Taxi drivers work on demand, so the Schedule tab is left out; the other tabs keep their branches.
+    final driving = taxi && ref.watch(taxiControllerProvider.select((s) => s.active != null || s.done != null)) && shell.currentIndex == 0;
     final tabs = [
-      (branch: 0, item: taxi ? NaqlNavItem(icon: LucideIcons.carTaxiFront, label: t.taxi) : NaqlNavItem(icon: LucideIcons.route, label: t.tabToday)),
-      if (!taxi) (branch: _scheduleBranch, item: NaqlNavItem(icon: LucideIcons.calendarDays, label: t.tabSchedule)),
-      (branch: 2, item: NaqlNavItem(icon: LucideIcons.wallet, label: t.tabEarnings)),
-      (branch: 3, item: NaqlNavItem(icon: LucideIcons.circleUser, label: t.tabProfile)),
+      (branch: 0, item: NaqlTabItem(icon: LucideIcons.house, label: t.tabHome)),
+      if (!taxi) (branch: _scheduleBranch, item: NaqlTabItem(icon: LucideIcons.calendarDays, label: t.tabSchedule)),
+      (branch: 2, item: NaqlTabItem(icon: LucideIcons.wallet, label: t.tabEarnings)),
+      (branch: 3, item: NaqlTabItem(icon: LucideIcons.circleUser, label: t.tabProfile)),
     ];
     final current = tabs.indexWhere((x) => x.branch == shell.currentIndex);
     return Scaffold(
       extendBody: true,
       body: shell,
-      bottomNavigationBar: NaqlBottomNav(
-        currentIndex: current < 0 ? 0 : current,
-        onTap: (i) => shell.goBranch(tabs[i].branch, initialLocation: tabs[i].branch == shell.currentIndex),
-        items: [for (final x in tabs) x.item],
+      bottomNavigationBar: AnimatedSwitcher(
+        duration: naqlMotion(context),
+        transitionBuilder: (c, a) => SizeTransition(sizeFactor: a, alignment: Alignment.topCenter, child: FadeTransition(opacity: a, child: c)),
+        child: driving
+            ? const SizedBox.shrink(key: ValueKey('no-tabs'))
+            : NaqlTabBar(
+                key: const ValueKey('tabs'),
+                currentIndex: current < 0 ? 0 : current,
+                onTap: (i) => shell.goBranch(tabs[i].branch, initialLocation: tabs[i].branch == shell.currentIndex),
+                items: [for (final x in tabs) x.item],
+              ),
       ),
     );
   }

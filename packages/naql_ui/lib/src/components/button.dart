@@ -24,7 +24,10 @@ enum NaqlButtonSize {
   regular(NaqlTouch.min),
 
   /// Driver app: larger target for use in the vehicle.
-  large(NaqlTouch.driver);
+  large(NaqlTouch.driver),
+
+  /// The driver's one big action ("I've arrived at the stop"): 64 dp.
+  huge(64);
 
   const NaqlButtonSize(this.height);
   final double height;
@@ -44,6 +47,7 @@ class NaqlButton extends StatelessWidget {
     this.icon,
     this.loading = false,
     this.expand = false,
+    this.semanticLabel,
   });
 
   final String label;
@@ -53,6 +57,9 @@ class NaqlButton extends StatelessWidget {
   final IconData? icon;
   final bool loading;
   final bool expand;
+
+  /// Fuller text for screen readers (defaults to [label]).
+  final String? semanticLabel;
 
   (Color bg, Color fg, Color? border) get _colors => switch (variant) {
         NaqlButtonVariant.primary => naqlIsDark ? (NaqlColors.ink, NaqlColors.onInk, null) : (NaqlColors.primary, NaqlColors.onPrimary, null),
@@ -68,12 +75,15 @@ class NaqlButton extends StatelessWidget {
     final enabled = onPressed != null && !loading;
     final cta = expand && variant != NaqlButtonVariant.ghost;
     final height = cta && size.height < NaqlTouch.driver ? NaqlTouch.driver : size.height;
-    final style = (size == NaqlButtonSize.large || cta ? NaqlText.headline.copyWith(fontSize: 17) : NaqlText.label).copyWith(color: fg, fontWeight: FontWeight.w600);
+    final style = (size == NaqlButtonSize.huge
+            ? NaqlText.headline.copyWith(fontSize: 19, fontWeight: FontWeight.w700)
+            : (size == NaqlButtonSize.large || cta ? NaqlText.headline.copyWith(fontSize: 17, fontWeight: FontWeight.w600) : NaqlText.label.copyWith(fontWeight: FontWeight.w600)))
+        .copyWith(color: fg);
     return Opacity(
       opacity: onPressed == null ? 0.5 : 1,
       child: NaqlPressable(
         onPressed: enabled ? onPressed : null,
-        semanticLabel: label,
+        semanticLabel: semanticLabel ?? label,
         minSize: height,
         child: Container(
           height: height,
@@ -91,7 +101,7 @@ class NaqlButton extends StatelessWidget {
               if (loading)
                 _Dots(color: fg)
               else ...[
-                if (icon != null) ...[Icon(icon, size: 20, color: fg), const SizedBox(width: NaqlSpace.s2)],
+                if (icon != null) ...[Icon(icon, size: size == NaqlButtonSize.huge ? 22 : 20, color: fg), const SizedBox(width: NaqlSpace.s2)],
                 Flexible(child: Text(label, style: style, maxLines: 1, overflow: TextOverflow.ellipsis, semanticsLabel: '')),
               ],
             ],
@@ -112,12 +122,25 @@ class _Dots extends StatefulWidget {
 }
 
 class _DotsState extends State<_Dots> with SingleTickerProviderStateMixin {
-  late final _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))..repeat();
+  late final _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
 
   @override
   void dispose() {
     _c.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reduced motion: three still dots instead of a pulse.
+    if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) {
+      _c
+        ..stop()
+        ..value = 0.5;
+    } else if (!_c.isAnimating) {
+      _c.repeat();
+    }
   }
 
   @override
