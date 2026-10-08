@@ -17,6 +17,9 @@ enum NaqlIconButtonStyle {
 
   /// Solid primary (light) / ink (dark) circle for the main action in a row.
   solid,
+
+  /// Green circle for a positive action (call the driver).
+  positive,
 }
 
 /// Circular icon button (back, notifications, call…) as in the reference designs.
@@ -49,9 +52,10 @@ class NaqlIconButton extends StatelessWidget {
     final dark = naqlIsDark;
     final (Color bg, Color fg, BoxBorder? border, List<BoxShadow>? shadow) = switch (style) {
       NaqlIconButtonStyle.outline => (NaqlColors.surface, NaqlColors.text, Border.all(color: NaqlColors.border), null),
-      NaqlIconButtonStyle.floating => (NaqlColors.surface.withValues(alpha: 0.94), NaqlColors.text, null, naqlFloatShadow),
+      NaqlIconButtonStyle.floating => (dark ? NaqlColors.surface.withValues(alpha: 0.92) : NaqlColors.surface, NaqlColors.text, dark ? Border.all(color: NaqlColors.border) : null, dark ? null : naqlFloatShadow),
       NaqlIconButtonStyle.soft => (dark ? NaqlColors.surfaceMuted : NaqlColors.primarySoft, dark ? NaqlColors.text : NaqlColors.primary, null, null),
       NaqlIconButtonStyle.solid => (dark ? NaqlColors.ink : NaqlColors.primary, dark ? NaqlColors.onInk : NaqlColors.onPrimary, null, null),
+      NaqlIconButtonStyle.positive => (NaqlColors.success, dark ? NaqlColors.bg : NaqlColors.onPrimary, null, null),
     };
     return NaqlPressable(
       onPressed: onPressed,
@@ -66,8 +70,8 @@ class NaqlIconButton extends StatelessWidget {
         ),
         if (badge)
           PositionedDirectional(
-            top: 10,
-            end: 12,
+            top: size * 0.23,
+            end: size * 0.25,
             child: Container(width: 9, height: 9, decoration: BoxDecoration(color: NaqlColors.danger, shape: BoxShape.circle, border: Border.all(color: NaqlColors.surface, width: 1.5))),
           ),
       ]),

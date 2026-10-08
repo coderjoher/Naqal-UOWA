@@ -79,7 +79,8 @@ test('[T5-12] live ops map shows a simulated bus moving and its run status updat
   await page.getByLabel('كلمة المرور').fill('password123');
   await page.getByRole('button', { name: 'دخول' }).click();
   await page.getByRole('navigation', { name: 'main' }).getByRole('link', { name: 'التشغيل المباشر' }).click();
-  await expect(page.getByText('مباشر', { exact: true })).toBeVisible({ timeout: 15_000 });
+  // The page's connection status (the rail also has a «مباشر» link).
+  await expect(page.getByRole('status').filter({ hasText: /^\s*مباشر\s*$/ })).toBeVisible({ timeout: 15_000 });
 
   const row = page.getByTestId('live-run').filter({ hasText: 'مرتضى كريم' });
   await expect(row.getByText('في الطريق')).toBeVisible();

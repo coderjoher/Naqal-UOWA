@@ -13,7 +13,7 @@ test('[T6-05] office reviews, approves and downloads PDF and XLSX; totals in the
   await page.getByLabel('كلمة المرور').fill('password123');
   await page.getByRole('button', { name: 'دخول' }).click();
   await page.getByRole('link', { name: 'التسوية الشهرية' }).click();
-  await page.getByLabel('الشهر').fill(MONTH);
+  await page.getByLabel('الشهر', { exact: true }).fill(MONTH);
 
   await page.getByRole('button', { name: 'احسب التسوية' }).click();
   await expect(page.getByTestId('settlement-status')).toContainText('مسودة');
@@ -51,6 +51,7 @@ test('[T6-05] office reviews, approves and downloads PDF and XLSX; totals in the
   expect(rows.sort()).toEqual([...linePayouts].sort());
 
   // The approval is in the audit log.
+  await page.getByRole('navigation', { name: 'main' }).getByRole('button', { name: 'الإعدادات' }).click();
   await page.getByRole('link', { name: 'سجل التغييرات' }).click();
   await expect(page.getByText('settlement.approve')).toBeVisible();
 });

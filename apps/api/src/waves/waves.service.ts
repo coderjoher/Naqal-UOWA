@@ -1,4 +1,5 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { officeViews } from '../common/swr-cache';
 import { ConfigCache } from '../config-cache/config-cache.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateWaveDto, UpdateWaveDto } from './waves.dto';
@@ -34,6 +35,8 @@ export class WavesService {
     await this.check(data);
     const wave = await this.prisma.db.wave.create({ data: { ...data, universityId } });
     await this.cache.invalidate(universityId, 'waves');
+    // The dispatch board and live views list waves: the office sees its change at once.
+    officeViews.invalidate(`${universityId}:`, true);
     return view(wave);
   }
 
@@ -50,6 +53,8 @@ export class WavesService {
     await this.check(next);
     const wave = await this.prisma.db.wave.update({ where: { id }, data: { minuteOfDay: next.minuteOfDay, weekdays: next.weekdays, active: next.active } });
     await this.cache.invalidate(universityId, 'waves');
+    // The dispatch board and live views list waves: the office sees its change at once.
+    officeViews.invalidate(`${universityId}:`, true);
     return view(wave);
   }
 }

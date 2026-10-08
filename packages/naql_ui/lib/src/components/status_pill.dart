@@ -129,22 +129,24 @@ class _NaqlLivePillState extends State<NaqlLivePill> with SingleTickerProviderSt
       liveRegion: true,
       excludeSemantics: true,
       child: Container(
-        height: 32,
-        padding: const EdgeInsetsDirectional.only(start: NaqlSpace.s3, end: NaqlSpace.s3),
+        height: widget.floating ? 44 : 32,
+        padding: EdgeInsetsDirectional.only(start: widget.floating ? NaqlSpace.s4 : NaqlSpace.s3, end: widget.floating ? NaqlSpace.s4 : NaqlSpace.s3),
         decoration: BoxDecoration(
-          color: widget.floating ? NaqlColors.surface.withValues(alpha: 0.92) : NaqlColors.dangerSoft,
+          color: widget.floating ? (naqlIsDark ? NaqlColors.surface.withValues(alpha: 0.95) : NaqlColors.surface) : NaqlColors.dangerSoft,
           borderRadius: BorderRadius.circular(NaqlRadius.pill),
-          boxShadow: widget.floating ? naqlFloatShadow : null,
+          border: widget.floating && naqlIsDark ? Border.all(color: NaqlColors.border) : null,
+          boxShadow: widget.floating && !naqlIsDark ? naqlFloatShadow : null,
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           SizedBox(
-            width: 14,
-            height: 14,
+            width: widget.floating ? 18 : 14,
+            height: widget.floating ? 18 : 14,
             child: AnimatedBuilder(
               animation: _c,
               builder: (_, _) {
                 final t = Curves.easeOut.transform(_c.value);
                 return Stack(alignment: Alignment.center, children: [
+                  if (widget.floating) Container(width: 18, height: 18, decoration: BoxDecoration(color: red.withValues(alpha: 0.25), shape: BoxShape.circle)),
                   if (_c.isAnimating)
                     Container(
                       width: 8 + 6 * t,
@@ -156,8 +158,8 @@ class _NaqlLivePillState extends State<NaqlLivePill> with SingleTickerProviderSt
               },
             ),
           ),
-          const SizedBox(width: NaqlSpace.s2),
-          Text(widget.label, style: NaqlText.label.copyWith(fontWeight: FontWeight.w600, color: widget.floating ? NaqlColors.text : red)),
+          SizedBox(width: widget.floating ? 10 : NaqlSpace.s2),
+          Text(widget.label, style: NaqlText.label.copyWith(fontSize: widget.floating ? 15 : null, fontWeight: FontWeight.w600, color: widget.floating ? NaqlColors.text : red)),
         ]),
       ),
     );

@@ -45,14 +45,14 @@ export function InboxPage() {
   return (
     <Stagger>
       <PageHeader title={t('inbox.title')} description={t('inbox.desc')} />
-      <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
+      <div className="grid gap-4 xl:grid-cols-[2fr_1fr]">
         <Card
           animated
           title={t('inbox.problems')}
           actions={
             <div role="tablist" className="flex rounded-pill bg-surface-muted p-1">
               {(['open', 'resolved', ''] as const).map((s) => (
-                <button key={s || 'all'} role="tab" aria-selected={status === s} onClick={() => setStatus(s)} className={clsx('h-8 rounded-pill px-4 text-caption', status === s ? 'bg-surface font-semibold shadow-sm' : 'text-text-muted')}>
+                <button key={s || 'all'} role="tab" aria-selected={status === s} onClick={() => setStatus(s)} className={clsx('h-10 rounded-pill px-4 text-label transition-colors', status === s ? 'bg-surface text-text shadow-card' : 'text-text-muted hover:text-text')}>
                   {t(s === 'open' ? 'inbox.open' : s === 'resolved' ? 'inbox.resolved' : 'audit.all')}
                 </button>
               ))}

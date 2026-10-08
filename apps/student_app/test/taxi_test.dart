@@ -18,11 +18,12 @@ void main() {
   testWidgets('[T10-10] taxi: home card follows taxiEnabled; quote → request → searching; accepted shows driver and plate', (tester) async {
     usePhone(tester);
 
-    // Taxis switched off: no card on Home.
+    // Taxis switched off: no taxi card on Home.
     final off = FakeBackend(signedIn: true, withPoint: true);
     await tester.pumpWidget(await off.app());
     await tester.pumpAndSettle();
-    expect(find.text('تكسي من الجامعة وإليها'), findsNothing);
+    expect(find.byKey(const ValueKey('service-bus')), findsOneWidget);
+    expect(find.byKey(const ValueKey('service-taxi')), findsNothing);
     expect(off.requests.any((r) => r.url.path.startsWith('/taxi')), isFalse);
 
     // Switched on: the card shows and opens the taxi screen.
@@ -30,9 +31,11 @@ void main() {
     await tester.pumpWidget(const SizedBox());
     await tester.pumpWidget(await api.app());
     await tester.pumpAndSettle();
-    expect(find.text('تكسي من الجامعة وإليها'), findsOneWidget);
-    await tester.tap(find.text('تكسي من الجامعة وإليها'));
-    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('service-taxi')), findsOneWidget);
+    // The card shows the fare from the gathering point and the pickup time before booking.
+    expect(find.text('من 4,500 د.ع'), findsOneWidget);
+    expect(find.text('4 د'), findsOneWidget);
+    await openTaxiFromHome(tester);
 
     // Plan: direction, the map pin, and the fare before booking.
     expect(find.text('تكسي الجامعة'), findsOneWidget);
@@ -77,7 +80,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('التكسي في الطريق إليك'), findsOneWidget);
     expect(find.text('علي حسين'), findsOneWidget);
-    expect(find.text('45678 كربلاء'), findsOneWidget);
+    expect(find.bySemanticsLabel('اللوحة 45678 كربلاء'), findsOneWidget);
     expect(find.text('4 د'), findsOneWidget);
     expect(find.byKey(const ValueKey('taxi-car-pin')), findsOneWidget);
     expect(find.byKey(const ValueKey('taxi-pickup-pin')), findsOneWidget);
@@ -117,8 +120,7 @@ void main() {
     // Back home, then book again; nobody accepts in time.
     await tester.tap(find.text('العودة للرئيسية'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('تكسي من الجامعة وإليها'));
-    await tester.pumpAndSettle();
+    await openTaxiFromHome(tester);
     await tester.tap(find.text('اطلب تكسي'));
     await _frames(tester);
     final first = jsonDecode(api.requests.lastWhere((r) => r.method == 'POST' && r.url.path == '/taxi/rides').body)['clientId'];

@@ -126,13 +126,13 @@ export interface RosterStudent {
   phone: string | null;
 }
 
-export const useDrivers = () => useQuery({ queryKey: ['drivers'], queryFn: () => api<DriverRow[]>('/drivers') });
+export const useDrivers = (enabled = true) => useQuery({ queryKey: ['drivers'], queryFn: () => api<DriverRow[]>('/drivers'), enabled });
 export const useDriver = (id: string | null) => useQuery({ queryKey: ['driver', id], queryFn: () => api<DriverDetail>(`/drivers/${id}`), enabled: !!id });
 export const useReviewDriver = () =>
   useSave(({ id, action, note }: { id: string; action: 'approve' | 'reject' | 'suspend' | 'reinstate'; note?: string }) => api(`/drivers/${id}/${action}`, json({ note })), [['drivers'], ['driver']]);
 export const documentLink = (driverId: string, key: string) => api<{ url: string; expiresAt: string }>(`/drivers/${driverId}/documents/${key}/link`, json({}));
 
-export const useStudents = () => useQuery({ queryKey: ['students'], queryFn: () => api<RosterStudent[]>('/students') });
+export const useStudents = (enabled = true) => useQuery({ queryKey: ['students'], queryFn: () => api<RosterStudent[]>('/students'), enabled });
 export const useImportRoster = () => useSave((rows: { studentId: string; name: string; nameAr?: string; gender: 'male' | 'female' }[]) => api<{ created: number; updated: number }>('/students/roster', json({ rows })), [['students']]);
 export const useIssueCode = () => useSave((studentId: string) => api<{ studentId: string; code: string; expiresAt: string }>(`/students/${encodeURIComponent(studentId)}/activation-code`, json({})), [['students']]);
 

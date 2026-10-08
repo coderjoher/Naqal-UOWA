@@ -41,8 +41,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('حسن جاسم'), findsOneWidget);
     expect(find.text('أحمد فلاح'), findsOneWidget);
-    expect(find.text('2,000 د.ع نقداً'), findsOneWidget);
-    expect(find.text('مشترك'), findsNWidgets(2));
+    // (The rider list for the next stop has its own tags; these are the timeline's.)
+    Finder tileText(String text) => find.descendant(of: find.byType(StopTile), matching: find.text(text));
+    expect(tileText('2,000 د.ع نقداً'), findsOneWidget);
+    expect(tileText('مشترك'), findsNWidgets(2));
     expect(tester.getSize(find.ancestor(of: find.text('حسن جاسم'), matching: find.byType(ConstrainedBox)).first).height, greaterThanOrEqualTo(NaqlTouch.driver));
   });
 
@@ -72,11 +74,12 @@ void main() {
     expect(saved.firstWhere((w) => w['waveId'] == 'w14')['available'], isTrue);
   });
 
-  testWidgets('[T4-12] today, run and schedule screens (golden)', (tester) async {
+  testWidgets('[T4-12] today, run and schedule screens (golden)', (tester) => atFixedTime(() async {
     tester.view.devicePixelRatio = 2.0;
     tester.view.physicalSize = const Size(390 * 2, 844 * 2);
     addTearDown(tester.view.reset);
     final api = FakeDriverBackend(status: 'approved')..runs = FakeDriverBackend.sampleRuns();
+    api.state.addAll({'name': 'حيدر عباس', 'vehicleType': 'coaster', 'plate': '12340 كربلاء'});
     // Fixed dates so the golden does not change with the calendar.
     for (final (i, d) in api.days.indexed) {
       d['date'] = '2026-10-0${4 + i}';
@@ -89,8 +92,11 @@ void main() {
     await tester.tap(find.descendant(of: find.byType(StopTile), matching: find.text('ساحة العباس')));
     await tester.pumpAndSettle();
     await expectLater(find.byType(MaterialApp), matchesGoldenFile('goldens/run.rtl.png'));
+    // The run screen covers the tab bar while driving; back returns Home.
+    await tester.tap(find.bySemanticsLabel('رجوع').first);
+    await tester.pumpAndSettle();
     await tester.tap(find.byIcon(LucideIcons.calendarDays));
     await tester.pumpAndSettle();
     await expectLater(find.byType(MaterialApp), matchesGoldenFile('goldens/schedule.rtl.png'));
-  });
+  }));
 }

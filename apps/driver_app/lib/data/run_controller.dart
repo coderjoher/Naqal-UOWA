@@ -117,9 +117,12 @@ class RunLocal {
 
 /// The run as the driver sees it: server state plus not-yet-sent actions.
 class RunView {
-  const RunView(this.base, [this.local = const RunLocal()]);
+  const RunView(this.base, [this.local = const RunLocal(), this.here]);
   final DriverRun base;
   final RunLocal local;
+
+  /// The latest GPS fix while the run is under way (distance to the next stop).
+  final GpsFix? here;
 
   String get status => local.status ?? base.status;
   bool get morning => base.waveType == WaveType.morning;
@@ -196,7 +199,7 @@ class RunController extends AsyncNotifier<RunView> {
   bool get _hasPending => _queue.items.any((i) => i.runId == runId && i.kind == 'action');
 
   void _replace(DriverRun base) {
-    final v = RunView(base);
+    final v = RunView(base, const RunLocal(), state.value?.here);
     state = AsyncData(v);
     _syncGps(v);
   }
@@ -221,7 +224,7 @@ class RunController extends AsyncNotifier<RunView> {
       'seq': ?seq,
       'requestIds': ?requestIds,
     }));
-    final next = RunView(v.base, apply(v));
+    final next = RunView(v.base, apply(v), v.here);
     state = AsyncData(next);
     _syncGps(next);
     unawaited(_queue.flush());
@@ -256,7 +259,7 @@ class RunController extends AsyncNotifier<RunView> {
     final v = state.value;
     if (v == null) return;
     await _queue.add(OutboxItem(kind: 'fare', runId: runId, payload: {'requestId': requestId}));
-    state = AsyncData(RunView(v.base, v.local.copyWith(paid: {...v.local.paid, requestId})));
+    state = AsyncData(RunView(v.base, v.local.copyWith(paid: {...v.local.paid, requestId}), v.here));
     unawaited(_queue.flush());
   }
 
@@ -278,6 +281,8 @@ class RunController extends AsyncNotifier<RunView> {
     // At most one point per interval, even if the device reports faster.
     if (_lastFix != null && f.at.difference(_lastFix!) < gpsInterval - const Duration(milliseconds: 200)) return;
     _lastFix = f.at;
+    final v = state.value;
+    if (v != null) state = AsyncData(RunView(v.base, v.local, f));
     _queue.add(OutboxItem(kind: 'gps', runId: runId, payload: {'lat': f.lat, 'lng': f.lng, 'at': f.at.toUtc().toIso8601String(), 'speed': ?f.speed, 'heading': ?f.heading}));
   }
 }

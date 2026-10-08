@@ -8,8 +8,7 @@ Future<void> openTrips(WidgetTester tester, FakeBackend api) async {
   usePhone(tester);
   await tester.pumpWidget(await api.app());
   await tester.pumpAndSettle();
-  await tester.tap(find.bySemanticsLabel('رحلاتي'));
-  await tester.pumpAndSettle();
+  await openFromMenu(tester, 'رحلاتي');
 }
 
 void main() {

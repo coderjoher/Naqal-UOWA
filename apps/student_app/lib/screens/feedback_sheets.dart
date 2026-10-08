@@ -32,7 +32,7 @@ class StarRow extends StatelessWidget {
                     padding: const EdgeInsets.all(6),
                     child: AnimatedScale(
                       scale: i <= value ? 1.1 : 1,
-                      duration: NaqlMotion.fast,
+                      duration: naqlMotion(context, NaqlMotion.fast),
                       child: Icon(i <= value ? Icons.star_rounded : Icons.star_outline_rounded, size: size, color: i <= value ? NaqlColors.accent : NaqlColors.textMuted),
                     ),
                   ),

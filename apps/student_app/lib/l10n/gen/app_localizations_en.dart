@@ -832,4 +832,185 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rideFare => 'Fare';
+
+  @override
+  String greetMorning(String name) {
+    return 'Good morning, $name';
+  }
+
+  @override
+  String greetEvening(String name) {
+    return 'Good evening, $name';
+  }
+
+  @override
+  String get greetMorningPlain => 'Good morning';
+
+  @override
+  String get greetEveningPlain => 'Good evening';
+
+  @override
+  String get whereTo => 'Where to today?';
+
+  @override
+  String get serviceBus => 'University bus';
+
+  @override
+  String get serviceTaxi => 'Taxi';
+
+  @override
+  String get serviceIncluded => 'Included';
+
+  @override
+  String get serviceCash => 'Cash';
+
+  @override
+  String serviceNext(String time) {
+    return 'Next $time';
+  }
+
+  @override
+  String get serviceNoTimes => 'No times left';
+
+  @override
+  String serviceFrom(String amount) {
+    return 'From $amount';
+  }
+
+  @override
+  String get serviceTaxiSub => 'Fare known upfront';
+
+  @override
+  String get watermarkBus => 'BUS';
+
+  @override
+  String get watermarkTaxi => 'TAXI';
+
+  @override
+  String homeBookBus(String time) {
+    return 'Book my seat on the $time bus';
+  }
+
+  @override
+  String get homeBookBusAny => 'Book my seat on the bus';
+
+  @override
+  String get chipHome => 'Home';
+
+  @override
+  String subTierDaysLeft(String tier, int days) {
+    return 'Tier $tier · $days days left';
+  }
+
+  @override
+  String get subPayShort => 'Pay cash at the transport office';
+
+  @override
+  String get mySubscription => 'My subscription';
+
+  @override
+  String notificationsUnread(int n) {
+    return 'Notifications, $n unread';
+  }
+
+  @override
+  String get bookPickTime => 'Choose a time';
+
+  @override
+  String get bookReturnTitle => 'Back from campus';
+
+  @override
+  String bookReturnSlot(String time) {
+    return 'Return $time';
+  }
+
+  @override
+  String bookSeatsLeft(int n) {
+    return '$n seats left';
+  }
+
+  @override
+  String get bookOpen => 'Open';
+
+  @override
+  String get bookFull => 'Full';
+
+  @override
+  String get bookFullHint =>
+      'This time is full: we add you to the waitlist and book you as soon as a seat frees up.';
+
+  @override
+  String get bookWhere => 'Where do you board?';
+
+  @override
+  String bookPointSub(String tier, String km) {
+    return 'Tier $tier · $km km from campus';
+  }
+
+  @override
+  String get bookCost => 'Cost';
+
+  @override
+  String get bookCovered => 'Covered by your subscription';
+
+  @override
+  String get bookPayDriver => 'Paid in cash to the driver';
+
+  @override
+  String get bookConfirm => 'Confirm booking';
+
+  @override
+  String get bookNoDay => 'No times on this day.';
+
+  @override
+  String get liveMessage => 'Message the driver';
+
+  @override
+  String get liveCallDriver => 'Call the driver';
+
+  @override
+  String get liveYourTaxi => 'Your car';
+
+  @override
+  String get liveTaxiName => 'Campus taxi';
+
+  @override
+  String get receiptTitle => 'Ride details';
+
+  @override
+  String receiptTrip(String from, String to) {
+    return 'Your trip from $from to $to';
+  }
+
+  @override
+  String get receiptPaidCash => 'Paid in cash to the driver';
+
+  @override
+  String get receiptCovered => 'Covered by your subscription';
+
+  @override
+  String get receiptNotPaid => 'No fare charged';
+
+  @override
+  String get receiptBusWord => 'BUS';
+
+  @override
+  String get receiptTaxiWord => 'TAXI';
+
+  @override
+  String receiptYouRated(int n) {
+    return 'You rated it $n/5';
+  }
+
+  @override
+  String get receiptOpen => 'Show ride details';
+
+  @override
+  String get receiptMissing => 'We could not find this ride';
+
+  @override
+  String get menuAccount => 'Account';
+
+  @override
+  String get menuMore => 'More';
 }

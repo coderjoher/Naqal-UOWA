@@ -38,7 +38,7 @@ export function AuditPage() {
         <div className="mb-5 flex flex-wrap items-end gap-3">
           <label className="flex min-w-48 flex-col gap-1.5 text-label">
             {t('audit.entity')}
-            <select className="h-11 rounded-md border border-border bg-surface px-3" value={entity} onChange={(e) => setEntity(e.target.value)} data-testid="audit-entity">
+            <select className="h-12 rounded-pill border border-border bg-surface px-5" value={entity} onChange={(e) => setEntity(e.target.value)} data-testid="audit-entity">
               <option value="">{t('audit.all')}</option>
               {(entities.data ?? []).map((e) => (
                 <option key={e} value={e}>

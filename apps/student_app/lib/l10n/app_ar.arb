@@ -471,5 +471,150 @@
   "driverCaption": "سائقك",
   "vehicleCaption": "الحافلة",
   "rideSummaryTotal": "المجموع",
-  "rideFare": "الأجرة"
+  "rideFare": "الأجرة",
+  "greetMorning": "صباح الخير، {name}",
+  "@greetMorning": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "greetEvening": "مساء الخير، {name}",
+  "@greetEvening": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "greetMorningPlain": "صباح الخير",
+  "greetEveningPlain": "مساء الخير",
+  "whereTo": "إلى أين اليوم؟",
+  "serviceBus": "حافلة الجامعة",
+  "serviceTaxi": "تكسي",
+  "serviceIncluded": "مشمول",
+  "serviceCash": "نقداً",
+  "serviceNext": "القادمة {time}",
+  "@serviceNext": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "serviceNoTimes": "لا مواعيد متاحة",
+  "serviceFrom": "من {amount}",
+  "@serviceFrom": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "serviceTaxiSub": "أجرة معروفة مسبقاً",
+  "watermarkBus": "BUS",
+  "watermarkTaxi": "TAXI",
+  "homeBookBus": "احجز مقعدي في حافلة {time}",
+  "@homeBookBus": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "homeBookBusAny": "احجز مقعدي في الحافلة",
+  "chipHome": "البيت",
+  "subTierDaysLeft": "الفئة {tier} · باقي {days} يوماً",
+  "@subTierDaysLeft": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "subPayShort": "ادفع نقداً في مكتب النقل",
+  "mySubscription": "اشتراكي",
+  "notificationsUnread": "الإشعارات، {n} غير مقروءة",
+  "@notificationsUnread": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "bookPickTime": "اختر الموعد",
+  "bookReturnTitle": "العودة من الجامعة",
+  "bookReturnSlot": "عودة {time}",
+  "@bookReturnSlot": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "bookSeatsLeft": "{n} مقاعد متاحة",
+  "@bookSeatsLeft": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "bookOpen": "متاحة",
+  "bookFull": "ممتلئة",
+  "bookFullHint": "الموعد ممتلئ: ننضمّك إلى قائمة الانتظار ونحجز لك فور تحرّر مقعد.",
+  "bookWhere": "من أين تصعد؟",
+  "bookPointSub": "الفئة {tier} · {km} كم عن الجامعة",
+  "@bookPointSub": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      },
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "bookCost": "التكلفة",
+  "bookCovered": "مشمولة باشتراكك",
+  "bookPayDriver": "تُدفع نقداً للسائق",
+  "bookConfirm": "تأكيد الحجز",
+  "bookNoDay": "لا توجد مواعيد في هذا اليوم.",
+  "liveMessage": "مراسلة السائق",
+  "liveCallDriver": "اتصال بالسائق",
+  "liveYourTaxi": "سيارتك",
+  "liveTaxiName": "تكسي الجامعة",
+  "receiptTitle": "تفاصيل الرحلة",
+  "receiptTrip": "رحلتك من {from} إلى {to}",
+  "@receiptTrip": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptPaidCash": "دُفعت نقداً للسائق",
+  "receiptCovered": "مشمولة باشتراكك",
+  "receiptNotPaid": "لم تُستوفَ أجرة",
+  "receiptBusWord": "حافلة",
+  "receiptTaxiWord": "تكسي",
+  "receiptYouRated": "قيّمتها {n} من 5",
+  "@receiptYouRated": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "receiptOpen": "عرض تفاصيل الرحلة",
+  "receiptMissing": "لم نجد هذه الرحلة",
+  "menuAccount": "الحساب",
+  "menuMore": "المزيد"
 }

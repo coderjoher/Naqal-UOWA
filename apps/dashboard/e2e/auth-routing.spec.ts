@@ -49,12 +49,15 @@ test('[T0-10] office user never sees super-admin menus and cannot open them', as
   await mockApi(page, 'office');
   await signIn(page, 'office@uowa.edu.iq');
   const nav = page.getByRole('navigation', { name: 'main' });
+  // Users sit in the rail's «الأشخاص» flyout.
+  await nav.getByRole('button', { name: 'الأشخاص' }).click();
   await expect(nav.getByRole('link', { name: 'المستخدمون' })).toBeVisible();
   await expect(nav.getByRole('link', { name: 'الجامعات' })).toHaveCount(0);
 
   await page.goto('/universities');
   await expect(page).toHaveURL(/\/$/);
 
+  await nav.getByRole('button', { name: 'الأشخاص' }).click();
   await nav.getByRole('link', { name: 'المستخدمون' }).click();
   await expect(page.getByRole('cell', { name: 'علي حسن' })).toBeVisible();
   await expect(page.getByText('موقوف')).toBeVisible();
@@ -68,6 +71,7 @@ test('[T0-10] super admin sees universities, not office menus', async ({ page })
   await nav.getByRole('link', { name: 'الجامعات' }).click();
   await expect(page.getByRole('cell', { name: 'جامعة وارث الأنبياء' })).toBeVisible();
   await expect(nav.getByRole('link', { name: 'المستخدمون' })).toHaveCount(0);
+  await expect(nav.getByRole('button', { name: 'الأشخاص' })).toHaveCount(0);
   await page.goto('/users');
   await expect(page).toHaveURL(/\/$/);
 });

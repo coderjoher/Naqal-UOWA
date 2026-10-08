@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:naql_app/naql_app.dart';
+import 'package:naql_core/naql_core.dart';
 import 'package:naql_ui/naql_ui.dart';
 
 import 'data/auth.dart';
-import 'l10n/gen/app_localizations.dart';
+import 'data/taxi.dart';
+import 'screens/bus_booking_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/notifications_screen.dart';
 import 'screens/track_screen.dart';
@@ -15,6 +17,8 @@ import 'screens/onboarding/sign_in_screen.dart';
 import 'screens/onboarding/university_screen.dart';
 import 'screens/onboarding/welcome_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/receipt.dart';
+import 'screens/subscription_screen.dart';
 import 'screens/taxi_screen.dart';
 import 'screens/trips_screen.dart';
 
@@ -55,26 +59,39 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/sign-in', builder: (_, _) => const SignInScreen()),
       GoRoute(path: '/activate', builder: (_, _) => const ActivateScreen()),
       GoRoute(path: '/choose-point', builder: (_, _) => const ChoosePointScreen()),
-      // P10: full screen (no tab bar) so the map and the ride card have the room.
-      GoRoute(path: '/taxi', builder: (_, s) => TaxiScreen(rideId: s.uri.queryParameters['ride'])),
-      StatefulShellRoute.indexedStack(
-        builder: (context, state, shell) => _Shell(shell: shell),
-        branches: [
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/home',
-              builder: (_, _) => const HomeScreen(),
-              routes: [GoRoute(path: 'track/:id', builder: (_, s) => TrackScreen(requestId: s.pathParameters['id']!))],
-            ),
-          ]),
-          StatefulShellBranch(routes: [GoRoute(path: '/trips', builder: (_, _) => const TripsScreen())]),
-          StatefulShellBranch(routes: [GoRoute(path: '/alerts', builder: (_, _) => const NotificationsScreen())]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen(), routes: [
-              GoRoute(path: 'point', builder: (_, _) => const ChoosePointScreen(changing: true)),
-            ]),
-          ]),
-        ],
+      // Home is the hub (map-first, no tab bar): everything else opens on top of it and
+      // goes back to it.
+      GoRoute(
+        path: '/home',
+        builder: (_, _) => const HomeScreen(),
+        routes: [GoRoute(path: 'track/:id', builder: (_, s) => TrackScreen(requestId: s.pathParameters['id']!))],
+      ),
+      GoRoute(
+        path: '/bus',
+        builder: (_, s) => BusBookingScreen(
+          prefer: switch (s.uri.queryParameters['dir']) { 'morning' => WaveType.morning, 'return' => WaveType.ret, _ => null },
+          waveId: s.uri.queryParameters['wave'],
+          date: s.uri.queryParameters['date'],
+        ),
+      ),
+      GoRoute(
+        path: '/taxi',
+        builder: (_, s) => TaxiScreen(
+          rideId: s.uri.queryParameters['ride'],
+          direction: switch (s.uri.queryParameters['dir']) { 'to' => TaxiDirection.toCampus, 'from' => TaxiDirection.fromCampus, _ => null },
+        ),
+      ),
+      GoRoute(
+        path: '/trips',
+        builder: (_, s) => TripsScreen(initialTab: s.uri.queryParameters['tab'] == 'payments' ? 1 : 0),
+        routes: [GoRoute(path: 'ride/:id', builder: (_, s) => RideDetailsScreen(rideId: s.pathParameters['id']!, initial: s.extra is RideHistoryItem ? s.extra! as RideHistoryItem : null))],
+      ),
+      GoRoute(path: '/alerts', builder: (_, _) => const NotificationsScreen()),
+      GoRoute(path: '/subscription', builder: (_, _) => const SubscriptionScreen()),
+      GoRoute(
+        path: '/profile',
+        builder: (_, _) => const ProfileScreen(),
+        routes: [GoRoute(path: 'point', builder: (_, _) => const ChoosePointScreen(changing: true))],
       ),
     ],
   );
@@ -85,29 +102,4 @@ class _Splash extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(body: Center(child: Icon(LucideIcons.busFront, size: 48, color: NaqlColors.primary)));
-}
-
-/// Content scrolls under the floating pill navigation (no Material NavigationBar).
-class _Shell extends StatelessWidget {
-  const _Shell({required this.shell});
-  final StatefulNavigationShell shell;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
-    return Scaffold(
-      extendBody: true,
-      body: shell,
-      bottomNavigationBar: NaqlBottomNav(
-        currentIndex: shell.currentIndex,
-        onTap: (i) => shell.goBranch(i, initialLocation: i == shell.currentIndex),
-        items: [
-          NaqlNavItem(icon: LucideIcons.house, label: t.tabHome),
-          NaqlNavItem(icon: LucideIcons.ticket, label: t.tabTrips),
-          NaqlNavItem(icon: LucideIcons.bell, label: t.tabAlerts),
-          NaqlNavItem(icon: LucideIcons.circleUser, label: t.tabProfile),
-        ],
-      ),
-    );
-  }
 }

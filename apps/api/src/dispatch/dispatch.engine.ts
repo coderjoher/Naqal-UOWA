@@ -302,8 +302,10 @@ export class DispatchEngine {
         data: run.stops.map((st, seq) => ({ universityId: ref.universityId, runId: id, seq, pointId: st.pointId, eta: instantAt(ref.date, st.time), servedAt: history.get(st.pointId)?.servedAt ?? null, arrivedAt: history.get(st.pointId)?.arrivedAt ?? null })),
       });
       const ids = run.stops.flatMap((st) => st.passengers.map((p) => p.id));
-      // No-shows keep their status: they stay counted on the bus they missed.
-      await tx.rideRequest.updateMany({ where: { id: { in: ids }, status: { not: 'no_show' } }, data: { runId: id, status: 'assigned', waitlistedUntil: null } });
+      // Only seatable requests are (re)assigned. No-shows keep their status (they stay counted on
+      // the bus they missed), and a ride that was finished or cancelled after this plan was loaded
+      // must never be flipped back to "assigned" (the row is re-checked at write time).
+      await tx.rideRequest.updateMany({ where: { id: { in: ids }, status: { in: ['open', 'waitlisted', 'assigned'] } }, data: { runId: id, status: 'assigned', waitlistedUntil: null } });
       const sig = (stops: { pointId: string; passengers: { id: string }[] }[]) => stops.map((st) => `${st.pointId}:${st.passengers.map((p) => p.id).sort().join(',')}`).join('|');
       const oldSig = old ? sig(s.domainRuns.find((d) => d.id === old.id)?.stops ?? []) : '';
       if (!old || oldSig !== sig(run.stops)) changed.push({ runId: id, driverId: run.driverId });

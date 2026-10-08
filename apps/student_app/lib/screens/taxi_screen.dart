@@ -25,8 +25,11 @@ const taxiQuoteDebounce = Duration(milliseconds: 600);
 /// P10: a taxi between the student's spot and campus. Plan (direction, spot, fare) → request →
 /// follow the ride. Opens straight on the ride when one is already going.
 class TaxiScreen extends ConsumerStatefulWidget {
-  const TaxiScreen({super.key, this.rideId});
+  const TaxiScreen({super.key, this.rideId, this.direction});
   final String? rideId;
+
+  /// Start planning in this direction (Home's quick destinations).
+  final TaxiDirection? direction;
 
   @override
   ConsumerState<TaxiScreen> createState() => _TaxiScreenState();
@@ -63,6 +66,7 @@ class _TaxiScreenState extends ConsumerState<TaxiScreen> {
   void initState() {
     super.initState();
     _rideId = widget.rideId;
+    _direction = widget.direction ?? TaxiDirection.toCampus;
     _boot();
   }
 
@@ -224,7 +228,7 @@ class _TaxiScreenState extends ConsumerState<TaxiScreen> {
 
   void _home() {
     ref.invalidate(taxiMineProvider);
-    context.go('/home');
+    context.canPop() ? context.pop() : context.go('/home');
   }
 
   @override
@@ -256,14 +260,15 @@ class _TaxiScreenState extends ConsumerState<TaxiScreen> {
     const overlap = 28.0;
     final map = Stack(
       children: [
+        const Positioned.fill(child: NaqlMapBackdrop()),
         Positioned.fill(
           child: ColoredBox(
-            color: NaqlColors.surfaceMuted,
+            color: const Color(0x00000000),
             child: FlutterMap(
               key: const ValueKey('taxi-plan-map'),
               mapController: _map,
               options: MapOptions(
-                backgroundColor: NaqlColors.surfaceMuted,
+                backgroundColor: const Color(0x00000000),
                 initialCenter: _start ?? taxiFallbackCenter,
                 initialZoom: 15,
                 interactionOptions: const InteractionOptions(flags: InteractiveFlag.all & ~InteractiveFlag.rotate),

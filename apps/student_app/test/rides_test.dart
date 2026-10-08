@@ -36,7 +36,7 @@ void main() {
     expect(find.text('حيدر عباس'), findsOneWidget);
     // Vehicle type as a caption and the plate in its own plate badge.
     expect(find.text('كوستر'), findsOneWidget);
-    expect(find.text('12345 كربلاء'), findsOneWidget);
+    expect(find.bySemanticsLabel('12345 كربلاء'), findsOneWidget);
     expect(find.byWidgetPredicate((w) => w is Image && w.image is MemoryImage), findsOneWidget);
     expect(find.text('مؤكد'), findsOneWidget);
     expect(find.text('للطالبات فقط'), findsOneWidget);
@@ -77,13 +77,14 @@ void main() {
     await tester.pumpWidget(await api.app());
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('اطلب رحلة'));
+    // Home's call to action names the next wave and opens the booking screen.
+    await tester.tap(find.text('احجز مقعدي في حافلة 08:00'));
     await tester.pumpAndSettle();
-    expect(find.text('طلب رحلة'), findsOneWidget);
+    expect(find.text('اختر الموعد'), findsOneWidget);
     // Choose the 14:00 return and keep the default point.
     await tester.tap(find.byKey(ValueKey('slot-w14-${FakeBackend.today}')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('أرسل الطلب'));
+    await tester.tap(find.text('تأكيد الحجز'));
     await tester.pumpAndSettle();
     final sent = api.requests.lastWhere((r) => r.method == 'POST' && r.url.path == '/rides');
     expect(sent.body, contains('"waveId":"w14"'));
@@ -104,11 +105,11 @@ void main() {
     await tester.tap(find.text('نعم، ألغِ'));
     await tester.pumpAndSettle();
     expect(api.requests.any((r) => r.url.path == '/rides/r1/cancel'), isTrue);
-    expect(find.text('اطلب رحلة'), findsOneWidget);
+    expect(find.text('احجز مقعدي في حافلة 08:00'), findsOneWidget);
   });
 
   for (final state in ['assigned', 'waitlisted']) {
-    testWidgets('[T4-10] home with a $state ride (golden)', (tester) async {
+    testWidgets('[T4-10] home with a $state ride (golden)', (tester) => atFixedTime(() async {
       usePhone(tester);
       final api = FakeBackend(signedIn: true, withPoint: true, subscription: FakeBackend.active());
       api.rides = [
@@ -119,6 +120,6 @@ void main() {
       await tester.pumpWidget(await api.app());
       await tester.pumpAndSettle();
       await expectLater(find.byType(MaterialApp), matchesGoldenFile('goldens/home_$state.rtl.png'));
-    });
+    }));
   }
 }

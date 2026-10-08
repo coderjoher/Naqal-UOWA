@@ -5,8 +5,8 @@ import { useState } from 'react';
 import { ApiError } from '../lib/api';
 import { useI18n, useMoney, type MessageKey } from '../lib/i18n';
 import { baghdadMonth, downloadFile, useRunVerdict, useSettlement, useSettlementAction, type ReviewRun } from '../lib/money';
-import { AnimatedNumber, Badge, Button, Card, Drawer, EmptyState, Input, PageHeader, SkeletonRows, Stagger, Table, Textarea, useToast } from '../ui';
-import { itemVariants, spring } from '../ui/motion';
+import { Badge, Button, Card, Drawer, EmptyState, Input, Kpi, PageHeader, SkeletonRows, Stagger, Table, Textarea, useToast, type KpiTone } from '../ui';
+import { itemVariants } from '../ui/motion';
 
 const FLAG_KEYS: Record<string, MessageKey> = {
   not_completed: 'settle.flag.not_completed',
@@ -17,21 +17,9 @@ const FLAG_KEYS: Record<string, MessageKey> = {
   off_path: 'settle.flag.off_path',
 };
 
-function Stat({ icon: Icon, label, value, tone = 'primary', testId }: { icon: typeof Wallet; label: string; value: number; tone?: 'primary' | 'success' | 'warning'; testId?: string }) {
+function Stat({ icon, label, value, tone = 'plain', testId }: { icon: typeof Wallet; label: string; value: number; tone?: KpiTone; testId?: string }) {
   const money = useMoney();
-  return (
-    <motion.div variants={itemVariants} whileHover={{ y: -3 }} transition={spring} className="flex items-center gap-4 rounded-lg bg-surface p-5 shadow-card">
-      <span className={clsx('grid size-12 shrink-0 place-items-center rounded-md', tone === 'success' ? 'bg-success-soft text-success' : tone === 'warning' ? 'bg-warning-soft text-warning' : 'bg-primary-soft text-primary')} aria-hidden>
-        <Icon className="size-6" />
-      </span>
-      <div className="min-w-0">
-        <p className="text-title" data-testid={testId} data-value={value}>
-          <AnimatedNumber value={value} format={money} />
-        </p>
-        <p className="truncate text-caption text-text-muted">{label}</p>
-      </div>
-    </motion.div>
-  );
+  return <Kpi compact icon={icon} label={label} value={value} format={money} tone={tone} testId={testId} />;
 }
 
 export function SettlementPage() {
@@ -120,11 +108,11 @@ export function SettlementPage() {
             </Button>
           </motion.div>
 
-          <motion.div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" variants={{ show: { transition: { staggerChildren: 0.05 } } }}>
-            <Stat icon={Wallet} label={t('settle.pool')} value={s.totals.pool} />
-            <Stat icon={HandCoins} label={t('settle.payout')} value={s.totals.payout} tone="success" testId="total-payout" />
+          <motion.div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-4 xl:grid-cols-4" variants={{ show: { transition: { staggerChildren: 0.05 } } }}>
+            <Stat icon={Wallet} label={t('settle.pool')} value={s.totals.pool} tone="brand" />
+            <Stat icon={HandCoins} label={t('settle.payout')} value={s.totals.payout} testId="total-payout" />
             <Stat icon={Percent} label={`${t('settle.commission')} (${s.commissionPct}%)`} value={s.totals.commission} testId="total-commission" />
-            <Stat icon={Wallet} label={t('settle.cash')} value={s.totals.cash} tone="warning" />
+            <Stat icon={Wallet} label={t('settle.cash')} value={s.totals.cash} tone="gold" />
           </motion.div>
 
           <Card animated title={t('settle.drivers')} description={t('settle.driversHint')}>

@@ -20,19 +20,24 @@ test('[T1-09] office configures 3 tiers, 5 points on the map and 2 waves end to 
   await signIn(page);
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
   const nav = page.getByRole('navigation', { name: 'main' });
+  // Settings pages live in the rail's «الإعدادات» flyout.
+  const settings = async (name: string) => {
+    await nav.getByRole('button', { name: 'الإعدادات' }).click();
+    await nav.getByRole('link', { name }).click();
+  };
 
   // Overview checklist: only driver requirements are done (they have defaults)
   await expect(page.getByText('1/4')).toBeVisible();
 
   // 1. Tiers: start from the suggested three, adjust one price, save
-  await nav.getByRole('link', { name: 'فئات المسافة' }).click();
+  await settings('فئات المسافة');
   await page.getByRole('button', { name: 'استخدم الفئات المقترحة' }).click();
   await page.locator('#tier-sub-0').fill('45000');
   await page.getByRole('button', { name: 'حفظ الفئات' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'تم حفظ الفئات' })).toBeVisible();
 
   // 2. Points: click the map five times, name each point, save
-  await nav.getByRole('link', { name: 'نقاط التجمّع' }).click();
+  await settings('نقاط التجمّع');
   const map = page.getByRole('application', { name: 'نقاط التجمّع' });
   await expect(map.locator('canvas')).toBeVisible({ timeout: 20_000 });
   const box = (await map.boundingBox())!;
@@ -52,7 +57,7 @@ test('[T1-09] office configures 3 tiers, 5 points on the map and 2 waves end to 
   await expect(page.locator('.naql-pin--point')).toHaveCount(5);
 
   // 3. Waves: one morning arrival, one return departure (Sun–Thu by default)
-  await nav.getByRole('link', { name: 'المواعيد' }).click();
+  await settings('المواعيد');
   await page.getByRole('button', { name: 'إضافة موعد' }).first().click();
   await page.getByLabel('الوقت').fill('08:00');
   await page.getByRole('dialog').getByRole('button', { name: 'حفظ' }).click();
@@ -68,7 +73,7 @@ test('[T1-09] office configures 3 tiers, 5 points on the map and 2 waves end to 
   await page.screenshot({ path: 'test-results/office-overview.png', fullPage: true });
 
   // Points were stored with automatic tiers and distances
-  await nav.getByRole('link', { name: 'نقاط التجمّع' }).click();
+  await settings('نقاط التجمّع');
   await expect(page.getByText(/كم ·/).first()).toBeVisible();
   await page.screenshot({ path: 'test-results/office-points.png' });
 });

@@ -6,7 +6,7 @@ import { useI18n, useMoney, type MessageKey } from '../lib/i18n';
 import { agoParts, useNow } from '../lib/live';
 import { errorMessages, useCurrentUniversity } from '../lib/queries';
 import { previewFare, useSaveTaxiSettings, useTaxiOverview, useTaxiSettings, type TaxiSettings, type TaxiStatus } from '../lib/taxi';
-import { AnimatedNumber, Badge, Button, Card, EmptyState, Input, PageHeader, SkeletonRows, Stagger, Table, useToast } from '../ui';
+import { Badge, Button, Card, EmptyState, Input, Kpi, KpiGrid, PageHeader, SkeletonRows, Stagger, Table, useToast } from '../ui';
 import type { MapMarker } from '../ui/MapView';
 import { spring } from '../ui/motion';
 import { Errors } from './UniversitiesPage';
@@ -46,23 +46,23 @@ export function TaxiPage() {
   }, [uni.data, online, t]);
 
   return (
-    <Stagger className="flex flex-col gap-6">
+    <Stagger>
       <PageHeader
         title={t('taxi.title')}
         description={t('taxi.desc')}
         actions={settings.data ? <ServiceSwitch settings={settings.data} /> : null}
       />
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-        <Kpi icon={CarTaxiFront} label={t('taxi.kpi.online')} value={k?.online ?? 0} tone="warning" />
-        <Kpi icon={Navigation} label={t('taxi.kpi.active')} value={k?.active ?? 0} tone="primary" />
-        <Kpi icon={CircleCheck} label={t('taxi.kpi.done')} value={k?.done ?? 0} tone="success" />
-        <Kpi icon={Hourglass} label={t('taxi.kpi.unserved')} value={k?.unserved ?? 0} tone="danger" />
-        <Kpi icon={HandCoins} label={t('taxi.kpi.cash')} value={k?.cash ?? 0} tone="success" format={(n) => money(n)} />
-        <Kpi icon={Timer} label={t('taxi.kpi.accept')} value={k?.avgAcceptSec ?? 0} tone="primary" format={(n) => (k?.avgAcceptSec == null ? '—' : n < 60 ? t('taxi.sec', { n }) : t('taxi.min', { n: Math.round(n / 60) }))} />
-      </div>
+      <KpiGrid cols={3}>
+        <Kpi tone="gold" icon={CarTaxiFront} label={t('taxi.kpi.online')} value={k?.online ?? 0} loading={overview.isPending} sub={k ? t('overview.taxiBusy', { n: online.filter((o) => o.busy).length }) : undefined} />
+        <Kpi tone="brand" icon={Navigation} label={t('taxi.kpi.active')} value={k?.active ?? 0} loading={overview.isPending} />
+        <Kpi icon={CircleCheck} label={t('taxi.kpi.done')} value={k?.done ?? 0} loading={overview.isPending} />
+        <Kpi icon={Hourglass} label={t('taxi.kpi.unserved')} value={k?.unserved ?? 0} loading={overview.isPending} />
+        <Kpi compact icon={HandCoins} label={t('taxi.kpi.cash')} value={k?.cash ?? 0} loading={overview.isPending} format={(n) => money(n)} />
+        <Kpi icon={Timer} label={t('taxi.kpi.accept')} value={k?.avgAcceptSec ?? 0} loading={overview.isPending} format={(n) => (k?.avgAcceptSec == null ? '—' : n < 60 ? t('taxi.sec', { n }) : t('taxi.min', { n: Math.round(n / 60) }))} />
+      </KpiGrid>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
         <Card className="overflow-hidden p-0">
           {uni.data ? (
             <Suspense fallback={<div className="h-[460px] animate-pulse bg-surface-muted" />}>
@@ -97,11 +97,11 @@ export function TaxiPage() {
                         onClick={() => setSelected(o.driverId === selected ? null : o.driverId)}
                         aria-pressed={o.driverId === selected}
                         className={clsx(
-                          'flex min-h-12 w-full items-center gap-3 rounded-md px-2 py-2 text-start transition-colors duration-200',
+                          'flex min-h-14 w-full items-center gap-3 rounded-md px-3 py-2 text-start transition-colors duration-200',
                           o.driverId === selected ? 'bg-primary-soft' : 'hover:bg-surface-muted',
                         )}
                       >
-                        <span className={clsx('grid size-9 shrink-0 place-items-center rounded-md', o.busy ? 'bg-ink text-on-ink' : 'bg-warning-soft text-warning')} aria-hidden>
+                        <span className={clsx('grid size-10 shrink-0 place-items-center rounded-pill', o.busy ? 'bg-ink text-on-ink' : 'bg-accent-soft text-on-accent dark:text-accent')} aria-hidden>
                           <CarTaxiFront size={18} />
                         </span>
                         <span className="min-w-0 flex-1">
@@ -121,7 +121,7 @@ export function TaxiPage() {
         </Card>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
         <Card title={t('taxi.ridesTitle')} description={t('taxi.ridesHint')}>
           {overview.isLoading ? (
             <SkeletonRows />
@@ -244,11 +244,11 @@ function TariffCard() {
             {field('taxiMinFare', 'taxi.minFare')}
             {field('taxiOfferSeconds', 'taxi.offerSeconds', 'taxi.offerSecondsHint')}
           </div>
-          <div className="rounded-md bg-surface-muted p-3">
-            <p className="mb-2 text-caption text-text-muted">{t('taxi.preview')}</p>
+          <div className="rounded-lg bg-accent-soft p-4">
+            <p className="mb-3 text-label text-on-accent dark:text-accent">{t('taxi.preview')}</p>
             <ul className="grid grid-cols-2 gap-2">
               {SAMPLE_KM.map((km) => (
-                <li key={km} className="flex items-baseline justify-between gap-2 rounded-md bg-surface px-3 py-2">
+                <li key={km} className="flex items-baseline justify-between gap-2 rounded-pill bg-surface px-4 py-2.5">
                   <span className="text-caption text-text-muted">
                     <span dir="ltr">{km}</span> {t('taxi.km')}
                   </span>
@@ -269,26 +269,3 @@ function TariffCard() {
   );
 }
 
-function Kpi({ icon: Icon, label, value, tone, format }: { icon: typeof CarTaxiFront; label: string; value: number; tone: 'primary' | 'warning' | 'success' | 'danger'; format?: (n: number) => string }) {
-  return (
-    <div className="flex items-center gap-3 rounded-lg bg-surface p-4 shadow-sm dark:border dark:border-border dark:shadow-none">
-      <span
-        className={clsx(
-          'grid size-10 shrink-0 place-items-center rounded-pill',
-          tone === 'primary' && 'bg-primary-soft text-primary',
-          tone === 'warning' && 'bg-warning-soft text-warning',
-          tone === 'success' && 'bg-success-soft text-success',
-          tone === 'danger' && 'bg-danger-soft text-danger',
-        )}
-      >
-        <Icon size={20} aria-hidden />
-      </span>
-      <span className="min-w-0">
-        <span className="block truncate text-caption text-text-muted">{label}</span>
-        <span className="block truncate text-title tabular-nums">
-          <AnimatedNumber value={value} format={format} />
-        </span>
-      </span>
-    </div>
-  );
-}

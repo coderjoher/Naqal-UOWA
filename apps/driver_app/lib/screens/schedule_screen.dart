@@ -104,7 +104,7 @@ class _WaveToggle extends StatelessWidget {
         child: NaqlPressable(
           onPressed: onTap,
           child: AnimatedContainer(
-            duration: NaqlMotion.fast,
+            duration: naqlMotion(context, NaqlMotion.fast),
             constraints: const BoxConstraints(minHeight: NaqlTouch.driver),
             padding: const EdgeInsets.symmetric(horizontal: NaqlSpace.s4),
             decoration: BoxDecoration(
@@ -122,7 +122,7 @@ class _WaveToggle extends StatelessWidget {
                 ]),
               ),
               AnimatedSwitcher(
-                duration: NaqlMotion.fast,
+                duration: naqlMotion(context, NaqlMotion.fast),
                 transitionBuilder: (c, a) => ScaleTransition(scale: a, child: c),
                 child: wave.locked
                     ? Icon(LucideIcons.lock, key: ValueKey('lock'), color: NaqlColors.textMuted)

@@ -14,10 +14,18 @@ class NaqlAvatar extends StatelessWidget {
     this.photo,
     this.size = 52,
     this.icon,
+    this.square = false,
+    this.accent = false,
   });
   final String name;
   final ImageProvider? photo;
   final double size;
+
+  /// Rounded square (person cards in ride sheets) instead of a circle.
+  final bool square;
+
+  /// Gold tone instead of blue.
+  final bool accent;
 
   /// Shown instead of initials (e.g. a bus for a vehicle).
   final IconData? icon;
@@ -30,14 +38,15 @@ class NaqlAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final fg = accent ? (naqlIsDark ? NaqlColors.accent : NaqlColors.onAccent) : NaqlColors.primary;
     final fallback = Center(
       child: icon != null
-          ? Icon(icon, size: size * 0.46, color: NaqlColors.primary)
+          ? Icon(icon, size: size * 0.46, color: fg)
           : Text(
               _initial,
               style: NaqlText.headline.copyWith(
-                fontSize: size * 0.4,
-                color: NaqlColors.primary,
+                fontSize: size * 0.38,
+                color: fg,
                 height: 1,
               ),
             ),
@@ -48,8 +57,9 @@ class NaqlAvatar extends StatelessWidget {
         height: size,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: NaqlColors.primarySoft,
-          shape: BoxShape.circle,
+          color: accent ? NaqlColors.accentSoft : NaqlColors.primarySoft,
+          shape: square ? BoxShape.rectangle : BoxShape.circle,
+          borderRadius: square ? BorderRadius.circular(size * 0.31) : null,
         ),
         child: photo == null
             ? fallback
@@ -102,6 +112,7 @@ class NaqlPersonAction {
     required this.label,
     required this.onPressed,
     this.primary = false,
+    this.positive = false,
   });
 
   /// Key for the action's button (tests, focus).
@@ -110,8 +121,11 @@ class NaqlPersonAction {
   final String label;
   final VoidCallback? onPressed;
 
-  /// Solid style for the main action (usually call).
+  /// Solid style for the main action.
   final bool primary;
+
+  /// Green style (call), as in the live ride sheet.
+  final bool positive;
 }
 
 /// Person row: avatar, name, a small caption ("Your driver", or a [rating] with a gold star),
@@ -130,6 +144,9 @@ class NaqlPersonCard extends StatelessWidget {
     this.below,
     this.actionSize = NaqlTouch.min,
     this.large = false,
+    this.squareAvatar = false,
+    this.avatarSize,
+    this.accentAvatar = false,
   });
 
   final String name;
@@ -150,6 +167,11 @@ class NaqlPersonCard extends StatelessWidget {
   /// Bigger name and avatar, for reading at a glance in the car (driver app).
   final bool large;
 
+  /// Rounded-square avatar (ride sheets) and its size.
+  final bool squareAvatar;
+  final double? avatarSize;
+  final bool accentAvatar;
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -158,7 +180,9 @@ class NaqlPersonCard extends StatelessWidget {
           name: name,
           photo: photo,
           icon: avatarIcon,
-          size: large ? 60 : 52,
+          size: avatarSize ?? (large ? 60 : 52),
+          square: squareAvatar,
+          accent: accentAvatar,
         ),
         const SizedBox(width: NaqlSpace.s3),
         Expanded(
@@ -166,20 +190,18 @@ class NaqlPersonCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                name,
-                style: large
-                    ? NaqlText.title.copyWith(fontSize: 24, height: 1.25)
-                    : NaqlText.headline.copyWith(fontSize: 17),
-                maxLines: large ? 2 : 1,
-                overflow: TextOverflow.ellipsis,
-              ),
               if (caption != null || rating != null)
                 Padding(
-                  padding: const EdgeInsets.only(top: 2),
+                  padding: const EdgeInsets.only(bottom: 2),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      if (rating != null) NaqlRating(rating!),
+                      if (caption != null && rating != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                          child: Text('·', style: NaqlText.caption),
+                        ),
                       if (caption != null)
                         Flexible(
                           child: Text(
@@ -193,17 +215,17 @@ class NaqlPersonCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                      if (caption != null && rating != null)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: NaqlSpace.s2,
-                          ),
-                          child: Text('·', style: NaqlText.caption),
-                        ),
-                      if (rating != null) NaqlRating(rating!),
                     ],
                   ),
                 ),
+              Text(
+                name,
+                style: large
+                    ? NaqlText.title.copyWith(fontSize: 24, height: 1.25)
+                    : NaqlText.headline.copyWith(fontSize: 19, height: 1.3),
+                maxLines: large ? 2 : 1,
+                overflow: TextOverflow.ellipsis,
+              ),
               if (below != null)
                 Padding(
                   padding: const EdgeInsets.only(top: NaqlSpace.s2),
@@ -220,7 +242,9 @@ class NaqlPersonCard extends StatelessWidget {
             onPressed: a.onPressed,
             semanticLabel: a.label,
             size: actionSize,
-            style: a.primary
+            style: a.positive
+                ? NaqlIconButtonStyle.positive
+                : a.primary
                 ? NaqlIconButtonStyle.solid
                 : NaqlIconButtonStyle.soft,
           ),

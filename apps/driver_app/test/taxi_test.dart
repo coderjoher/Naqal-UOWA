@@ -38,8 +38,8 @@ void main() {
     expect(find.text('تكسي الجامعة'), findsOneWidget);
     expect(find.text('أنت غير متصل'), findsOneWidget);
     expect(find.text('رحلات اليوم'), findsNothing);
-    expect(find.bySemanticsLabel('جدولي'), findsNothing);
-    expect(find.bySemanticsLabel('تكسي'), findsOneWidget);
+    expect(find.bySemanticsLabel('الجدول'), findsNothing);
+    expect(find.bySemanticsLabel('الرئيسية'), findsOneWidget);
     expect(find.bySemanticsLabel('الأرباح'), findsOneWidget);
     expect(api.requests.where((r) => r.url.path == '/drivers/me/runs'), isEmpty);
     expect(api.requests.where((r) => r.url.path == '/drivers/me/availability'), isEmpty);
@@ -82,7 +82,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('رحلات اليوم'), findsOneWidget);
     expect(find.text('ذهاب 08:00'), findsOneWidget);
-    expect(find.bySemanticsLabel('جدولي'), findsOneWidget);
+    expect(find.bySemanticsLabel('الجدول'), findsOneWidget);
     expect(find.text('تكسي الجامعة'), findsNothing);
     expect(bus.requests.where((r) => r.url.path.startsWith('/taxi/')), isEmpty);
   });
@@ -272,12 +272,13 @@ void main() {
 
   for (final dark in [false, true]) {
     final mode = dark ? '.dark' : '';
-    testWidgets('[T10-11] taxi home: offline switch and an accepted ride (golden${dark ? ', dark mode' : ''})', (tester) async {
+    testWidgets('[T10-11] taxi home: offline switch and an accepted ride (golden${dark ? ', dark mode' : ''})', (tester) => atFixedTime(() async {
       tester.view.devicePixelRatio = 2.0;
       tester.view.physicalSize = const Size(390 * 2, 844 * 2);
       addTearDown(tester.view.reset);
       if (dark) useDark(tester);
       final api = taxiDriver()..taxiOffers = [FakeDriverBackend.taxiOffer('r1', fare: 6250)];
+      api.state.addAll({'name': 'حيدر عباس', 'plate': '45670 كربلاء أجرة'});
       await tester.pumpWidget(await api.app(signedIn: true));
       await tester.pumpAndSettle();
       await expectLater(find.byType(MaterialApp), matchesGoldenFile('goldens/taxi_home$mode.rtl.png'));
@@ -286,6 +287,6 @@ void main() {
       await tapKey(tester, 'accept-r1');
       await tester.pumpAndSettle();
       await expectLater(find.byType(MaterialApp), matchesGoldenFile('goldens/taxi_ride$mode.rtl.png'));
-    });
+    }));
   }
 }

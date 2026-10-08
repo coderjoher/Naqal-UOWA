@@ -54,6 +54,9 @@ List<BoxShadow> get naqlFloatShadow => [
       ),
     ];
 
+/// Ease-out-quart: things arriving or changing state settle quickly without bounce.
+const naqlEaseOut = Cubic(0.165, 0.84, 0.44, 1);
+
 /// Short, eased motion. Returns [Duration.zero] when the platform asks for reduced motion.
 Duration naqlMotion(BuildContext context, [Duration d = NaqlMotion.fast]) =>
     (MediaQuery.maybeDisableAnimationsOf(context) ?? false) ? Duration.zero : d;

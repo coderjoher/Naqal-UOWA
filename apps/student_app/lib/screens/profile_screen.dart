@@ -6,6 +6,8 @@ import 'package:naql_core/naql_core.dart';
 import 'package:naql_ui/naql_ui.dart';
 
 import '../data/auth.dart';
+import '../data/home.dart';
+import '../data/subscription.dart';
 import '../l10n/gen/app_localizations.dart';
 import 'feedback_sheets.dart';
 
@@ -58,99 +60,203 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final t = AppLocalizations.of(context);
     final lang = ref.watch(localeProvider).languageCode;
     final user = ref.watch(authProvider).value;
-    if (user == null) return const SizedBox.shrink();
-    return Column(children: [
-      NaqlTopBar(title: t.profileTitle),
-      Expanded(
-        child: ListView(padding: const EdgeInsets.fromLTRB(NaqlSpace.s5, NaqlSpace.s2, NaqlSpace.s5, 120), children: [
-          NaqlEntrance(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: NaqlSpace.s5),
-              child: Row(children: [
-                NaqlAvatar(name: user.displayName(lang), size: 64),
-                const SizedBox(width: NaqlSpace.s4),
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(user.displayName(lang), style: NaqlText.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-                    Text(user.studentId, style: NaqlText.caption, textDirection: TextDirection.ltr),
-                  ]),
-                ),
-              ]),
+    if (user == null) return const Scaffold(body: SizedBox.shrink());
+    final unread = ref.watch(unreadCountProvider);
+    final sub = ref.watch(subscriptionProvider).value;
+    return Scaffold(
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            NaqlTopBar(title: t.profileTitle, onBack: () => context.canPop() ? context.pop() : context.go('/home'), backLabel: MaterialLocalizations.of(context).backButtonTooltip),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(NaqlSpace.s5, NaqlSpace.s2, NaqlSpace.s5, NaqlSpace.s8),
+                children: [
+                  NaqlEntrance(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: NaqlSpace.s5),
+                      child: Row(
+                        children: [
+                          NaqlAvatar(name: user.displayName(lang), size: 64, square: true),
+                          const SizedBox(width: NaqlSpace.s4),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(user.displayName(lang), style: NaqlText.title, maxLines: 2, overflow: TextOverflow.ellipsis),
+                                Text(user.studentId, style: NaqlText.caption, textDirection: TextDirection.ltr),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // The places most visits come for, as three big tiles.
+                  NaqlEntrance(
+                    child: Row(
+                      spacing: NaqlSpace.s3,
+                      children: [
+                        Expanded(
+                          child: _MenuTile(key: const ValueKey('menu-trips'), icon: LucideIcons.ticket, label: t.tabTrips, onTap: () => context.push('/trips')),
+                        ),
+                        Expanded(
+                          child: _MenuTile(
+                            key: const ValueKey('menu-subscription'),
+                            icon: LucideIcons.creditCard,
+                            label: t.mySubscription,
+                            caption: sub == null ? null : (sub.isActive ? t.subActive : t.subNone),
+                            onTap: () => context.push('/subscription'),
+                          ),
+                        ),
+                        Expanded(
+                          child: _MenuTile(key: const ValueKey('menu-alerts'), icon: LucideIcons.bell, label: t.notifications, dot: unread > 0, onTap: () => context.push('/alerts')),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: NaqlSpace.s4),
+                  NaqlEntrance(
+                    child: NaqlCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(t.personalInfo, style: NaqlText.headline),
+                          const SizedBox(height: NaqlSpace.s2),
+                          NaqlInfoRow(label: t.name, value: user.displayName(lang), locked: true, lockedHint: t.fromUniversity),
+                          NaqlInfoRow(label: t.studentNumber, value: user.studentId, locked: true, lockedHint: t.fromUniversity),
+                          NaqlInfoRow(label: t.gender, value: user.gender == Gender.female ? t.female : t.male, locked: true, lockedHint: t.fromUniversity),
+                          const SizedBox(height: NaqlSpace.s1),
+                          Text(t.fromUniversity, style: NaqlText.caption),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: NaqlSpace.s4),
+                  NaqlEntrance(
+                    index: 1,
+                    child: NaqlCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          NaqlField(
+                            label: t.phone,
+                            hint: t.phoneHint,
+                            controller: _phone,
+                            keyboardType: TextInputType.phone,
+                            textDirection: TextDirection.ltr,
+                            prefixIcon: LucideIcons.phone,
+                            error: _phoneError,
+                          ),
+                          const SizedBox(height: NaqlSpace.s3),
+                          Row(
+                            children: [
+                              NaqlButton(label: t.save, variant: NaqlButtonVariant.secondary, loading: _saving, onPressed: _savePhone),
+                              const SizedBox(width: NaqlSpace.s3),
+                              if (_savedNote != null) StatusPill(label: _savedNote!, tone: NaqlTone.success),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: NaqlSpace.s4),
+                  NaqlEntrance(
+                    index: 2,
+                    child: NaqlListRow(
+                      title: t.defaultPoint,
+                      subtitle: user.defaultPoint?.displayName(lang) ?? t.notSet,
+                      leading: const NaqlIconTile(LucideIcons.mapPin, size: 40),
+                      onTap: () => context.push('/profile/point'),
+                    ),
+                  ),
+                  const SizedBox(height: NaqlSpace.s2),
+                  NaqlEntrance(
+                    index: 3,
+                    child: NaqlListRow(
+                      title: t.language,
+                      subtitle: lang == 'ar' ? t.arabic : t.english,
+                      leading: const NaqlIconTile(LucideIcons.languages, size: 40),
+                      onTap: () => ref.read(localeProvider.notifier).toggle(),
+                    ),
+                  ),
+                  const SizedBox(height: NaqlSpace.s2),
+                  NaqlEntrance(
+                    index: 3,
+                    child: NaqlListRow(
+                      title: t.reportProblem,
+                      subtitle: t.reportProblemHint,
+                      leading: const NaqlIconTile(LucideIcons.messageSquareWarning, size: 40),
+                      onTap: () => showProblemSheet(context),
+                    ),
+                  ),
+                  const SizedBox(height: NaqlSpace.s6),
+                  NaqlEntrance(
+                    index: 4,
+                    child: NaqlButton(label: t.signOut, variant: NaqlButtonVariant.ghost, icon: LucideIcons.logOut, expand: true, onPressed: () => ref.read(authProvider.notifier).signOut()),
+                  ),
+                ],
+              ),
             ),
-          ),
-          NaqlEntrance(
-            child: NaqlCard(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                Text(t.personalInfo, style: NaqlText.headline),
-                const SizedBox(height: NaqlSpace.s2),
-                NaqlInfoRow(label: t.name, value: user.displayName(lang), locked: true, lockedHint: t.fromUniversity),
-                NaqlInfoRow(label: t.studentNumber, value: user.studentId, locked: true, lockedHint: t.fromUniversity),
-                NaqlInfoRow(label: t.gender, value: user.gender == Gender.female ? t.female : t.male, locked: true, lockedHint: t.fromUniversity),
-                const SizedBox(height: NaqlSpace.s1),
-                Text(t.fromUniversity, style: NaqlText.caption),
-              ]),
-            ),
-          ),
-          const SizedBox(height: NaqlSpace.s4),
-          NaqlEntrance(
-            index: 1,
-            child: NaqlCard(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                NaqlField(
-                  label: t.phone,
-                  hint: t.phoneHint,
-                  controller: _phone,
-                  keyboardType: TextInputType.phone,
-                  textDirection: TextDirection.ltr,
-                  prefixIcon: LucideIcons.phone,
-                  error: _phoneError,
-                ),
-                const SizedBox(height: NaqlSpace.s3),
-                Row(children: [
-                  NaqlButton(label: t.save, variant: NaqlButtonVariant.secondary, loading: _saving, onPressed: _savePhone),
-                  const SizedBox(width: NaqlSpace.s3),
-                  if (_savedNote != null) StatusPill(label: _savedNote!, tone: NaqlTone.success),
-                ]),
-              ]),
-            ),
-          ),
-          const SizedBox(height: NaqlSpace.s4),
-          NaqlEntrance(
-            index: 2,
-            child: NaqlListRow(
-              title: t.defaultPoint,
-              subtitle: user.defaultPoint?.displayName(lang) ?? t.notSet,
-              leading: const NaqlIconTile(LucideIcons.mapPin, size: 40),
-              onTap: () => context.go('/profile/point'),
-            ),
-          ),
-          const SizedBox(height: NaqlSpace.s2),
-          NaqlEntrance(
-            index: 3,
-            child: NaqlListRow(
-              title: t.language,
-              subtitle: lang == 'ar' ? t.arabic : t.english,
-              leading: const NaqlIconTile(LucideIcons.languages, size: 40),
-              onTap: () => ref.read(localeProvider.notifier).toggle(),
-            ),
-          ),
-          const SizedBox(height: NaqlSpace.s2),
-          NaqlEntrance(
-            index: 3,
-            child: NaqlListRow(
-              title: t.reportProblem,
-              subtitle: t.reportProblemHint,
-              leading: const NaqlIconTile(LucideIcons.messageSquareWarning, size: 40),
-              onTap: () => showProblemSheet(context),
-            ),
-          ),
-          const SizedBox(height: NaqlSpace.s6),
-          NaqlEntrance(
-            index: 4,
-            child: NaqlButton(label: t.signOut, variant: NaqlButtonVariant.ghost, icon: LucideIcons.logOut, expand: true, onPressed: () => ref.read(authProvider.notifier).signOut()),
-          ),
-        ]),
+          ],
+        ),
       ),
-    ]);
+    );
   }
+}
+
+/// A big square entry on the account page: icon, label, optional caption or unread dot.
+class _MenuTile extends StatelessWidget {
+  const _MenuTile({super.key, required this.icon, required this.label, required this.onTap, this.caption, this.dot = false});
+  final IconData icon;
+  final String label;
+  final String? caption;
+  final bool dot;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => NaqlPanel(
+    floating: true,
+    onTap: onTap,
+    padding: const EdgeInsets.all(14),
+    child: Semantics(
+      button: true,
+      label: [label, caption].whereType<String>().join('، '),
+      excludeSemantics: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              NaqlIconTile(icon, size: 40),
+              if (dot)
+                PositionedDirectional(
+                  top: -2,
+                  end: -2,
+                  child: Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: NaqlColors.danger,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: NaqlColors.surface, width: 1.5),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: NaqlSpace.s3),
+          Text(
+            label,
+            style: NaqlText.label.copyWith(fontWeight: FontWeight.w600),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(caption ?? ' ', style: NaqlText.caption, maxLines: 1, overflow: TextOverflow.ellipsis),
+        ],
+      ),
+    ),
+  );
 }
