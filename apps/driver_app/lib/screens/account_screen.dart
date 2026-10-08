@@ -79,6 +79,7 @@ class AccountScreen extends ConsumerWidget {
                 title: t.accountDocuments,
                 subtitle: t.accountDocumentsCount(a.documents.length),
                 leading: const Icon(LucideIcons.fileCheck2, color: NaqlColors.primary),
+                onTap: () => showNaqlSheet<void>(context, builder: (_) => _DocumentsSheet(lang: lang)),
               ),
             ),
             const SizedBox(height: NaqlSpace.s2),
@@ -119,6 +120,46 @@ class AccountScreen extends ConsumerWidget {
           ]),
         ),
       ),
+    ]);
+  }
+}
+
+/// The documents the office asked for, and which of them this driver has uploaded.
+class _DocumentsSheet extends ConsumerWidget {
+  const _DocumentsSheet({required this.lang});
+  final String lang;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = AppLocalizations.of(context);
+    final a = ref.watch(applicationProvider).value;
+    if (a == null) return const SizedBox.shrink();
+    final asked = [for (final f in a.form) if (f.isDocument) (key: f.key.replaceFirst('doc_', ''), label: lang == 'ar' ? (f.labelAr ?? f.label) : f.label, required: f.required)];
+    // Uploaded documents the current form no longer asks for still count.
+    final extra = [for (final k in a.documents) if (!asked.any((d) => d.key == k)) (key: k, label: k, required: false)];
+    final docs = [...asked, ...extra];
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
+      Text(t.accountDocuments, style: NaqlText.title),
+      const SizedBox(height: NaqlSpace.s1),
+      Text(t.accountDocumentsHint, style: NaqlText.body.copyWith(color: NaqlColors.textMuted)),
+      const SizedBox(height: NaqlSpace.s4),
+      if (docs.isEmpty) Text(t.accountDocumentsCount(0), style: NaqlText.body),
+      for (final d in docs)
+        Padding(
+          padding: const EdgeInsets.only(bottom: NaqlSpace.s2),
+          child: Row(children: [
+            Icon(a.documents.contains(d.key) ? LucideIcons.circleCheck : LucideIcons.circleDashed,
+                color: a.documents.contains(d.key) ? NaqlColors.success : NaqlColors.textMuted, size: 22),
+            const SizedBox(width: NaqlSpace.s3),
+            Expanded(child: Text(d.label, style: NaqlText.body)),
+            StatusPill(
+              label: a.documents.contains(d.key) ? t.accountDocUploaded : t.accountDocMissing,
+              tone: a.documents.contains(d.key) ? NaqlTone.success : (d.required ? NaqlTone.warning : NaqlTone.neutral),
+            ),
+          ]),
+        ),
+      const SizedBox(height: NaqlSpace.s3),
+      NaqlButton(label: t.accountClose, variant: NaqlButtonVariant.ghost, expand: true, onPressed: () => Navigator.of(context).pop()),
     ]);
   }
 }

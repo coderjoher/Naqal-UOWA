@@ -703,4 +703,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get accountStay => 'البقاء مسجّلاً';
+
+  @override
+  String get accountDocumentsHint =>
+      'المستمسكات التي طلبها مكتب النقل. لتحديث أي منها راجع المكتب.';
+
+  @override
+  String get accountDocUploaded => 'مرفوع';
+
+  @override
+  String get accountDocMissing => 'غير مرفوع';
+
+  @override
+  String get accountClose => 'إغلاق';
 }
