@@ -1,0 +1,1 @@
+Entry point and navigation of the student app: main.dart starts the app through naql_app's runNaqlApp (optional Sentry), app.dart builds the themed MaterialApp, router.dart declares the routes (onboarding, home, booking, track, taxi, trips, subscription, profile, notifications).

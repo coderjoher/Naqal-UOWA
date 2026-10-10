@@ -1,0 +1,3 @@
+- In-process caches (verified-token cache, user-status cache with 10 s TTL, officeViews SWR cache) are per worker; with API_WORKERS > 1 a suspended user keeps access on other workers for up to AUTH_CACHE_MS, and office views may lag by a few seconds.
+- The REST rate limiter is Redis-backed and has no fallback: if Redis is down, the INCR in RateLimitGuard throws and sign-in endpoints return 500 (fail closed). Non-auth routes have no rate limit at all.
+- Socket.IO authenticates only at connection time; a socket opened with a token keeps working after the token expires or the user is suspended until it disconnects.

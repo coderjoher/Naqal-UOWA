@@ -1,0 +1,12 @@
+graph LR
+    app-shell["App Shell\nlib/main.dart, app.dart, router.dart"]
+    screens["Screens\nlib/screens/"]
+    data["Data and Run Controller\nlib/data/"]
+    l10n["Localization\nlib/l10n/"]
+
+    app-shell -->|"routes to"| screens
+    screens -->|"drive runs, taxi, earnings via providers"| data
+    screens -->|"Arabic/English strings"| l10n
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    class app-shell entry

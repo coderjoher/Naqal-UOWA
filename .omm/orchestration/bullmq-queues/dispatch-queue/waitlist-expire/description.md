@@ -1,0 +1,1 @@
+Delayed job waitlist.expire {universityId, waveId, date, requestId} scheduled in afterCommit for every request whose waitlistedUntil changed. Handled exactly like a recheck; entries past their expiry become cancelled with cancelReason=expired and get ride.expired.

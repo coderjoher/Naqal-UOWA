@@ -1,0 +1,1 @@
+Only data that may be briefly stale may be cached here, because API_WORKERS processes each hold their own copy; anything that must be consistent across processes (rate limits, presence, queues) goes to Redis.

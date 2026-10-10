@@ -1,0 +1,1 @@
+SettlementService.approve (POST settlements/:month/approve). Sets status approved, approvedAt, approvedById and records an AuditEvent `settlement.approve` with before/after totals in the same transaction. From then on database triggers make the settlement and its lines immutable.

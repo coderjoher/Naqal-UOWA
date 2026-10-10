@@ -1,0 +1,30 @@
+created: 2026-10-10T17:27:29.650Z
+updated: 2026-10-10T17:28:18.771Z
+update_count: 5
+last_field: note
+kind: nested-class
+title: ride-request
+children:
+  - assigned
+  - cancelled
+  - done
+  - no-show
+  - open
+  - waitlisted
+parentPath: []
+prev_diagram: |
+  stateDiagram-v2
+      [*] --> open: student POST ride request (ST-04)
+      open --> assigned: wave.plan or waitlist.recheck seats the rider
+      open --> waitlisted: plan or recheck finds no seat
+      waitlisted --> assigned: recheck or office extra run frees a seat
+      assigned --> waitlisted: bumped by a subscriber (SM-03)
+      waitlisted --> cancelled: waitlist.expire job, reason expired
+      open --> cancelled: student cancel
+      waitlisted --> cancelled: student cancel
+      assigned --> cancelled: student cancel before pickup
+      assigned --> no_show: bus departs after noShowWaitMinutes
+      assigned --> done: driver ends run (boarded riders)
+      done --> [*]
+      no_show --> [*]
+      cancelled --> [*]

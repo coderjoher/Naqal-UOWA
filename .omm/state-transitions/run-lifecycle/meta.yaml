@@ -1,0 +1,13 @@
+created: 2026-10-10T17:28:55.736Z
+updated: 2026-10-10T17:28:56.356Z
+update_count: 4
+last_field: concern
+kind: nested-class
+title: run-lifecycle
+children:
+  - at-stop
+  - cancelled
+  - done
+  - planned
+  - started
+parentPath: []

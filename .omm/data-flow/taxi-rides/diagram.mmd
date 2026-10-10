@@ -1,0 +1,20 @@
+graph LR
+    taxi-quote["Quote\napps/api/src/taxi/taxi.service.ts"]
+    online-presence["Online Presence\ntaxi:online:{uni} (Redis hash)"]
+    ride-request["Request and Offer\napps/api/src/taxi/taxi.service.ts"]
+    accept-trip["Accept and Trip States\napps/api/src/taxi/taxi.service.ts"]
+    trip-end["Trip End and Fare\napps/api/src/taxi/taxi.service.ts"]
+    expiry-sweep["Expiry Sweep\napps/api/src/taxi/taxi.processor.ts"]
+
+    online-presence -->|"taxis nearby + pickup ETA"| taxi-quote
+    taxi-quote -->|"distanceKm + fare frozen on the ride"| ride-request
+    online-presence -->|"nearest free taxis within 8 km, fresh < 60 s"| ride-request
+    ride-request -->|"status requested, expiresAt"| accept-trip
+    accept-trip -->|"on_trip -> end"| trip-end
+    expiry-sweep -->|"requested + expiresAt passed -> expired"| ride-request
+    accept-trip -->|"driver heartbeat position to student"| online-presence
+
+    classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    class online-presence store
+    class expiry-sweep entry

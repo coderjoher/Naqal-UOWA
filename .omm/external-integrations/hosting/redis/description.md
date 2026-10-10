@@ -1,0 +1,1 @@
+`redis` service: redis:7-alpine with redis-cli ping healthcheck and no persistence volume. Used by the API for BullMQ job queues (@nestjs/bullmq) and the Socket.IO redis-adapter that fans events out across API workers.

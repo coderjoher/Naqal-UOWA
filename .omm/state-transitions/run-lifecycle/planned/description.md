@@ -1,0 +1,1 @@
+Created by DispatchEngine.save() (wave.plan, recheck or office extraRun) with stops and ETAs. Stops and riders may still change (insertions, cancels, moves) and each change emits run:updated to the driver. On return runs riders 'board' on campus while planned.

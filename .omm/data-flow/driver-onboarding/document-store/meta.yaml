@@ -1,0 +1,9 @@
+created: 2026-10-10T17:34:47.081Z
+updated: 2026-10-10T17:34:47.081Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: document-store
+children: []
+parentPath:
+  - driver-onboarding

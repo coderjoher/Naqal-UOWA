@@ -1,0 +1,22 @@
+graph LR
+    bullmq-queues["BullMQ Queues\napps/api/src/*/*.processor.ts"]
+    live-hub["Socket.IO LiveHub\napps/api/src/live/"]
+    notification-outbox["Notification Outbox\napps/api/src/notifications/"]
+    office-view-cache["Office View Cache\napps/api/src/common/swr-cache.ts"]
+    redis-broker["Redis\nREDIS_URL, prefix QUEUE_PREFIX"]
+    fcm-push["Firebase Cloud Messaging\nFCM HTTP v1"]
+
+    bullmq-queues -->|"jobs, schedulers and locks stored in"| redis-broker
+    bullmq-queues -->|"afterCommit: deliverPending after outbox rows written"| notification-outbox
+    bullmq-queues -->|"run:updated, taxi:gone, taxi:ride emits"| live-hub
+    bullmq-queues -->|"officeViews.invalidate (soft) after each wave change"| office-view-cache
+    notification-outbox -->|"toUser 'notification' to user room"| live-hub
+    notification-outbox -->|"push per device token"| fcm-push
+    live-hub -->|"redis-adapter pub/sub fan-out across API instances"| redis-broker
+
+    classDef external fill:#585b70,stroke:#585b70,color:#cdd6f4
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e
+    class redis-broker store
+    class fcm-push external
+    class bullmq-queues,live-hub entry

@@ -1,0 +1,9 @@
+created: 2026-10-10T17:28:59.065Z
+updated: 2026-10-10T17:28:59.065Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: settings-flyout
+children: []
+parentPath:
+  - dashboard-routes

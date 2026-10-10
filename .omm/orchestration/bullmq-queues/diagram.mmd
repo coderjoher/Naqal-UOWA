@@ -1,0 +1,11 @@
+graph LR
+    dispatch-queue["Dispatch Queue\napps/api/src/dispatch/dispatch.processor.ts"]
+    taxi-queue["Taxi Queue\napps/api/src/taxi/taxi.processor.ts"]
+    routing-queue["Routing Queue\napps/api/src/routing/travel-matrix.processor.ts"]
+    metrics["Queue Metrics\napps/api/src/observability/metrics.ts"]
+
+    routing-queue -->|"travel_time matrix read by dispatch travel()"| dispatch-queue
+    metrics -->|"reads dispatch queue depth for /metrics"| dispatch-queue
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    class dispatch-queue,taxi-queue,routing-queue entry

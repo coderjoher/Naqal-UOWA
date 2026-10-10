@@ -1,0 +1,9 @@
+created: 2026-10-10T17:38:14.783Z
+updated: 2026-10-10T17:38:32.642Z
+update_count: 3
+last_field: concern
+kind: nested-class
+title: bullmq-queues
+children: []
+parentPath:
+  - redis

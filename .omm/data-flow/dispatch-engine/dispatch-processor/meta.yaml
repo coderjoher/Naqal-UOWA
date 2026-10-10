@@ -1,0 +1,9 @@
+created: 2026-10-10T17:30:10.583Z
+updated: 2026-10-10T17:30:10.583Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: dispatch-processor
+children: []
+parentPath:
+  - dispatch-engine

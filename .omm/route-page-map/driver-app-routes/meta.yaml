@@ -1,0 +1,13 @@
+created: 2026-10-10T17:31:36.151Z
+updated: 2026-10-10T17:31:36.381Z
+update_count: 2
+last_field: description
+kind: nested-class
+title: driver-app-routes
+children:
+  - application-gate
+  - onboarding
+  - run-screen
+  - splash-gate
+  - tab-shell
+parentPath: []

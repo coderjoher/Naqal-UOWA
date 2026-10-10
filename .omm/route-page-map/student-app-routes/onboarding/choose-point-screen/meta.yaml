@@ -1,0 +1,10 @@
+created: 2026-10-10T17:30:41.412Z
+updated: 2026-10-10T17:30:41.412Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: choose-point-screen
+children: []
+parentPath:
+  - student-app-routes
+  - onboarding

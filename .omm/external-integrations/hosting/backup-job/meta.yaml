@@ -1,0 +1,9 @@
+created: 2026-10-10T17:34:13.239Z
+updated: 2026-10-10T17:34:13.239Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: backup-job
+children: []
+parentPath:
+  - hosting

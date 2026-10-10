@@ -1,0 +1,1 @@
+Flutter design system (packages/naql_ui/lib/src/): foundation/ (theme.dart, format.dart, generated tokens.g.dart) and components/ (button, card, chip, field, otp_field, top_bar, bottom_nav, trip_card, timeline, status_pill, map_overlays, plate, vehicles, person_card, summary, ...). Bundles fonts; testing.dart offers golden/widget test helpers.

@@ -1,0 +1,1 @@
+The RunPosition table (apps/api/prisma/schema.prisma; index (runId, at)): the durable GPS track. Written by LiveService.ingest with createMany for points that won a per-minute or near-stop slot (NF-01). Read by LiveService.last as fallback when Redis has no live:last entry, and by SettlementService.verifyRun to verify the run (SE-02). Rows cascade-delete with their Run.

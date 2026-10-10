@@ -1,0 +1,9 @@
+created: 2026-10-10T17:37:34.610Z
+updated: 2026-10-10T17:37:34.611Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: room-join
+children: []
+parentPath:
+  - socket-path

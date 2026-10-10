@@ -1,0 +1,4 @@
+- TenantMiddleware must run before guards; JwtAuthGuard throws "TenantMiddleware is not mounted" otherwise.
+- RateLimitGuard is registered before JwtAuthGuard on purpose so public sign-in endpoints are throttled.
+- Unknown body properties are rejected with 400 (forbidNonWhitelisted); DTOs must declare every accepted field with class-validator decorators.
+- setupApp() is shared by main.ts and the e2e tests so both run the identical pipeline.

@@ -1,0 +1,15 @@
+created: 2026-10-10T17:29:22.936Z
+updated: 2026-10-10T17:29:23.575Z
+update_count: 4
+last_field: note
+kind: nested-class
+title: taxi-ride
+children:
+  - accepted
+  - arrived
+  - cancelled
+  - done
+  - expired
+  - on-trip
+  - requested
+parentPath: []

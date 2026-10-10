@@ -1,0 +1,13 @@
+created: 2026-10-10T17:32:18.154Z
+updated: 2026-10-10T17:32:18.383Z
+update_count: 2
+last_field: description
+kind: nested-class
+title: notification-outbox
+children:
+  - deliver-pending
+  - notification-rules
+  - outbox-write
+  - producers
+  - push-sender
+parentPath: []

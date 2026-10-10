@@ -1,0 +1,1 @@
+deploy/oracle: compose.server.yml (overlay using `!reset` to remove all host ports except Caddy, requires DB_PASSWORD and JWT_SECRET, restart: unless-stopped), env.example and up.sh. Documented in docs/DEPLOY-ORACLE.md; targets Oracle Cloud Ampere (ARM) or any VM.

@@ -1,0 +1,1 @@
+Office suspended an approved driver with a reason. assertApproved returns "Your account is suspended by the transport office"; excluded from planning and taxi offers. Only reinstate returns to approved.

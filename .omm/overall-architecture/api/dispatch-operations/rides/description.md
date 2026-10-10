@@ -1,0 +1,1 @@
+dispatch/rides.controller.ts + rides.service.ts: students book, view and cancel RideRequests for a wave/date; office manually moves students between runs. The office dispatch board (`loadBoard`) is served through the officeViews SWR cache keyed `{universityId}:board:{date}`; mutations invalidate it.

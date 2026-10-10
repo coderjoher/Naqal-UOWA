@@ -1,0 +1,1 @@
+`Nightly` (nightly.yml; cron 04:17 Baghdad + manual): long-running property tests too slow for PRs — `dispatch-property` (100,000 randomized runs of the dispatch domain properties, time-based seed) and `settlement-property`.

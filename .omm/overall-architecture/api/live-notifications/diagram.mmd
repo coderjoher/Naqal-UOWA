@@ -1,0 +1,14 @@
+graph LR
+    live-gateway["Live Gateway\nlive/live.gateway.ts"]
+    live-service["Live Service\nlive/live.service.ts, eta.ts"]
+    live-hub["Live Hub\nlive/live.hub.ts, redis-io.adapter.ts"]
+    notifications["Notifications\nnotifications/"]
+
+    live-gateway -->|"driver gps events"| live-service
+    live-service -->|"broadcast bus position with ETAs"| live-hub
+    live-service -->|"bus approaching stop alerts"| notifications
+    notifications -->|"in-app event to user room"| live-hub
+    live-gateway -->|"attaches Socket.IO server on init"| live-hub
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    class live-gateway entry

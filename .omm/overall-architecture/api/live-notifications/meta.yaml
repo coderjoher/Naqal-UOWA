@@ -1,0 +1,13 @@
+created: 2026-10-10T17:34:07.579Z
+updated: 2026-10-10T17:34:07.785Z
+update_count: 2
+last_field: diagram
+kind: nested-class
+title: live-notifications
+children:
+  - live-gateway
+  - live-hub
+  - live-service
+  - notifications
+parentPath:
+  - api

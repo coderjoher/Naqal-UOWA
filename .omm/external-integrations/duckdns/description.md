@@ -1,0 +1,1 @@
+Free dynamic DNS used for the Oracle Cloud deployment: deploy/oracle/env.example sets DASHBOARD_DOMAIN=naql-office.duckdns.org, STUDENT_DOMAIN=naql-app.duckdns.org, DRIVER_DOMAIN=naql-driver.duckdns.org, all pointing at the server's public IP (docs/DEPLOY-ORACLE.md step 4). Configured manually; no DuckDNS updater runs in the stack.

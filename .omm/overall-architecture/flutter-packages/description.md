@@ -1,0 +1,1 @@
+Shared Dart packages in the pub workspace (root pubspec.yaml) used by both Flutter apps: naql_ui (design system widgets), naql_core (API client, live feed, offline outbox, models; no Flutter UI), naql_app (app bootstrap, config, secure token storage, Riverpod providers). naql_app depends on naql_core and naql_ui; the apps depend on all three.

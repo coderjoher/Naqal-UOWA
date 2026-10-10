@@ -1,0 +1,6 @@
+Where data enters the Naql campus transport system, how the NestJS API transforms it, and where it lands. Four main streams:
+
+1. Bus rides: a student's RideRequest (apps/api/src/dispatch/rides.service.ts) is planned by the Dispatch Engine in BullMQ workers into Runs/RunStops; the driver app executes the run (board, no-show, end) and streams GPS; Live Location keeps the newest point in Redis and samples one point per minute into PostgreSQL; every change produces deduplicated Notification outbox rows that are pushed over Socket.IO and FCM.
+2. Money: subscriptions sold at the office and cash fares collected by drivers (bus and taxi) all go through PaymentsService.record, which writes an immutable Payment row with a gap-free per-university receipt number. Monthly settlement and reports are pure reads over those immutable rows plus GPS-verified runs.
+3. Campus taxi: quote -> request -> offer to nearby online taxis (Redis hash) -> first accept wins -> arrive/start/end; trip end writes a cash_fare Payment in the same transaction.
+4. Driver onboarding: OTP sign-in, application data, and document uploads stored privately on disk with HMAC-signed short-lived links; every link issuance is logged.

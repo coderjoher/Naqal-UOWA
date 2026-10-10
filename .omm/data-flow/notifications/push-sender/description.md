@@ -1,0 +1,1 @@
+PushSender implementations (apps/api/src/notifications/push.ts), chosen by pushSenderFromEnv: FcmPushSender (FCM HTTP v1 with a service account from FCM_SERVICE_ACCOUNT; caches the OAuth access token) or LogPushSender (development: logs only). Returns sent / invalid-token / failed; high Android priority.

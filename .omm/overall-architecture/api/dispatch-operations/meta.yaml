@@ -1,0 +1,15 @@
+created: 2026-10-10T17:33:07.463Z
+updated: 2026-10-10T17:33:28.258Z
+update_count: 2
+last_field: diagram
+kind: nested-class
+title: dispatch-operations
+children:
+  - dispatch-engine
+  - dispatch-queue
+  - rides
+  - routing
+  - runs
+  - waves
+parentPath:
+  - api

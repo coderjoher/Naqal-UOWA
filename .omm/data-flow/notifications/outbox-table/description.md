@@ -1,0 +1,1 @@
+Notification model (schema.prisma, table notifications): universityId, userId, kind, data JSON, unique dedupeKey, pushedAt (delivery claim), readAt, createdAt; index (userId, createdAt). Written with createMany skipDuplicates inside the producing transaction so a rolled-back business change never notifies; also the in-app inbox (last 50 per user).

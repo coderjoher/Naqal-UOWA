@@ -1,0 +1,1 @@
+identity/student-auth.controller.ts + student-auth.service.ts: public, rate-limited endpoints for students to look up, activate and sign in to their account; the provider factory (identity.factory.ts) resolves the university's IdentityProvider. students/: StudentsController/Service for profile and gathering point, office student management.

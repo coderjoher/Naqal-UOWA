@@ -1,0 +1,13 @@
+graph LR
+    splash-gate["Splash Gate\n/splash router.dart"]
+    onboarding["Onboarding\nscreens/onboarding/"]
+    application-gate["Application Gate\n/apply /status"]
+    tab-shell["Tab Shell\nStatefulShellRoute _Shell"]
+    run-screen["Run Screen\n/run/:id screens/runs/run_screen.dart"]
+    splash-gate -->|"no application session: redirect /welcome"| onboarding
+    onboarding -->|"phone verified, status draft: redirect /apply"| application-gate
+    application-gate -->|"office approves: redirect /today"| tab-shell
+    tab-shell -->|"push /run/:id from Today (bus drivers)"| run-screen
+    run-screen -->|"finished: go /today"| tab-shell
+    class splash-gate entry
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e

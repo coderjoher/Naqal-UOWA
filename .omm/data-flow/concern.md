@@ -1,0 +1,2 @@
+- Notification delivery (deliverPending) runs inline after commit on the API/worker process, sending FCM pushes sequentially per token; a large burst (wave planning for hundreds of students) delays the caller. Failed deliveries are only logged; rows are already marked pushedAt, so a crash mid-loop loses pushes (in-app list still shows them).
+- PaymentType `tier_difference` exists in the schema and is summed in the super-admin overview, but nothing writes it: tier-difference amounts are recorded as `cash_fare`.

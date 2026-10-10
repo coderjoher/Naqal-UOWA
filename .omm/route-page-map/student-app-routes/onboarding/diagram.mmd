@@ -1,0 +1,14 @@
+graph LR
+    welcome-screen["Welcome\n/welcome onboarding/welcome_screen.dart"]
+    university-screen["University\n/university onboarding/university_screen.dart"]
+    sign-in-screen["Sign In\n/sign-in onboarding/sign_in_screen.dart"]
+    activate-screen["Activate\n/activate onboarding/activate_screen.dart"]
+    choose-point-screen["Choose Point\n/choose-point onboarding/choose_point_screen.dart"]
+    welcome-screen -->|"go /university"| university-screen
+    university-screen -->|"slug saved, go /sign-in"| sign-in-screen
+    sign-in-screen -->|"first time: go /activate"| activate-screen
+    activate-screen -->|"back: go /sign-in"| sign-in-screen
+    sign-in-screen -->|"session without defaultPoint: redirect"| choose-point-screen
+    activate-screen -->|"account activated, signed in: redirect"| choose-point-screen
+    class welcome-screen entry
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e

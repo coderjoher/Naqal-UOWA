@@ -1,0 +1,3 @@
+- officeViews is an in-process Map: with several API instances (cluster mode), an invalidate on one instance does not reach the others, so office boards there can be up to the 5 s freshness window plus one refresh stale.
+- deliverPending marks rows pushed before sending, so a crash mid-loop loses those pushes (socket + FCM) rather than retrying them; the in-app list still shows them.
+- LiveService keeps a 15 s in-memory route cache per run, invalidated only on the instance that handled the run action.

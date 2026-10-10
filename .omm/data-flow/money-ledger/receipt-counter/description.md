@@ -1,0 +1,1 @@
+ReceiptCounter model (table receipt_counters; universityId primary key, last). PaymentsService.nextReceiptNo runs a raw `INSERT ... ON CONFLICT (university_id) DO UPDATE SET last = last + 1 RETURNING last` inside the payment transaction, so numbers are atomic, gap-free and roll back with a failed payment. Not in TENANT_MODELS (raw SQL passes university_id explicitly).

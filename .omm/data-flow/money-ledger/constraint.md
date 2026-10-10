@@ -1,0 +1,4 @@
+- NF-14: trigger `payments_immutable` (migration 20261004200000_p3_payments, function forbid_money_mutation) rejects UPDATE and DELETE on payments; TRUNCATE is intentionally allowed for test resets.
+- Amounts are positive whole IQD on record(); only reversals are negative; a reversal cannot be reversed and a payment can be reversed once (unique reversesPaymentId).
+- Receipt numbers are sequential and gap-free per university (unique (universityId, receiptNo)); the counter increment rolls back with the surrounding transaction.
+- One fare per ride: unique rideRequestId and unique taxiRideId on payments; unique idempotencyKey for client retries.

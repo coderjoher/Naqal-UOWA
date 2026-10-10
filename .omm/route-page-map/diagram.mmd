@@ -1,0 +1,9 @@
+graph LR
+    dashboard-routes["Dashboard Routes\napps/dashboard/src/app/App.tsx"]
+    student-app-routes["Student App Routes\napps/student_app/lib/router.dart"]
+    driver-app-routes["Driver App Routes\napps/driver_app/lib/router.dart"]
+    dashboard-routes -->|"announcements published at /announcements reach /alerts via API"| student-app-routes
+    dashboard-routes -->|"approval on /drivers moves driver from /status to /today"| driver-app-routes
+    dashboard-routes -->|"waves set at /settings/waves fill /bus booking grid"| student-app-routes
+    class dashboard-routes,student-app-routes,driver-app-routes entry
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e

@@ -1,0 +1,9 @@
+created: 2026-10-10T17:28:58.449Z
+updated: 2026-10-10T17:28:58.449Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: comms-flyout
+children: []
+parentPath:
+  - dashboard-routes

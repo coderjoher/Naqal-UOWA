@@ -1,0 +1,1 @@
+Role comes from the database row, not the token, which is good; but there is no token revocation list — a stolen token is valid until its 12 h expiry unless the user is suspended (and then only after the per-worker user cache expires).

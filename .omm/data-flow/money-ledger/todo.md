@@ -1,0 +1,2 @@
+- Electronic providers (zaincash, qi) exist in the PaymentMethod enum but only OfficeCashProvider and DriverCashProvider are registered (app.module.ts PAYMENT_PROVIDERS).
+- PaymentType tier_difference is never written; decide whether tier-difference fares should be recorded with that type instead of cash_fare.

@@ -1,0 +1,1 @@
+save() rewrites all RunStops of every touched run (deleteMany + createMany) on each recheck, copying servedAt/arrivedAt from the previous rows by pointId. Correct but write-heavy at peak when many requests arrive for an already planned wave (one recheck job per request).

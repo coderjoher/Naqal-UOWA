@@ -1,0 +1,1 @@
+Points are accepted only from the run's own driver while the run is started or at_stop. Device times are clamped to now, sorted, and at most the last 2000 points per batch are kept. Only the bus position is ever broadcast, never a student's location (NF-12). The route (stops, riders, legs) is cached in process memory for 15 s and invalidated on run changes.

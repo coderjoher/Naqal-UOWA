@@ -1,0 +1,1 @@
+Hash `taxi:online:{universityId}` (apps/api/src/taxi/taxi.service.ts): field driverId -> JSON {lat, lng, at}. Written by every taxi driver heartbeat (HSET), removed on goOffline (HDEL), read with HGETALL by quote/offer (entries older than ONLINE_STALE_MS = 60 s ignored) and HGET for one driver's position. The only store of live taxi positions; nothing is persisted to Postgres.

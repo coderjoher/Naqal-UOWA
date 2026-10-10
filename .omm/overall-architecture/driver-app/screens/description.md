@@ -1,0 +1,1 @@
+Driver UI (lib/screens/): onboarding/ (welcome, university, phone, OTP code), application_screen and status_screen (driver application with documents and its review state), runs/today_screen and runs/run_screen (stop-by-stop run driving), schedule_screen, taxi/taxi_home_screen (online toggle, ride offers), earnings_screen, account_screen, drive_layout/home_header.

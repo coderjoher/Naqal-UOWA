@@ -1,0 +1,1 @@
+computePayouts in apps/api/src/settlement/payout.ts (SE-01): payout_d = sum over tiers of Pool_tier x (1 - c) x runs_d,tier / runs_tier - c x cash_d, where c is the university commissionPct in basis points. Pools of tiers with no counted run are reported as unallocated. Pure function with unit tests (payout.spec.ts).

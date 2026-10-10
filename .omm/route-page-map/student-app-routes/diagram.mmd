@@ -1,0 +1,15 @@
+graph LR
+    splash-gate["Splash Gate\n/splash router.dart _Splash"]
+    onboarding["Onboarding\nscreens/onboarding/"]
+    home-hub["Home Hub\n/home screens/home_screen.dart"]
+    trips-history["Trips History\n/trips screens/trips_screen.dart"]
+    profile["Profile\n/profile screens/profile_screen.dart"]
+    splash-gate -->|"auth loaded, no user: redirect /welcome"| onboarding
+    splash-gate -->|"auth loaded, user with point: redirect /home"| home-hub
+    onboarding -->|"default point chosen: redirect /home"| home-hub
+    home-hub -->|"push /profile and /profile/point"| profile
+    profile -->|"push /trips"| trips-history
+    trips-history -->|"go /home"| home-hub
+    profile -->|"go /home"| home-hub
+    class splash-gate entry
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e

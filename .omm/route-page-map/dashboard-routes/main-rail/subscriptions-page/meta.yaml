@@ -1,0 +1,10 @@
+created: 2026-10-10T17:29:26.900Z
+updated: 2026-10-10T17:29:26.900Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: subscriptions-page
+children: []
+parentPath:
+  - dashboard-routes
+  - main-rail

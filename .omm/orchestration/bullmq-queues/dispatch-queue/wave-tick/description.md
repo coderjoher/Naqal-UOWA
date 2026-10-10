@@ -1,0 +1,1 @@
+Job scheduler 'wave-tick' (job name wave.tick) upserted every 60 000 ms in DispatchProcessor.onModuleInit unless DISPATCH_TICK=off. tick() looks at today and tomorrow (Asia/Baghdad), across all tenants via runAsSystem, for active waves running that weekday with no WavePlan whose time is within the next PLAN_LEAD_MIN (60) minutes, and enqueues one wave.plan per due wave.

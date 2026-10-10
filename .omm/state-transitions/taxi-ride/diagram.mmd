@@ -1,0 +1,25 @@
+graph LR
+    requested["Requested\nTaxiRideStatus.requested"]
+    accepted["Accepted\nTaxiRideStatus.accepted"]
+    arrived["Arrived\nTaxiRideStatus.arrived"]
+    on-trip["On Trip\nTaxiRideStatus.on_trip"]
+    done["Done\nTaxiRideStatus.done"]
+    cancelled["Cancelled\nTaxiRideStatus.cancelled"]
+    expired["Expired\nTaxiRideStatus.expired"]
+
+    requested -->|"accept: first driver wins conditional update"| accepted
+    accepted -->|"arrive: driver at pickup, taxi.arrived push"| arrived
+    accepted -->|"start: pickup skipped arrive"| on-trip
+    arrived -->|"start: rider on board"| on-trip
+    on-trip -->|"end: cash_fare payment recorded"| done
+    requested -->|"cancel_student"| cancelled
+    accepted -->|"cancel_student, driver gets taxi.cancelled"| cancelled
+    arrived -->|"cancel_student"| cancelled
+    accepted -->|"cancel_driver: back on offer, fresh expiresAt"| requested
+    arrived -->|"cancel_driver: back on offer, fresh expiresAt"| requested
+    requested -->|"expire: taxi.sweep every 20s past expiresAt"| expired
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e
+    class requested entry
+    class done,cancelled,expired store

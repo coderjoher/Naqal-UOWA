@@ -1,0 +1,13 @@
+created: 2026-10-10T17:31:51.382Z
+updated: 2026-10-10T17:31:51.622Z
+update_count: 2
+last_field: description
+kind: nested-class
+title: live-hub
+children:
+  - emitters
+  - live-gateway
+  - live-service
+  - redis-io-adapter
+  - rooms
+parentPath: []

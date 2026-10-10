@@ -1,0 +1,4 @@
+- At most one active subscription per student and month (checked in the create transaction, 409 otherwise).
+- Student must be active and have an active default gathering point; price comes from the point's tier.
+- A reversal cannot be reversed and a payment can be reversed only once, so cancelled is terminal.
+- RidesService.request reads active subscriptions covering the ride date to set RideRequest.subscriber and the fare (0, or tier difference when riding farther than the subscribed tier).

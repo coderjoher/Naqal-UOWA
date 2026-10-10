@@ -1,0 +1,1 @@
+`/run/:id` (screens/runs/run_screen.dart, DR-03/04, state in data/run_controller.dart): full-screen driving view — map (drive_layout.dart) with instruction card, stop timeline, riders boarding per stop, one big action (start -> arrive -> board -> leave -> finish) and DR-06 hand-off to Google Maps or Waze. No tab bar; blocked for taxi drivers by the redirect.

@@ -1,0 +1,1 @@
+Terminal. Only the student cancels to this state (cancelledBy=student) from requested, accepted or arrived; the assigned driver, if any, gets taxi.cancelled. A driver cancel never lands here, it returns the ride to requested.

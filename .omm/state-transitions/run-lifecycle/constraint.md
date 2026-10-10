@@ -1,0 +1,6 @@
+- Actions run inside DispatchEngine.locked for the run's wave+date, so they never interleave with planning/rechecks.
+- Idempotent by (runId, clientId): a replayed action returns applied=false (NF-09). Device time is clamped to now.
+- 'arrive' must target the next unserved stop (seq check); 'end' refused while stops remain.
+- 'depart' (morning) and 'start' (return) throw StillWaitingException (409 with waitLeftS) until noShowWaitMinutes elapse or every rider is boarded.
+- 'board' is allowed at_stop (morning, riders of that stop) or in planned (return, on campus); it sets boardedAt without changing run status.
+- GPS ingest (LiveService.ingest) is accepted only while the run is started or at_stop.

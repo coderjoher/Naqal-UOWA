@@ -1,0 +1,10 @@
+created: 2026-10-10T17:34:08.396Z
+updated: 2026-10-10T17:34:08.397Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: live-hub
+children: []
+parentPath:
+  - api
+  - live-notifications

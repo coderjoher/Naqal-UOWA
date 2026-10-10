@@ -1,0 +1,18 @@
+graph LR
+    wave-tick["Wave Tick Scheduler\ndispatch.processor.ts tick()"]
+    wave-plan["wave.plan Job\ndispatch.engine.ts plan()"]
+    waitlist-recheck["waitlist.recheck Job\ndispatch.engine.ts recheck()"]
+    waitlist-expire["waitlist.expire Job\ndispatch.engine.ts scheduleExpiries()"]
+    dispatch-engine["Dispatch Engine\napps/api/src/dispatch/dispatch.engine.ts"]
+    request-producers["Request-Path Producers\nrides.controller.ts, rides.service.ts"]
+
+    wave-tick -->|"every 60s: enqueuePlan for waves due within PLAN_LEAD_MIN=60"| wave-plan
+    request-producers -->|"office 'plan now' enqueuePlan (same jobId)"| wave-plan
+    request-producers -->|"new request on planned wave, cancel, move"| waitlist-recheck
+    wave-plan -->|"locked plan: planWave + save"| dispatch-engine
+    waitlist-recheck -->|"locked recheckIn: recheckWaitlist + save"| dispatch-engine
+    waitlist-expire -->|"same handler as recheck: expires overdue entries"| dispatch-engine
+    dispatch-engine -->|"afterCommit: delayed job at each new waitlistedUntil"| waitlist-expire
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    class wave-tick,request-producers entry

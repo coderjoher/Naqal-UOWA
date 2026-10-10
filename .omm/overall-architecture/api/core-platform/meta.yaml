@@ -1,0 +1,14 @@
+created: 2026-10-10T17:32:25.930Z
+updated: 2026-10-10T17:32:26.151Z
+update_count: 2
+last_field: diagram
+kind: nested-class
+title: core-platform
+children:
+  - auth
+  - bootstrap
+  - data-access
+  - observability
+  - tenancy
+parentPath:
+  - api

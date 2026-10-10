@@ -1,0 +1,1 @@
+There is no mapping of Prisma known errors (e.g. P2002 unique violation, P2025 not found) to 4xx; services are expected to check and throw HttpExceptions themselves, otherwise such cases surface as 500 and are sent to Sentry.

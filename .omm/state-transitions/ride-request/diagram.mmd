@@ -1,0 +1,24 @@
+graph LR
+    open["Open\nRideStatus.open"]
+    waitlisted["Waitlisted\nRideStatus.waitlisted"]
+    assigned["Assigned\nRideStatus.assigned"]
+    done["Done\nRideStatus.done"]
+    no-show["No Show\nRideStatus.no_show"]
+    cancelled["Cancelled\nRideStatus.cancelled"]
+
+    open -->|"wave.plan / waitlist.recheck seats rider (save)"| assigned
+    open -->|"plan or recheck finds no seat, waitlistedUntil set"| waitlisted
+    waitlisted -->|"waitlist.recheck or office extra run seats rider"| assigned
+    assigned -->|"bumped by a subscriber (SM-03), re-queued"| waitlisted
+    waitlisted -->|"waitlist.expire job: cancelReason=expired"| cancelled
+    open -->|"student cancel (ST-08)"| cancelled
+    waitlisted -->|"student cancel (ST-08)"| cancelled
+    assigned -->|"student cancel before pickup, frees seat"| cancelled
+    assigned -->|"driver depart / start after noShowWaitMinutes, not boarded"| no-show
+    assigned -->|"driver end run: boarded (morning) or all assigned (return)"| done
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e
+    classDef concern fill:#f38ba8,stroke:#f38ba8,color:#1e1e2e
+    class open entry
+    class done,no-show,cancelled store

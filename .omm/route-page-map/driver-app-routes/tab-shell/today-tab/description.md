@@ -1,0 +1,1 @@
+`/today` (private `_TodayTab` in router.dart): shows TaxiHomeScreen (screens/taxi/taxi_home_screen.dart, online switch and active ride) for taxi drivers, otherwise TodayScreen (screens/runs/today_screen.dart, DR-03): next run card, today's figures and later runs; tapping a run pushes /run/:id.

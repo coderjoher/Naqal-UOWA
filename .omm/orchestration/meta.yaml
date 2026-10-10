@@ -1,0 +1,13 @@
+created: 2026-10-10T17:30:32.686Z
+updated: 2026-10-10T17:30:33.600Z
+update_count: 5
+last_field: concern
+git_commit: aeb2786
+git_branch: claude/project-phases-testing-stack-c2lzwu
+children:
+  - bullmq-queues
+  - fcm-push
+  - live-hub
+  - notification-outbox
+  - office-view-cache
+  - redis-broker

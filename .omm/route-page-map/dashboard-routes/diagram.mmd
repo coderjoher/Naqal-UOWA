@@ -1,0 +1,19 @@
+graph LR
+    login-page["Login Page\n/login pages/LoginPage.tsx"]
+    auth-shell["Auth Shell\napp/guards.tsx + app/Shell.tsx"]
+    main-rail["Main Rail\nnav.group.main"]
+    comms-flyout["Comms Flyout\n/inbox /announcements"]
+    people-flyout["People Flyout\n/drivers /students /users"]
+    platform-rail["Platform Rail\n/universities"]
+    settings-flyout["Settings Flyout\n/settings/* /audit"]
+    catch-all-redirect["Catch-all Redirect\npath * -> /"]
+    login-page -->|"session stored, return to state.from"| auth-shell
+    auth-shell -->|"no session: Navigate to /login"| login-page
+    auth-shell -->|"rail buttons (office)"| main-rail
+    auth-shell -->|"flyout popover (office)"| comms-flyout
+    auth-shell -->|"flyout popover (office)"| people-flyout
+    auth-shell -->|"rail button (super_admin only)"| platform-rail
+    auth-shell -->|"bottom flyout (office; audit also super_admin)"| settings-flyout
+    catch-all-redirect -->|"RedirectOnce to index"| auth-shell
+    class login-page,auth-shell entry
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e

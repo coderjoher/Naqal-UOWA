@@ -1,0 +1,12 @@
+created: 2026-10-10T17:37:33.769Z
+updated: 2026-10-10T17:37:33.997Z
+update_count: 2
+last_field: diagram
+kind: nested-class
+title: socket-path
+children:
+  - fan-out
+  - gps-ingest
+  - handshake
+  - room-join
+parentPath: []

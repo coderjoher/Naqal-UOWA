@@ -132,3 +132,15 @@ pass in CI → tick the exit gate → set `Status: done`. The checker then keeps
 | Q3 mixed-tier run pool | P4, P6 | Farthest-stop tier |
 | Q4 calendar month vs 30 days | P3 | Calendar month |
 | Q5 refunds | P3 | No refunds in v1 |
+
+## Architecture docs
+
+`.omm/` holds the architecture written with [oh-my-mermaid](https://github.com/oh-my-mermaid/oh-my-mermaid): eight perspectives (overall architecture, request lifecycle, data flow, storage, state transitions, orchestration, route/page map, external integrations), each a Mermaid diagram plus notes, concerns and todos found in the code.
+
+```bash
+npm install -g oh-my-mermaid
+omm view            # browse at http://localhost:3000
+omm validate        # check every diagram
+```
+
+Re-run the `/omm-scan` skill in Claude Code after big changes to refresh them.

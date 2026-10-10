@@ -1,0 +1,32 @@
+graph LR
+    student-app["Student App\napps/student_app/"]
+    driver-app["Driver App\napps/driver_app/"]
+    dashboard["Office Dashboard\napps/dashboard/"]
+    flutter-packages["Shared Flutter Packages\npackages/naql_*"]
+    design-tokens["Design Tokens\npackages/design-tokens/"]
+    api["NestJS API\napps/api/"]
+    postgres["PostgreSQL 16\napps/api/prisma/schema.prisma"]
+    redis["Redis 7\napps/api/src/redis/"]
+    osrm["OSRM Router\ninfra/osrm/"]
+    push-services["FCM / SMS\napps/api/src/notifications/push.ts"]
+    infra-deploy["Docker Stack and Deploy\ndocker-compose.yml, deploy/, infra/"]
+
+    student-app -->|"uses UI, API client, bootstrap"| flutter-packages
+    driver-app -->|"uses UI, API client, offline outbox"| flutter-packages
+    design-tokens -->|"generates tokens.g.dart"| flutter-packages
+    design-tokens -->|"generates tokens.theme.css"| dashboard
+    student-app -->|"REST + Socket.IO /live (bus tracking)"| api
+    driver-app -->|"REST actions + GPS stream over Socket.IO"| api
+    dashboard -->|"REST /api + Socket.IO via nginx proxy"| api
+    api -->|"Prisma, tenant-scoped queries"| postgres
+    api -->|"BullMQ queues, rate limits, cache, Socket.IO adapter, live GPS"| redis
+    api -->|"travel-time matrix and routes"| osrm
+    api -->|"push notifications, driver OTP"| push-services
+    infra-deploy -->|"builds and runs all containers"| api
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e
+    classDef external fill:#585b70,stroke:#585b70,color:#cdd6f4
+    class student-app,driver-app,dashboard entry
+    class postgres,redis store
+    class osrm,push-services external

@@ -1,0 +1,3 @@
+- Every tenant-owned model must have universityId and be listed in apps/api/src/tenancy/tenant-models.ts; raw SQL ($queryRaw/$executeRaw) bypasses the tenant filter and must include university_id explicitly.
+- Money tables are append-only by database trigger (payments; settlements and settlement_lines once approved). Schema changes go through Prisma migrations (apps/api/prisma/migrations); triggers and partial unique indexes live in migration SQL, not in schema.prisma.
+- Redis is never the source of truth: every Redis-backed path either has a Postgres fallback (live last position -> RunPosition; config cache -> loader) or is acceptable to lose (presence, rate limits).

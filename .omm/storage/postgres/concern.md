@@ -1,0 +1,3 @@
+- Raw SQL bypasses tenant scoping: the dispatch advisory lock and PaymentsService.nextReceiptNo pass university_id explicitly; any new $queryRaw must do the same.
+- RunPosition, RunEvent, Notification and DocumentAccess grow without any retention/cleanup job in the code.
+- Tenant isolation is application-level only (no Postgres row-level security); a code path running under runAsSystem sees all universities.

@@ -1,0 +1,11 @@
+graph LR
+    student-identity["Student Identity\nidentity/, students/"]
+    drivers["Driver Onboarding\ndrivers/, users/"]
+    storage["Document Storage\nstorage/"]
+    identity-providers["University Identity Source\nidentity/*.provider.ts"]
+
+    student-identity -->|"verify student via roster, HTTP API or OIDC"| identity-providers
+    drivers -->|"store and sign document links"| storage
+
+    classDef external fill:#585b70,stroke:#585b70,color:#cdd6f4
+    class identity-providers external

@@ -1,0 +1,1 @@
+RideRating (ride_ratings, unique requestId): one 1-5 star rating with optional comment per finished ride, linked to student, driver and run. ProblemReport (problem_reports): student-reported problem (category late|driver|vehicle|safety|app|other, text, optional requestId) with status open|resolved, office reply, resolver and time; replies notify the student (problem.answered).

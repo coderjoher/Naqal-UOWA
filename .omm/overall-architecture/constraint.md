@@ -1,0 +1,4 @@
+- Node >= 22, pnpm 10 for the TypeScript side; Dart SDK ^3.13 pub workspace for all Flutter code (one shared resolution).
+- Design tokens are generated, never hand-edited: `pnpm tokens` writes packages/naql_ui/lib/src/foundation/tokens.g.dart and packages/design-tokens/build/tokens.theme.css; the dashboard lint forbids raw colors (scripts/no-raw-colors.mjs).
+- The API requires DATABASE_URL, REDIS_URL and JWT_SECRET at startup (getOrThrow).
+- Clients use the WebSocket transport only, so multiple API workers need no sticky sessions.

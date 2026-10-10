@@ -1,0 +1,9 @@
+created: 2026-10-10T17:28:59.265Z
+updated: 2026-10-10T17:28:59.266Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: catch-all-redirect
+children: []
+parentPath:
+  - dashboard-routes

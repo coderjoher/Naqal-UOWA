@@ -1,0 +1,1 @@
+MetricsController (observability/metrics.ts) injects the dispatch queue and LiveHub so the Prometheus /metrics endpoint can report queue state and connected socket count; guarded by METRICS_TOKEN when set.

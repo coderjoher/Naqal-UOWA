@@ -1,0 +1,1 @@
+OSM's public tile servers are for light use only; the code comments and .env.example require switching to a keyed provider (e.g. MapTiler) for full launch. The driver-web build does not receive MAP_TILES build args in docker-compose.yml, so it always uses OSM.

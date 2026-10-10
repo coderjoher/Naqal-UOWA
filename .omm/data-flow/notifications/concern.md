@@ -1,0 +1,1 @@
+At-most-once push: rows are marked pushedAt before sending, so a crash or FCM failure after the claim is never retried (the socket event and in-app list still carry the message). deliverPending handles at most 200 rows per call and is only triggered by later business events, so a backlog beyond 200 waits for the next event in that university.

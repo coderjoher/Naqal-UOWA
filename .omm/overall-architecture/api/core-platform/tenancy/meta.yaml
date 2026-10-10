@@ -1,0 +1,10 @@
+created: 2026-10-10T17:32:26.978Z
+updated: 2026-10-10T17:32:49.081Z
+update_count: 2
+last_field: concern
+kind: nested-class
+title: tenancy
+children: []
+parentPath:
+  - api
+  - core-platform

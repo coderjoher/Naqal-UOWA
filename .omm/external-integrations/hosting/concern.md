@@ -1,0 +1,3 @@
+- Single VM: database, Redis, API workers, OSRM and backups share one host; local backups do not survive host loss unless BACKUP_REMOTE is set.
+- Base docker-compose.yml publishes postgres:5432, redis:6379, osrm:5000, api:3000/9464 with default password `naql`; it is only safe because the Oracle overlay resets those ports. Running the base file alone on a public host would expose them.
+- The observability profile is not enabled by up.sh, so production has no Prometheus alerting unless started manually.

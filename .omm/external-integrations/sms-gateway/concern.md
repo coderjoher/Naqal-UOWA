@@ -1,0 +1,1 @@
+Not an actual external integration yet. docker-compose.yml says DEMO=false enables "real SMS codes", but no real sender exists — production driver onboarding is blocked until an Iraqi SMS gateway adapter is implemented.

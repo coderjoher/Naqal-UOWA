@@ -1,0 +1,1 @@
+Global REDIS provider (apps/api/src/redis/redis.module.ts): one ioredis connection per API process from REDIS_URL with lazyConnect and maxRetriesPerRequest 1, so a Redis outage fails fast instead of hanging requests. Users call connect() on first use when status is `wait`. Also pinged by the health endpoint (health.controller.ts). Disconnected on module destroy.

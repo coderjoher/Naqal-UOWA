@@ -1,0 +1,21 @@
+created: 2026-10-10T17:32:44.903Z
+updated: 2026-10-10T17:32:45.965Z
+update_count: 5
+last_field: todo
+git_commit: aeb2786
+git_branch: claude/project-phases-testing-stack-c2lzwu
+children:
+  - app-stores
+  - backup-remote
+  - client-apps
+  - duckdns
+  - firebase-fcm
+  - geofabrik-extract
+  - github-actions
+  - hosting
+  - lets-encrypt
+  - map-tiles
+  - navigation-apps
+  - sentry
+  - sms-gateway
+  - university-identity

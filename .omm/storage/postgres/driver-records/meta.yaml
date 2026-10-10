@@ -1,0 +1,9 @@
+created: 2026-10-10T17:37:24.213Z
+updated: 2026-10-10T17:37:24.213Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: driver-records
+children: []
+parentPath:
+  - postgres

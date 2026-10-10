@@ -1,0 +1,1 @@
+RequirementsService (apps/api/src/driver-requirements/, TO-01): reads the university's DriverRequirementSet (required documents with keys, vehicle rules) through the Redis ConfigCache (`cfg:{uni}:driver-requirements`, 1 h TTL) and builds the registration form shown in the driver app; taxi-specific rules apply when the university has taxis enabled.

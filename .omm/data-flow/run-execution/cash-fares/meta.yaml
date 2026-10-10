@@ -1,0 +1,9 @@
+created: 2026-10-10T17:30:41.979Z
+updated: 2026-10-10T17:30:41.979Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: cash-fares
+children: []
+parentPath:
+  - run-execution

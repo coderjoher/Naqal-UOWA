@@ -1,0 +1,1 @@
+Role lists are duplicated: nav.ts claims to be the "single source for menu items and route permissions", but App.tsx hard-codes RequireRole roles per route (office() helper, explicit lists for /universities and /audit). Adding a page requires updating both files consistently.

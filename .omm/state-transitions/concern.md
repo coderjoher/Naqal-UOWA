@@ -1,0 +1,2 @@
+- RunStatus.cancelled is declared but no code path sets a Run to cancelled; runs left empty are deleted instead (DispatchEngine.save). Likewise DispatchEngine.cancel accepts reason 'office' but no office endpoint calls it.
+- State checks are spread between pure rule modules and inline service code (ride requests have no single nextRideState function), which makes the ride-request machine harder to audit than the run/taxi/driver ones.

@@ -1,0 +1,4 @@
+- update/upload/submit are refused (409) unless status is draft or rejected.
+- reject and suspend require a non-empty note.
+- An illegal action returns 409 "Cannot {action} a driver who is {status}".
+- Only approved drivers operate: assertApproved guards run endpoints (T2-08); wave planning and extraRun select drivers with status approved, seats > 0 and vehicleType != taxi (BUS_ONLY); taxi actions require approved + vehicleType=taxi.

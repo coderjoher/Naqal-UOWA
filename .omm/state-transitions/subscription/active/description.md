@@ -1,0 +1,1 @@
+Paid subscription for one calendar month (periodStart..periodEnd), linked 1:1 to its subscription payment. Makes ride requests in the period subscriber requests (free in tier, priority over pay-per-ride riders when seats are short, SM-03).

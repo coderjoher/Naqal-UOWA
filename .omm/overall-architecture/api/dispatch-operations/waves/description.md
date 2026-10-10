@@ -1,0 +1,1 @@
+waves/: WavesController/Service and wave-rules.ts. A wave is a scheduled departure slot (to or from campus) with booking cut-off and planning lead. Changes hard-invalidate officeViews and the waves ConfigCache entry.

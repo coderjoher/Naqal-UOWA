@@ -1,0 +1,14 @@
+graph LR
+    ci-workflow["CI\n.github/workflows/ci.yml"]
+    phase-gates-workflow["Phase Gates\n.github/workflows/phase-gates.yml"]
+    demo-apk-workflow["Android Test Builds\n.github/workflows/apps.yml"]
+    release-workflow["Release\n.github/workflows/release.yml"]
+    load-workflow["Load Test\n.github/workflows/load.yml"]
+    nightly-workflow["Nightly\n.github/workflows/nightly.yml"]
+    ci-workflow -->|"same push/PR triggers, traceability check"| phase-gates-workflow
+    ci-workflow -->|"main push also publishes demo APKs"| demo-apk-workflow
+    demo-apk-workflow -->|"v* tag promotes to signed store builds"| release-workflow
+    ci-workflow -->|"heavy perf checks moved out of PRs"| load-workflow
+    ci-workflow -->|"long property tests moved out of PRs"| nightly-workflow
+    class ci-workflow entry
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e

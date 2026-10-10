@@ -1,0 +1,9 @@
+created: 2026-10-10T17:31:40.164Z
+updated: 2026-10-10T17:31:40.164Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: oracle-deploy
+children: []
+parentPath:
+  - infra-deploy

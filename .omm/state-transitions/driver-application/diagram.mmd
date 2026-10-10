@@ -1,0 +1,20 @@
+graph LR
+    draft["Draft\nDriverStatus.draft"]
+    pending["Pending\nDriverStatus.pending"]
+    approved["Approved\nDriverStatus.approved"]
+    rejected["Rejected\nDriverStatus.rejected"]
+    suspended["Suspended\nDriverStatus.suspended"]
+
+    draft -->|"driver submit: missingRequirements empty"| pending
+    pending -->|"office approve"| approved
+    pending -->|"office reject (reason required)"| rejected
+    rejected -->|"driver edits and resubmits"| pending
+    approved -->|"office suspend (reason required)"| suspended
+    suspended -->|"office reinstate"| approved
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e
+    classDef concern fill:#f38ba8,stroke:#f38ba8,color:#1e1e2e
+    class draft entry
+    class approved store
+    class suspended concern

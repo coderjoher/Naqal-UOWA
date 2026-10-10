@@ -1,0 +1,3 @@
+- Dashboard: every route except /login sits under RequireAuth + Shell; unauthorized roles are redirected once to "/" (RedirectOnce) instead of seeing a broken page.
+- Student app: no route except onboarding is reachable without a session, and no hub route is reachable before a default pickup point is chosen.
+- Driver app: routing is gated by DriverStatus (draft -> /apply, pending/suspended -> /status, rejected -> /status or /apply, approved -> tabs); taxi drivers are redirected away from /schedule and /run/:id.

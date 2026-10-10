@@ -1,0 +1,1 @@
+`/profile` (screens/profile_screen.dart): personal info taken from the university (name, student number, gender), editable phone number, default pickup point, links to /trips, /subscription and /alerts, and sign-out. Child route `/profile/point` reuses ChoosePointScreen(changing: true) to change the default pickup point after onboarding.

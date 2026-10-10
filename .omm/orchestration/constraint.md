@@ -1,0 +1,4 @@
+- DISPATCH_TICK=off disables both repeating schedulers (wave-tick and taxi-sweep) in onModuleInit; queued one-off jobs (wave.plan, waitlist.*, travel-matrix.rebuild) still run. Used by tests and by instances that must not drive time.
+- Repeating jobs use upsertJobScheduler, so multiple API instances register a single scheduler per id instead of duplicating ticks.
+- LiveHub emits are dropped silently when no gateway server is attached (unit tests, standalone workers).
+- Notification delivery is at-most-once per row: rows are claimed by setting pushedAt before sending.

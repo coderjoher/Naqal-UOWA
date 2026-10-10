@@ -1,0 +1,36 @@
+graph LR
+    client-apps["Client Apps\napps/dashboard + apps/*_app"]
+    hosting["Hosting\ndocker-compose.yml + deploy/oracle/"]
+    map-tiles["Map Tiles\nOSM tile.openstreetmap.org (configurable)"]
+    navigation-apps["Navigation Apps\nGoogle Maps / Waze deep links"]
+    geofabrik-extract["Geofabrik Extract\niraq-latest.osm.pbf"]
+    university-identity["University Identity\napps/api/src/identity/"]
+    firebase-fcm["Firebase Cloud Messaging\napps/api/src/notifications/push.ts"]
+    sms-gateway["SMS Gateway (not wired)\napps/api/src/drivers/otp.service.ts"]
+    sentry["Sentry\nSENTRY_DSN / VITE_SENTRY_DSN"]
+    duckdns["DuckDNS\ndeploy/oracle/env.example"]
+    lets-encrypt["Let's Encrypt\ninfra/caddy/Caddyfile"]
+    backup-remote["Backup Remote\nrclone BACKUP_REMOTE"]
+    github-actions["GitHub Actions\n.github/workflows/"]
+    app-stores["App Stores\nGoogle Play + TestFlight"]
+    client-apps -->|"HTTPS REST + Socket.IO via /api/"| hosting
+    client-apps -->|"raster {z}/{x}/{y} tiles + attribution"| map-tiles
+    client-apps -->|"driver hands off stop coordinates"| navigation-apps
+    client-apps -->|"uncaught errors when DSN baked in"| sentry
+    hosting -->|"osrm-download fetches road extract"| geofabrik-extract
+    hosting -->|"verify student via HTTP POST or OIDC JWKS"| university-identity
+    hosting -->|"HTTP v1 push with service-account OAuth"| firebase-fcm
+    hosting -.->|"driver OTP codes (ConsoleSmsSender only)"| sms-gateway
+    hosting -->|"API 5xx exceptions"| sentry
+    duckdns -->|"free hostnames resolve to server IP"| hosting
+    hosting -->|"Caddy ACME certificates"| lets-encrypt
+    hosting -->|"nightly pg_dump copied off-site"| backup-remote
+    github-actions -->|"CI boots the compose stack"| hosting
+    github-actions -->|"signed AAB / IPA on v* tags"| app-stores
+    github-actions -->|"demo-apk release APKs"| client-apps
+    class client-apps entry
+    class map-tiles,navigation-apps,geofabrik-extract,university-identity,firebase-fcm,sentry,duckdns,lets-encrypt,backup-remote,github-actions,app-stores external
+    class sms-gateway concern
+    classDef external fill:#585b70,stroke:#585b70,color:#cdd6f4
+    classDef concern fill:#f38ba8,stroke:#f38ba8,color:#1e1e2e
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e

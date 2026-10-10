@@ -1,0 +1,3 @@
+Raster basemap tiles. Default `https://tile.openstreetmap.org/{z}/{x}/{y}.png` with attribution "© OpenStreetMap contributors".
+- Dashboard: apps/dashboard/src/ui/MapView.tsx (MapLibre GL raster source, 256 px tiles); VITE_MAP_TILES accepts comma-separated URL templates, VITE_MAP_ATTRIBUTION the credit; passed as Docker build args.
+- Flutter: packages/naql_app/lib/src/config.dart `mapTilesUrl` / `mapAttribution` from --dart-define MAP_TILES / MAP_ATTRIBUTION (CI secrets in release.yml, build args for student-web). naql_ui darkens tiles in dark mode with a colour matrix (foundation/theme.dart).

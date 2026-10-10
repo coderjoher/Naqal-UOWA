@@ -1,0 +1,9 @@
+created: 2026-10-10T17:32:19.050Z
+updated: 2026-10-10T17:32:19.050Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: outbox-write
+children: []
+parentPath:
+  - notification-outbox

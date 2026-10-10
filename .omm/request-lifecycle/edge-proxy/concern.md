@@ -1,0 +1,1 @@
+With Caddy in front of nginx there are two proxy hops, but TRUST_PROXY_HOPS defaults to 1. Depending on how X-Forwarded-For is appended, req.ip may become the nginx/Caddy address (all clients share one rate-limit bucket) or a client-supplied value (limits bypassable). Verify the hop count per deployment.

@@ -1,0 +1,1 @@
+Flyout group `nav.group.comms` (office only): `/inbox` -> pages/InboxPage.tsx (student/driver messages and feedback for the office) and `/announcements` -> pages/AnnouncementsPage.tsx (broadcast announcements that appear in the apps' notification lists).

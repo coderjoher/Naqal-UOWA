@@ -1,0 +1,1 @@
+Terminal. TaxiService.expireDue (taxi.sweep job, every 20 s) flips requested rides past expiresAt with a conditional update, sends taxi.expired to the student and taxiGone to drivers. Counted as "unserved" in the office overview.

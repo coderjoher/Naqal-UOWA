@@ -1,0 +1,1 @@
+`/earnings` (screens/earnings_screen.dart, DR-08; data/earnings.dart): this month's earnings using the same formula as the office settlement, the runs behind them and past approved settlements; taxi drivers see this month's taxi trips and cash instead (P10).

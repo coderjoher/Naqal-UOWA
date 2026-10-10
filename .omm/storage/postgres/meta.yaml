@@ -1,0 +1,51 @@
+created: 2026-10-10T17:36:20.189Z
+updated: 2026-10-10T17:36:43.929Z
+update_count: 4
+last_field: concern
+kind: nested-class
+title: postgres
+children:
+  - configuration
+  - dispatch-runs
+  - driver-records
+  - feedback
+  - identity
+  - immutability-triggers
+  - messaging
+  - money
+  - settlement
+  - taxi
+  - tenant-core
+  - tenant-scope
+parentPath: []
+prev_diagram: >
+  graph TD
+      tenant-scope["Tenant Scope Extension\napps/api/src/tenancy/"]
+      tenant-core["Tenants, Users, Audit\nUniversity, User, AuditEvent"]
+      configuration["Transport Configuration\nDistanceTier, GatheringPoint, Wave, DriverRequirementSet, TravelTime"]
+      identity["Sign-in Identity\nRosterEntry, OtpCode"]
+      driver-records["Driver Records\nDriverProfile, DriverDocument, DocumentAccess, DriverAvailability"]
+      dispatch-runs["Dispatch and Runs\nRideRequest, Run, RunStop, WavePlan, RunEvent, RunPosition"]
+      money["Money Ledger\nPayment, Subscription, ReceiptCounter"]
+      settlement["Settlement\nSettlement, SettlementLine"]
+      messaging["Messaging\nNotification, DeviceToken, Announcement"]
+      feedback["Feedback\nRideRating, ProblemReport"]
+      taxi["Campus Taxi\nTaxiRide"]
+      immutability-triggers["Immutability Triggers\napps/api/prisma/migrations/"]
+
+      tenant-scope -->|"injects universityId into every query"| tenant-core
+      tenant-core -->|"University owns all tenant rows"| configuration
+      configuration -->|"tier and point referenced by requests and runs"| dispatch-runs
+      driver-records -->|"approved drivers + availability feed planning"| dispatch-runs
+      identity -->|"activation / OTP creates User rows"| tenant-core
+      dispatch-runs -->|"cash fares reference run and ride request"| money
+      taxi -->|"cash fare references taxi ride"| money
+      money -->|"pools and cash per driver"| settlement
+      dispatch-runs -->|"counted runs per driver and tier"| settlement
+      dispatch-runs -->|"rated / reported rides"| feedback
+      immutability-triggers -->|"reject UPDATE/DELETE on payments"| money
+      immutability-triggers -->|"freeze approved settlements and lines"| settlement
+
+      classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e
+      classDef concern fill:#f38ba8,stroke:#f38ba8,color:#1e1e2e
+      class tenant-core,configuration,identity,driver-records,dispatch-runs,money,settlement,messaging,feedback,taxi store

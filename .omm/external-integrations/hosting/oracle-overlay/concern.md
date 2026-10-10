@@ -1,0 +1,1 @@
+env.example ships DEMO=true, which turns on demo seed data and OTP_DEV_ECHO (sign-in codes shown on screen) on a public server; operators must flip it to false for real use — and then hit the missing SMS gateway.

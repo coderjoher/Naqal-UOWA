@@ -1,0 +1,1 @@
+Index route `/` (pages/OverviewPage.tsx), visible to office and super_admin. KPI cards and per-wave status computed from the dispatch board and today's live runs (useLiveRuns + useLiveFeed over Socket.IO), a lazily loaded MapLibre MapView, and links into /dispatch.

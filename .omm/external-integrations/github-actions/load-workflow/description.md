@@ -1,0 +1,1 @@
+`Load test` (load.yml, NF-06/NF-08): k6 via grafana/setup-k6-action. Weekly cron (Friday 01:41 Baghdad) runs the 3x morning peak for 30 minutes plus month end against a stack on the runner; manual runs choose scale/duration and may target staging (STAGING_DATABASE_URL / STAGING_JWT_SECRET); PRs touching load scripts run a 1-minute 0.2x self-check.

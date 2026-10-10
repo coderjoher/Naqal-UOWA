@@ -1,0 +1,1 @@
+Entry point and navigation of the driver app: main.dart (runNaqlApp from naql_app), app.dart (theme, providers), router.dart (onboarding -> application/status -> home with today, schedule, taxi, earnings, account).

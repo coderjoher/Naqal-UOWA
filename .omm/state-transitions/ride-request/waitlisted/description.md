@@ -1,0 +1,1 @@
+No seat found at planning or recheck time, or bumped by a subscriber. waitlistedUntil = min(now + university.waitlistMinutes, wave time) (DS-04); a waitlist.expire job is scheduled for that instant. Re-examined by every waitlist.recheck (cancellations, new runs) and by office extraRun.

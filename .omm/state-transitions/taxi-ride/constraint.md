@@ -1,0 +1,6 @@
+- One active ride per student; request is idempotent by clientId (P2002 retry returns the same ride).
+- accept: updateMany where status=requested AND expiresAt > now, so two drivers can never both win; a busy driver cannot accept another ride; only approved drivers with vehicleType=taxi.
+- Fare is fixed at request time (fareFor: base + perKm x road km, min fare, rounded up to 250 IQD).
+- expiresAt = now + university.taxiOfferSeconds; reset on cancel_driver.
+- end is idempotent (already done returns the view) and records an immutable cash_fare payment with idempotencyKey taxi:{rideId}.
+- Offers show only the coarse (~500 m) area until accepted (NF-12).

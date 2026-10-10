@@ -1,0 +1,17 @@
+graph LR
+    bootstrap["Bootstrap\nmain.ts, setup-app.ts, app.module.ts"]
+    auth["Auth and Rate Limit\nauth/, security/"]
+    tenancy["Tenancy\ntenancy/"]
+    data-access["Data Access and Caches\nprisma/, redis/, config-cache/, common/"]
+    observability["Observability and Audit\nobservability/, audit/, health/"]
+
+    bootstrap -->|"registers global guards, pipe, filter, middleware"| auth
+    bootstrap -->|"mounts TenantMiddleware on all routes"| tenancy
+    auth -->|"fills tenant store after JWT check"| tenancy
+    tenancy -->|"Prisma extension scopes every query"| data-access
+    auth -->|"rate-limit counters, user lookup"| data-access
+    bootstrap -->|"instrument.ts loaded first, metrics middleware"| observability
+    observability -->|"writes AuditEvent rows"| data-access
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    class bootstrap entry

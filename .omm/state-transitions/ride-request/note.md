@@ -1,0 +1,1 @@
+cancelReason distinguishes student | office | expired; reports/metrics.ts excludes student cancellations from "requested" and counts cancelReason=expired as unserved. The domain events driving this machine are DispatchEvent types assigned | waitlisted | bumped | expired (dispatch/domain/types.ts).

@@ -1,0 +1,1 @@
+infra/observability: prometheus.yml (scrapes the API metrics endpoint on :9464, aggregated across cluster workers, optional METRICS_TOKEN bearer), alerts.yml, and Grafana provisioning + dashboards. Jaeger receives OpenTelemetry traces on :4318 when OTEL_EXPORTER_OTLP_ENDPOINT is set on the API. All under the `observability` compose profile.

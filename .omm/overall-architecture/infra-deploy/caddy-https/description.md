@@ -1,0 +1,1 @@
+infra/caddy/Caddyfile: optional `https` profile. Caddy terminates TLS with Let's Encrypt (ACME_EMAIL) for DASHBOARD_DOMAIN, STUDENT_DOMAIN and DRIVER_DOMAIN and forwards to the dashboard, student-web and driver-web containers (whose nginx in turn proxies /api).

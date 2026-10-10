@@ -1,0 +1,1 @@
+In-memory per instance: in a multi-instance or cluster deployment invalidations are local, so other instances may serve a stale board until their own 5 s window passes and a refresh completes. Taxi and subscription changes do not invalidate it (they are not part of these views).

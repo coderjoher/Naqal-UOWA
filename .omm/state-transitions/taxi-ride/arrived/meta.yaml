@@ -1,0 +1,9 @@
+created: 2026-10-10T17:29:24.210Z
+updated: 2026-10-10T17:29:24.210Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: arrived
+children: []
+parentPath:
+  - taxi-ride

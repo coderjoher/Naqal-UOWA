@@ -1,0 +1,13 @@
+created: 2026-10-10T17:29:43.812Z
+updated: 2026-10-10T17:29:44.595Z
+update_count: 4
+last_field: note
+kind: nested-class
+title: driver-application
+children:
+  - approved
+  - draft
+  - pending
+  - rejected
+  - suspended
+parentPath: []

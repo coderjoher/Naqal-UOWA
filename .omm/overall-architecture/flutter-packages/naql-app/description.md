@@ -1,0 +1,1 @@
+App plumbing shared by both apps (packages/naql_app/lib/src/): bootstrap.dart (runNaqlApp, opt-in Sentry via --dart-define SENTRY_DSN, no PII), config.dart and server_settings.dart (API base URL), secure_token_store.dart (token in platform secure storage), prefs.dart, providers.dart (Riverpod providers for ApiClient, session, live feed).

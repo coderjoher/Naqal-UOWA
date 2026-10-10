@@ -1,0 +1,1 @@
+`/university` (onboarding/university_screen.dart): picks the university (stored in universitySlugProvider from naql_app). The redirect forces this screen before /sign-in or /activate when no slug is set.

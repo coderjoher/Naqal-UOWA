@@ -1,0 +1,1 @@
+Job wave.plan {universityId, waveId, date}. DispatchEngine.plan loads open requests and available approved bus drivers (DriverAvailability, BUS_ONLY), runs the pure planWave, persists runs/stops, sets assigned/waitlisted, writes ride.assigned / ride.waitlisted outbox rows and a WavePlan marker (DS-02).

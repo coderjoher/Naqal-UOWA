@@ -1,0 +1,1 @@
+`https` service (profile https): caddy:2.9-alpine on ports 80/443 with infra/caddy/Caddyfile mounted read-only and certificates in the `caddy` volume. Terminates TLS for DASHBOARD_DOMAIN, STUDENT_DOMAIN and DRIVER_DOMAIN and reverse-proxies to the three nginx web frontends; the API is not exposed on its own domain.

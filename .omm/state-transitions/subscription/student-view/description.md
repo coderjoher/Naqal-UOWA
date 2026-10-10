@@ -1,0 +1,1 @@
+Derived status returned to the student app by SubscriptionsService.forStudent: 'active' if an active subscription covers today, 'expiring' if it ends within EXPIRING_DAYS (3) and no upcoming one exists, 'expired' if only past subscriptions exist, 'none' otherwise. Computed on read, never persisted.

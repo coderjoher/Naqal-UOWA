@@ -1,0 +1,34 @@
+created: 2026-10-10T17:29:43.781Z
+updated: 2026-10-10T17:35:33.150Z
+update_count: 5
+last_field: diagram
+kind: nested-class
+title: dispatch-engine
+children:
+  - after-commit
+  - dispatch-domain
+  - dispatch-processor
+  - dispatch-queue
+  - engine-transaction
+  - travel-matrix
+parentPath: []
+prev_diagram: >
+  graph LR
+      dispatch-processor["Dispatch Processor\napps/api/src/dispatch/dispatch.processor.ts"]
+      dispatch-queue["BullMQ dispatch queue\napps/api/src/dispatch/dispatch.engine.ts"]
+      engine-transaction["Locked Wave Transaction\napps/api/src/dispatch/dispatch.engine.ts"]
+      dispatch-domain["Pure Dispatch Domain\napps/api/src/dispatch/domain/"]
+      travel-matrix["Travel Matrix\napps/api/src/routing/"]
+      after-commit["After-Commit Fan-out\napps/api/src/dispatch/dispatch.engine.ts"]
+
+      dispatch-processor -->|"wave.tick every 60 s queues wave.plan"| dispatch-queue
+      dispatch-queue -->|"wave.plan / waitlist.recheck / waitlist.expire"| dispatch-processor
+      dispatch-processor -->|"plan(ref) / recheck(ref)"| engine-transaction
+      engine-transaction -->|"requests, runs, drivers, ctx"| dispatch-domain
+      travel-matrix -->|"TravelTime durations (fallback haversine x1.3 @30 km/h)"| engine-transaction
+      dispatch-domain -->|"new runs, waitlist, events"| engine-transaction
+      engine-transaction -->|"expiries + changed runs"| after-commit
+      after-commit -->|"waitlist.expire delayed jobs"| dispatch-queue
+
+      classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+      class dispatch-processor entry

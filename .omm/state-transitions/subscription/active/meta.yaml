@@ -1,0 +1,9 @@
+created: 2026-10-10T17:30:05.832Z
+updated: 2026-10-10T17:30:05.832Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: active
+children: []
+parentPath:
+  - subscription

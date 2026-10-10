@@ -1,0 +1,1 @@
+Private file storage for driver documents and vehicle photos (apps/api/src/storage/storage.service.ts): files on local disk under STORAGE_DIR (Docker volume `storage` mounted at /data/storage in the api container), readable only through HMAC-signed links at GET /files/:token that expire within 5 minutes.

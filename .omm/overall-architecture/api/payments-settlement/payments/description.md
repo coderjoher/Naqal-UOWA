@@ -1,0 +1,1 @@
+payments/: PaymentsService writes Payment rows inside the caller's transaction (Tx) after a PaymentProvider confirms collection (PAYMENT_PROVIDERS: cash_office, cash_driver). Supports reversals. Adding an electronic provider needs no schema change (PA-04). No HTTP controller of its own; used by subscriptions, runs (fares) and taxi.

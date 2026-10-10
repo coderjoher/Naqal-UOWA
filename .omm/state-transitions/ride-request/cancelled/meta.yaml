@@ -1,0 +1,9 @@
+created: 2026-10-10T17:28:32.219Z
+updated: 2026-10-10T17:28:32.219Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: cancelled
+children: []
+parentPath:
+  - ride-request

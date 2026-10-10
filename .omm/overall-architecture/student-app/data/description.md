@@ -1,0 +1,1 @@
+State/data layer of the student app (lib/data/): auth.dart (session), home.dart, rides.dart (bus booking), taxi.dart, subscription.dart, track.dart (live feed join for the student's run), history.dart. Each wraps calls to naql_core's ApiClient and LiveFeed and exposes them as providers.

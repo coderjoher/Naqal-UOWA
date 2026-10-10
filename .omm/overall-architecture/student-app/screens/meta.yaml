@@ -1,0 +1,9 @@
+created: 2026-10-10T17:28:21.571Z
+updated: 2026-10-10T17:28:21.571Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: screens
+children: []
+parentPath:
+  - student-app

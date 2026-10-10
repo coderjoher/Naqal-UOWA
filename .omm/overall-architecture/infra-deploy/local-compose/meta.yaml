@@ -1,0 +1,9 @@
+created: 2026-10-10T17:31:39.748Z
+updated: 2026-10-10T17:31:39.955Z
+update_count: 2
+last_field: concern
+kind: nested-class
+title: local-compose
+children: []
+parentPath:
+  - infra-deploy

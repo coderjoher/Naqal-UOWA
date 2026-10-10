@@ -1,0 +1,10 @@
+created: 2026-10-10T17:31:22.975Z
+updated: 2026-10-10T17:31:22.976Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: wave-tick
+children: []
+parentPath:
+  - bullmq-queues
+  - dispatch-queue

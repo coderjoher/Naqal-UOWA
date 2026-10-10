@@ -1,0 +1,4 @@
+- All mutations of one wave on one date (planning, insertion, cancellation, move, run actions) serialize on a Postgres advisory transaction lock `dispatch:{waveId}:{date}`.
+- Payments must be created only through PaymentsService.record/reverse; a DB trigger rejects UPDATE/DELETE on payments and on approved settlements/lines.
+- Notifications are written inside the business transaction and delivered after commit (outbox pattern); delivery claims rows by setting pushedAt so concurrent callers never double-send.
+- Students never receive another student's location; buses broadcast only to run:{id} and ops:{uni} rooms (NF-02/NF-12); taxi offers show a coarse area only.

@@ -1,0 +1,1 @@
+`/subscription` (screens/subscription_screen.dart): current subscription tier and status; pushes /trips?tab=payments for payment history. Payments themselves are recorded by the office (dashboard /subscriptions).

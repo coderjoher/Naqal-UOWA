@@ -1,0 +1,10 @@
+created: 2026-10-10T17:30:59.575Z
+updated: 2026-10-10T17:30:59.575Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: track-screen
+children: []
+parentPath:
+  - student-app-routes
+  - home-hub

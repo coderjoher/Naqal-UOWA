@@ -1,0 +1,1 @@
+settlementPdf / settlementXlsx in apps/api/src/settlement/settlement-export.ts, served by GET settlements/:month/export.pdf and export.xlsx. Generated on demand from the stored Settlement (draft or approved) with the university name, tiers, driver lines and totals; nothing is persisted.

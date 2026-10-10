@@ -1,0 +1,1 @@
+NotificationsService.add(tx, universityId, drafts, extra) - static, used inside business transactions (DispatchEngine.save/move/extraRun, RunsService.applyOne, TaxiService accept/arrive/cancel/expire). addNow(universityId, drafts) writes outside a transaction and delivers immediately (LiveService ETA, TaxiService.offer, FeedbackService problem reply, AnnouncementsService).

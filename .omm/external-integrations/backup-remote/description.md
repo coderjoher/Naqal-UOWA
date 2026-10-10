@@ -1,0 +1,1 @@
+Optional off-site copy of database backups. infra/backup/backup.sh (the `backup` profile service) writes a custom-format pg_dump nightly at BACKUP_HOUR Baghdad time, verifies it with pg_restore --list, prunes after KEEP_DAYS, and when BACKUP_REMOTE is set (e.g. "s3:naql-backups") runs `rclone copy` to that remote.

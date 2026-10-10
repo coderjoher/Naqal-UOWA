@@ -1,0 +1,1 @@
+The student app's hub (`/home`, initialLocation). Map-first, no tab bar: bus booking, taxi, alerts and subscription are pushed on top of Home and return to it with `context.go('/home')`. The only nested GoRoute under /home is `track/:id`.

@@ -1,0 +1,9 @@
+created: 2026-10-10T17:37:25.539Z
+updated: 2026-10-10T17:37:25.539Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: taxi
+children: []
+parentPath:
+  - postgres

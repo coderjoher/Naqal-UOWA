@@ -1,0 +1,1 @@
+Terminal (RideStatus.no_show, SM-04). Set when the bus has waited university.noShowWaitMinutes at the stop (morning 'depart') or on campus past the wave time (return 'start') and the rider has not boarded. No penalty. The domain treats no_show riders as boarded so they keep their seat count on that run.

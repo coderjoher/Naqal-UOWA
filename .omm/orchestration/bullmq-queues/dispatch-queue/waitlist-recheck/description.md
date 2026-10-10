@@ -1,0 +1,1 @@
+Job waitlist.recheck {universityId, waveId, date}, enqueued by DispatchEngine.enqueueRecheck after a new request on an already planned wave (RidesService.request), after a cancel, and after an office move. recheckIn inserts open and waitlisted riders into existing runs (subscribers may bump pay-per-ride riders), expires overdue waitlist entries, and saves (DS-03/DS-04).

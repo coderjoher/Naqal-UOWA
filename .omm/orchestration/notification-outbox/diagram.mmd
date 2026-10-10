@@ -1,0 +1,16 @@
+graph LR
+    notification-rules["Notification Rules\napps/api/src/notifications/rules.ts"]
+    outbox-write["Outbox Write\nnotifications.service.ts add / addNow"]
+    deliver-pending["Deliver Pending\nnotifications.service.ts deliverPending"]
+    push-sender["Push Sender\napps/api/src/notifications/push.ts"]
+    producers["Event Producers\ndispatch, runs, live, taxi, feedback, announcements"]
+
+    producers -->|"domain events (assigned, eta, arrived...)"| notification-rules
+    notification-rules -->|"NotificationDraft with dedupeKey"| outbox-write
+    producers -->|"direct drafts (taxi.*, ride.moved, run.changed, announcement)"| outbox-write
+    outbox-write -->|"rows with pushedAt null, skipDuplicates"| deliver-pending
+    deliver-pending -->|"messageFor(kind, 'ar') title/body per device token"| push-sender
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    classDef external fill:#585b70,stroke:#585b70,color:#cdd6f4
+    class producers entry

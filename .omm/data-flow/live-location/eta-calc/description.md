@@ -1,0 +1,1 @@
+etas() in apps/api/src/live/eta.ts. Given the latest bus point and the run's remaining (unserved) stops, sums TravelTime leg durations (from the cached route's legs map) to produce seconds to each remaining stop by 1-based stop number. Its output is included in every `bus` broadcast and feeds the `eta` notification rule ("your bus is about 5 minutes away").

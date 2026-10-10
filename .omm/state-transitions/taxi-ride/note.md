@@ -1,0 +1,1 @@
+The assignment brief named the states requested/offered/accepted/arrived/started/ended; the schema actually uses requested, accepted, arrived, on_trip, done, cancelled, expired. "Offered" is not a state: offers are fan-out messages (taxi.offer notification + 'taxi:offer' socket event) while the ride stays requested.

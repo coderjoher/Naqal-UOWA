@@ -1,0 +1,1 @@
+Small in-house component library (src/ui/): Badge, Button, Card, Drawer, Feedback, Input, Kpi, Layout, MapView (MapLibre), Table, motion presets. Styled with Tailwind using the generated token CSS only.

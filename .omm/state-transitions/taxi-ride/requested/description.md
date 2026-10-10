@@ -1,0 +1,1 @@
+Created by TaxiService.request after a quote (coverage polygon, OSRM distance, fare). TaxiService.offer sends taxi.offer push + 'taxi:offer' card to up to 15 fresh online taxis within 8 km, nearest first, not busy. Re-entered when a driver gives up (cancel_driver) with a new offer round.

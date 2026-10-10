@@ -1,0 +1,3 @@
+- Not included in backups (infra/backup only runs pg_dump), and not replicated: losing the `storage` volume loses every uploaded document.
+- Re-uploads leave the previous file on disk (DriverDocument.storageKey is overwritten, old file never deleted).
+- A local volume ties all API processes to one host; scaling the API across machines needs the planned S3/MinIO backend.

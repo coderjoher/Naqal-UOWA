@@ -1,0 +1,1 @@
+Single source of visual tokens (packages/design-tokens/tokens.json). generate.mjs renders them to packages/naql_ui/lib/src/foundation/tokens.g.dart (Flutter) and build/tokens.theme.css (imported by apps/dashboard/src/index.css). Run via `pnpm tokens`; a check mode fails when outputs are stale.

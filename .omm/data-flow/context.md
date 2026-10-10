@@ -1,0 +1,5 @@
+- Multi-tenant: every tenant-owned row carries universityId and the Prisma client extension (apps/api/src/tenancy/tenant-scope.ts) injects it into every query; workers re-enter the tenant with runAsTenant/runAsSystem.
+- NF-03: heavy work (wave planning, waitlist re-checks/expiries, taxi expiry sweep, OSRM travel matrix) runs in BullMQ workers, never on the request path.
+- NF-01: live GPS stays in Redis and is broadcast via Socket.IO (Redis adapter, so all API instances see all sockets); only one point per run per minute is persisted.
+- NF-09: the driver app buffers actions, GPS and fares in a persistent outbox (packages/naql_core/lib/src/sync_queue.dart) keyed by client ids; the server applies each once (RunEvent unique (runId, clientId), Payment.idempotencyKey).
+- NF-14: money rows are append-only; corrections are negative reversal rows.

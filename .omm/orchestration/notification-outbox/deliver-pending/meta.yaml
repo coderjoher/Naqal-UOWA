@@ -1,0 +1,9 @@
+created: 2026-10-10T17:32:19.254Z
+updated: 2026-10-10T17:32:19.481Z
+update_count: 2
+last_field: concern
+kind: nested-class
+title: deliver-pending
+children: []
+parentPath:
+  - notification-outbox

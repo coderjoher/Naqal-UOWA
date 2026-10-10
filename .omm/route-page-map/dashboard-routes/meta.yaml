@@ -1,0 +1,16 @@
+created: 2026-10-10T17:28:57.353Z
+updated: 2026-10-10T17:28:57.806Z
+update_count: 3
+last_field: concern
+kind: nested-class
+title: dashboard-routes
+children:
+  - auth-shell
+  - catch-all-redirect
+  - comms-flyout
+  - login-page
+  - main-rail
+  - people-flyout
+  - platform-rail
+  - settings-flyout
+parentPath: []

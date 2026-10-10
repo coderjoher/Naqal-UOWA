@@ -1,0 +1,15 @@
+graph LR
+    driver-application["Driver Application\napps/api/src/drivers/driver-rules.ts"]
+    subscription["Subscription\napps/api/src/subscriptions/"]
+    ride-request["Ride Request\napps/api/src/dispatch/dispatch.engine.ts"]
+    run-lifecycle["Run Lifecycle\napps/api/src/runs/run-rules.ts"]
+    taxi-ride["Taxi Ride\napps/api/src/taxi/taxi-rules.ts"]
+
+    driver-application -->|"approved bus driver eligible for wave planning"| run-lifecycle
+    driver-application -->|"approved taxi driver may go online and accept"| taxi-ride
+    subscription -->|"active period sets subscriber flag and fare at request time"| ride-request
+    ride-request -->|"assigned rides become run stops"| run-lifecycle
+    run-lifecycle -->|"depart marks missing riders no_show, end marks boarded riders done"| ride-request
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    class ride-request,taxi-ride entry

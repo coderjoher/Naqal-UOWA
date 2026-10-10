@@ -1,0 +1,1 @@
+SettlementService.compute writes one Settlement per (universityId, month) via upsert (commissionBp, per-tier pools/runs/commission JSON, totals, excludedRuns, computedAt) and replaces its SettlementLines (driverId, runs, per-tier shares JSON, cash, cashCommission, payout) in one transaction. GET settlements/:month reads it back with driver names and plates.

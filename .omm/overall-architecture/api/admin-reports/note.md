@@ -1,0 +1,1 @@
+Controller placement does not follow folder names: announcements and reports have no controllers of their own (served by FeedbackController), and the audit log endpoints (GET /audit, /audit/entities) live in settlement/settlement.controller.ts.

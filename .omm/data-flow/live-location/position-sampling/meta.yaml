@@ -1,0 +1,9 @@
+created: 2026-10-10T17:31:26.141Z
+updated: 2026-10-10T17:31:26.141Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: position-sampling
+children: []
+parentPath:
+  - live-location

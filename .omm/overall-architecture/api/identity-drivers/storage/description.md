@@ -1,0 +1,1 @@
+storage/storage.service.ts: writes files under STORAGE_DIR (mode 0700, outside public paths) and issues HMAC-signed links valid at most 300 s (STORAGE_SECRET, defaulting to JWT_SECRET + ':files'). files.controller.ts serves them via the public GET /files/:token. Designed so an S3/MinIO backend can replace disk later.

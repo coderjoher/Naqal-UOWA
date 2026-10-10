@@ -1,0 +1,1 @@
+`/splash` — a bus icon on a blank Scaffold (private `_Splash` widget in router.dart). Shown only while authProvider is loading without a cached value; the redirect then sends the user to onboarding or /home.

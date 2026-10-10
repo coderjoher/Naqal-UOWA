@@ -1,0 +1,1 @@
+Queue `routing`, job `travel-matrix.rebuild`, scheduled with a 2 s delay from UniversitiesService (campus moved) and PointsService (points added/moved/toggled). Taxi quotes also use RoutingService.toCampus (live OSRM route, approximate fallback).

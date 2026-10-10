@@ -1,0 +1,53 @@
+graph LR
+    student-app["Student App\napps/student_app/"]
+    driver-app["Driver App\napps/driver_app/"]
+    dashboard["Office Dashboard\napps/dashboard/"]
+    ride-booking["Ride Booking\napps/api/src/dispatch/rides.service.ts"]
+    dispatch-engine["Dispatch Engine\napps/api/src/dispatch/"]
+    run-execution["Run Execution\napps/api/src/runs/"]
+    live-location["Live Location\napps/api/src/live/"]
+    notifications["Notifications\napps/api/src/notifications/"]
+    money-ledger["Money Ledger\napps/api/src/payments/, subscriptions/"]
+    settlement-reports["Settlement and Reports\napps/api/src/settlement/, reports/"]
+    taxi-rides["Campus Taxi\napps/api/src/taxi/"]
+    driver-onboarding["Driver Onboarding\napps/api/src/drivers/"]
+    postgres["PostgreSQL\napps/api/prisma/schema.prisma"]
+    redis["Redis\napps/api/src/redis/"]
+    file-storage["Private File Storage\napps/api/src/storage/"]
+    fcm["Firebase Cloud Messaging\napps/api/src/notifications/push.ts"]
+
+    student-app -->|"POST ride request (wave, date, point)"| ride-booking
+    ride-booking -->|"insert RideRequest with fare + subscriber flag"| postgres
+    ride-booking -->|"enqueue recheck if wave already planned"| dispatch-engine
+    dispatch-engine -->|"Runs, RunStops, assignments, waitlist"| postgres
+    dispatch-engine -->|"outbox rows: assigned / waitlisted / expired"| notifications
+    driver-app -->|"offline outbox: actions, GPS, fares"| run-execution
+    run-execution -->|"board / no-show / end under wave lock"| dispatch-engine
+    run-execution -->|"GPS batches"| live-location
+    run-execution -->|"cash fare via PaymentsService.record"| money-ledger
+    live-location -->|"last point + GEO set"| redis
+    live-location -->|"1 RunPosition per minute"| postgres
+    live-location -->|"bus position + ETA over Socket.IO"| student-app
+    live-location -->|"approaching-stop notices"| notifications
+    notifications -->|"push to device tokens"| fcm
+    notifications -->|"socket event to user room"| student-app
+    dashboard -->|"record subscription cash payment"| money-ledger
+    money-ledger -->|"immutable Payment + receipt number"| postgres
+    settlement-reports -->|"read runs, subscriptions, cash fares"| postgres
+    dashboard -->|"compute / approve / export month"| settlement-reports
+    student-app -->|"taxi quote / request"| taxi-rides
+    driver-app -->|"heartbeat, accept, arrive, start, end"| taxi-rides
+    taxi-rides -->|"online hash taxi:online:{uni}"| redis
+    taxi-rides -->|"cash_fare on trip end"| money-ledger
+    taxi-rides -->|"TaxiRide state rows"| postgres
+    driver-app -->|"application + document upload"| driver-onboarding
+    driver-onboarding -->|"file bytes"| file-storage
+    driver-onboarding -->|"DriverProfile, DriverDocument, DocumentAccess"| postgres
+    dashboard -->|"review drivers, open signed document links"| driver-onboarding
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e
+    classDef external fill:#585b70,stroke:#585b70,color:#cdd6f4
+    class student-app,driver-app,dashboard entry
+    class postgres,redis,file-storage store
+    class fcm external

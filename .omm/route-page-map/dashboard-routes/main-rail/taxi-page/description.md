@@ -1,0 +1,1 @@
+`/taxi` (pages/TaxiPage.tsx, P10 / TX-06): campus taxi service — on/off switch for students and taxi drivers, tariff editor with fare preview (TX-03), online drivers on a map and today's rides. Office only.

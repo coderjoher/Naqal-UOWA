@@ -1,0 +1,1 @@
+Seated on a run (runId set, waitlistedUntil cleared). Students may join the run's Socket.IO room only in assigned or done. Can be moved to another run of the same wave by the office (DispatchEngine.move, TO-08) without changing status, which sends ride.moved and run.changed notifications.

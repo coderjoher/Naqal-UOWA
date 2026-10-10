@@ -1,0 +1,1 @@
+routing/ (global RoutingModule): OsrmClient (OSRM_URL table/route calls), RoutingService (point-to-campus legs, e.g. when a gathering point is saved; used by taxi fares/ETAs), TravelMatrixProcessor on the routing BullMQ queue that rebuilds the TravelTime matrix between a university's gathering points and campus in one transaction.

@@ -1,0 +1,1 @@
+Expiry granularity is the 20 s sweep: a request can stay visible up to ~20 s past its expiresAt (accept already refuses expired rides via expiresAt > now, so this only delays the student's "no driver" notice).

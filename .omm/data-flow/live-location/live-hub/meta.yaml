@@ -1,0 +1,9 @@
+created: 2026-10-10T17:31:26.550Z
+updated: 2026-10-10T17:31:36.793Z
+update_count: 2
+last_field: description
+kind: nested-class
+title: live-hub
+children: []
+parentPath:
+  - live-location

@@ -1,0 +1,1 @@
+Re-uploading a document replaces DriverDocument.storageKey but never deletes the previous file, so superseded uploads accumulate on disk as orphans. Upload files are held fully in memory (multer buffer, up to 8 MB each) before writing.

@@ -1,0 +1,2 @@
+- $queryRaw/$executeRaw and nested relation writes/includes are not rewritten by the extension; only the top-level model operation is scoped. Raw SQL must filter university_id manually, and nested `create` inside another model's data relies on the parent being correct.
+- A super_admin request runs in global context, so any service code path reachable by super_admin sees all universities unless it filters explicitly.

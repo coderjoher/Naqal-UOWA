@@ -1,0 +1,1 @@
+TaxiService.end (TX-05). Idempotent if already done. In one transaction: transition to done with endedAt, and PaymentsService.record (type cash_fare, method cash_driver, amount = ride.fare, studentId, collectedById = driver, taxiRideId, idempotencyKey `taxi:{rideId}`, note "Campus taxi"). Settlement later attributes the cash to the driver by the month the trip ended.

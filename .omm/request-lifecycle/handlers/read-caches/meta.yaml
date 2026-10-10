@@ -1,0 +1,9 @@
+created: 2026-10-10T17:36:48.132Z
+updated: 2026-10-10T17:37:09.627Z
+update_count: 3
+last_field: constraint
+kind: nested-class
+title: read-caches
+children: []
+parentPath:
+  - handlers

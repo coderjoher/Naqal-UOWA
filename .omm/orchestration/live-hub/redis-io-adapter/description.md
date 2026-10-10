@@ -1,0 +1,1 @@
+RedisIoAdapter (live/redis-io.adapter.ts): Socket.IO adapter over Redis pub/sub (@socket.io/redis-adapter) with key '{QUEUE_PREFIX}:io'. Installed in setupApp only when REDIS_URL is set, so emits and server-side socketsJoin/socketsLeave reach sockets on every API instance (NF-01).

@@ -1,0 +1,2 @@
+- Backups cover PostgreSQL only. The `storage` volume with driver documents and vehicle photos is not dumped or copied off-site, so a lost disk loses all uploaded documents while DriverDocument rows still point at them.
+- Redis runs without a volume or AOF/RDB configuration in compose: a restart drops pending/delayed BullMQ jobs (waitlist expiries, plans; the 60 s wave tick re-plans unplanned waves, but already scheduled waitlist.expire jobs are lost until the next recheck), live positions and online-taxi presence.

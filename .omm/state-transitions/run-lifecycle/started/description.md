@@ -1,0 +1,1 @@
+Bus is driving (startedAt set). Entered from planned via 'start' or from at_stop via 'depart' (stop servedAt set, missing riders -> no_show). GPS points are accepted and broadcast as 'bus' events; ETA under 5 minutes triggers ride.approaching.

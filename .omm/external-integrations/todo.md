@@ -1,0 +1,4 @@
+- Implement a real SmsSender (Iraqi SMS provider) and bind it in app.module.ts when DEMO=false.
+- Add firebase_messaging to naql_app and call registerDevice after sign-in to activate FCM push.
+- Configure MAP_TILES / VITE_MAP_TILES with a keyed tile provider before full launch.
+- Set BACKUP_REMOTE so nightly dumps leave the single server.

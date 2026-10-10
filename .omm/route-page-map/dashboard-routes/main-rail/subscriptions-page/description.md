@@ -1,0 +1,1 @@
+`/subscriptions` (pages/SubscriptionsPage.tsx): record a student's subscription payment at the office counter (useRecordSubscription, lookup by student number), monthly list with stats, and payment reversal with a reason (useReversePayment). Office only.

@@ -1,0 +1,23 @@
+graph LR
+    api["NestJS API processes\napps/api/src/"]
+    driver-device["Driver Device Outbox\npackages/naql_core/lib/src/sync_queue.dart"]
+    postgres["PostgreSQL 16\napps/api/prisma/schema.prisma"]
+    redis["Redis 7\napps/api/src/redis/"]
+    file-storage["Private File Storage\napps/api/src/storage/"]
+    process-memory["In-Process Caches\napps/api/src/auth/user-cache.ts"]
+    backups["Nightly Backups\ninfra/backup/"]
+
+    driver-device -->|"replays actions, GPS, fares with client ids"| api
+    api -->|"Prisma tenant-scoped client, raw SQL for locks and counters"| postgres
+    api -->|"ioredis: cache, rate limits, live keys, taxi presence"| redis
+    api -->|"BullMQ queues + Socket.IO adapter pub/sub"| redis
+    api -->|"write/read driver documents"| file-storage
+    api -->|"user, token, route and office-view caches"| process-memory
+    backups -->|"pg_dump custom format, pg_restore --list check"| postgres
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e
+    classDef concern fill:#f38ba8,stroke:#f38ba8,color:#1e1e2e
+    class api,driver-device entry
+    class postgres,redis,file-storage,process-memory store
+    class backups concern

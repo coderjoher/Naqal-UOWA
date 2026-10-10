@@ -1,0 +1,9 @@
+created: 2026-10-10T17:30:11.403Z
+updated: 2026-10-10T17:30:20.351Z
+update_count: 2
+last_field: note
+kind: nested-class
+title: travel-matrix
+children: []
+parentPath:
+  - dispatch-engine

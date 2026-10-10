@@ -1,0 +1,1 @@
+Raw SQL ($queryRaw / $executeRaw) bypasses the tenant extension (documented in prisma.service.ts); every raw query must add university_id itself. runAsSystem disables filtering entirely, so its use in services (auth lookups, audit, settlement, taxi) must be reviewed carefully.

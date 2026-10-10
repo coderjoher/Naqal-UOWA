@@ -1,0 +1,17 @@
+graph LR
+    home-screen["Home Map\n/home screens/home_screen.dart"]
+    track-screen["Track Ride\n/home/track/:id screens/track_screen.dart"]
+    bus-booking["Bus Booking\n/bus screens/bus_booking_screen.dart"]
+    taxi-screen["Taxi\n/taxi screens/taxi_screen.dart"]
+    alerts-screen["Alerts\n/alerts screens/notifications_screen.dart"]
+    subscription-screen["Subscription\n/subscription screens/subscription_screen.dart"]
+    home-screen -->|"go /home/track/:id for active ride"| track-screen
+    home-screen -->|"push /bus?dir=&wave=&date="| bus-booking
+    home-screen -->|"push /taxi?ride=id"| taxi-screen
+    home-screen -->|"push /alerts"| alerts-screen
+    home-screen -->|"push /subscription"| subscription-screen
+    bus-booking -->|"booked: go /home"| home-screen
+    taxi-screen -->|"done: go /home"| home-screen
+    track-screen -->|"go /home"| home-screen
+    class home-screen entry
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e

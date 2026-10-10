@@ -1,0 +1,13 @@
+graph LR
+    handshake["Handshake Auth\nlive/live.gateway.ts handleConnection"]
+    room-join["Run Room Join\nlive/live.gateway.ts join"]
+    gps-ingest["GPS Ingest\nlive/live.gateway.ts gps, live/live.service.ts"]
+    fan-out["Cross-worker Fan-out\nlive/live.hub.ts, live/redis-io.adapter.ts"]
+
+    handshake -->|"socket.data.user, personal/ops/driver rooms"| room-join
+    handshake -->|"driver sockets only"| gps-ingest
+    room-join -->|"reply with last bus position from Redis"| fan-out
+    gps-ingest -->|"bus event with ETAs to run and ops rooms"| fan-out
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    class handshake entry

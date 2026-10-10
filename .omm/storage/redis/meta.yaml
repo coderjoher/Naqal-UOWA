@@ -1,0 +1,32 @@
+created: 2026-10-10T17:37:40.876Z
+updated: 2026-10-10T17:38:12.938Z
+update_count: 3
+last_field: diagram
+kind: nested-class
+title: redis
+children:
+  - bullmq-queues
+  - config-cache
+  - live-keys
+  - rate-limits
+  - redis-client
+  - socket-adapter
+  - taxi-online
+parentPath: []
+prev_diagram: >
+  graph LR
+      config-cache["Config Cache\napps/api/src/config-cache/config-cache.service.ts"]
+      rate-limits["Rate-limit Counters\napps/api/src/security/rate-limit.ts"]
+      bullmq-queues["BullMQ Queues\napps/api/src/app.module.ts"]
+      live-keys["Live Tracking Keys\napps/api/src/live/live.service.ts"]
+      taxi-online["Online Taxi Hash\napps/api/src/taxi/taxi.service.ts"]
+      socket-adapter["Socket.IO Adapter\napps/api/src/live/redis-io.adapter.ts"]
+
+      config-cache -->|"invalidated after configuration writes that also rebuild matrix jobs"| bullmq-queues
+      live-keys -->|"newest bus point broadcast to run rooms"| socket-adapter
+      taxi-online -->|"presence joins taxi room, offers broadcast"| socket-adapter
+      bullmq-queues -->|"job handlers emit run and taxi events"| socket-adapter
+      rate-limits -->|"guards sign-in before identity lookups that read cfg"| config-cache
+
+      classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e
+      class config-cache,rate-limits,bullmq-queues,live-keys,taxi-online,socket-adapter store

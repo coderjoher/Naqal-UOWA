@@ -1,0 +1,13 @@
+graph LR
+    app["App Shell and Guards\nsrc/app/"]
+    pages["Pages\nsrc/pages/"]
+    lib["API, Auth and Live Clients\nsrc/lib/"]
+    ui["UI Kit\nsrc/ui/"]
+
+    app -->|"role-guarded routes render"| pages
+    pages -->|"queries, mutations, live hooks"| lib
+    pages -->|"compose Card, Table, Drawer, MapView"| ui
+    app -->|"session and role from auth context"| lib
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    class app entry

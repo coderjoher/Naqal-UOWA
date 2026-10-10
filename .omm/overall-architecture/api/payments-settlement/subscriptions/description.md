@@ -1,0 +1,1 @@
+subscriptions/: SubscriptionsController/Service. Office sells monthly subscriptions (price from distance tier, pricing.ts) and students view theirs; period-policy.ts defines calendar-month coverage. Payment goes through PaymentsService; receipts rendered as PDF via payments/receipt-pdf.ts.

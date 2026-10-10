@@ -1,0 +1,1 @@
+Server side is complete but no client registers tokens: no firebase_messaging dependency in any pubspec, and ApiClient.registerDevice (packages/naql_core/lib/src/api_client.dart -> POST /devices in runs.controller.ts) has no caller. FCM_SERVICE_ACCOUNT is also absent from docker-compose.yml and .env.example.

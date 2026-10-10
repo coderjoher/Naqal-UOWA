@@ -1,0 +1,1 @@
+OpenStreetMap road data for routing. The one-shot `osrm-download` compose service (curlimages/curl) downloads https://download.geofabrik.de/asia/iraq-latest.osm.pbf into the `osrm` volume if missing; `osrm-prepare` (infra/osrm/prepare.sh) builds the MLD graph used by the self-hosted `osrm` service. CI caches the prepared volume between runs (ci.yml "Restore/Save OSRM volume").

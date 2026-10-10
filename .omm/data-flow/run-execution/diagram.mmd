@@ -1,0 +1,13 @@
+graph LR
+    driver-outbox["Driver Offline Outbox\npackages/naql_core/lib/src/sync_queue.dart"]
+    run-actions["Run Actions\napps/api/src/runs/runs.service.ts"]
+    cash-fares["Cash Fare Recording\napps/api/src/runs/runs.service.ts"]
+    gps-verification["GPS Track Verification\napps/api/src/settlement/verify.ts"]
+
+    driver-outbox -->|"action items with clientId + device time"| run-actions
+    driver-outbox -->|"fare items with clientId"| cash-fares
+    run-actions -->|"run ended: check stored track"| gps-verification
+    run-actions -->|"boardedAt required before fare"| cash-fares
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    class driver-outbox entry

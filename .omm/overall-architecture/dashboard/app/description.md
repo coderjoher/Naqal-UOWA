@@ -1,0 +1,1 @@
+Application shell (src/app/): App.tsx (router + QueryClient), Shell.tsx (sidebar layout), nav.ts (menu per role), guards.tsx (redirects unauthenticated users to login and restricts super-admin / office routes), Search.tsx (global search).

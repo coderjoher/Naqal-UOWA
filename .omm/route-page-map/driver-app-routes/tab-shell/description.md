@@ -1,0 +1,1 @@
+StatefulShellRoute.indexedStack in router.dart with branches home(0), schedule(1), earnings(2), profile(3); `_Shell` renders a floating NaqlTabBar (naql_ui). Taxi drivers get no Schedule tab, and the tab bar hides (AnimatedSwitcher) while a taxi ride or its "done" moment fills the Home tab. Re-tapping the current tab resets it to its initial location.

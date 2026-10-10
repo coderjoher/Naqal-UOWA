@@ -1,0 +1,1 @@
+ride.expired and ride.cancelled share the dedupe key cancelled:{requestId}, so a request notifies its closure at most once whichever path closes it. ride.moved, run.changed, announcement, problem.answered and taxi.* drafts are built directly in their services rather than through notificationsFor.

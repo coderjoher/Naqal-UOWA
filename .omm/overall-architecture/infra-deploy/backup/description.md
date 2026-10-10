@@ -1,0 +1,1 @@
+infra/backup: small image running backup.sh nightly at BACKUP_HOUR (default 03:00), keeping KEEP_DAYS (14) of PostgreSQL dumps in ./backups with optional BACKUP_REMOTE copy; restore-drill.sh verifies a dump can be restored. Enabled by the `backup` profile.

@@ -1,0 +1,1 @@
+`postgres` service: official postgres:16-bookworm (multi-arch, runs on Oracle Ampere), user/db `naql`, data in the `pgdata` volume, pg_isready healthcheck. Password `naql` locally; DB_PASSWORD on the server via the overlay.

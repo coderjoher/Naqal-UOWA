@@ -1,0 +1,1 @@
+No TTL or cleanup: drivers who disappear without going offline remain as stale fields (filtered on read). Like the other direct keys (cfg:*, rl:*, live:*), it is not prefixed with QUEUE_PREFIX, unlike BullMQ and Socket.IO keys, so two environments sharing one Redis database would share presence.

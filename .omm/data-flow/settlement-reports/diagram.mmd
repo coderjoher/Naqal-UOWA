@@ -1,0 +1,15 @@
+graph LR
+    settlement-inputs["Settlement Inputs\napps/api/src/settlement/settlement.service.ts"]
+    payout-formula["Payout Formula\napps/api/src/settlement/payout.ts"]
+    settlement-draft["Settlement Draft\nSettlement + SettlementLine (schema.prisma)"]
+    run-review["Flagged Run Review\napps/api/src/settlement/settlement.service.ts"]
+    settlement-approval["Approval\napps/api/src/settlement/settlement.service.ts"]
+    settlement-export["Settlement Export\napps/api/src/settlement/settlement-export.ts"]
+    monthly-reports["Monthly Reports\napps/api/src/reports/"]
+
+    settlement-inputs -->|"tier pools, counted runs per driver, net cash"| payout-formula
+    payout-formula -->|"lines, commission, unallocated, residual"| settlement-draft
+    run-review -->|"officeVerdict changes which runs count"| settlement-inputs
+    settlement-draft -->|"status draft -> approved + AuditEvent"| settlement-approval
+    settlement-draft -->|"tiers, lines, totals"| settlement-export
+    settlement-inputs -->|"same month range helper"| monthly-reports

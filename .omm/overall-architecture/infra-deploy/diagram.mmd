@@ -1,0 +1,14 @@
+graph LR
+    local-compose["Local Compose Stack\ndocker-compose.yml"]
+    oracle-deploy["Public Server Overlay\ndeploy/oracle/"]
+    web-images["Web Images and nginx\napps/*/Dockerfile, infra/flutter-web/"]
+    caddy-https["Caddy HTTPS\ninfra/caddy/"]
+    observability-stack["Observability Stack\ninfra/observability/"]
+    backup["Postgres Backup\ninfra/backup/"]
+
+    oracle-deploy -->|"overrides ports, secrets, restart policy"| local-compose
+    local-compose -->|"builds api, dashboard, student/driver web"| web-images
+    local-compose -->|"profile https: TLS reverse proxy"| caddy-https
+    local-compose -->|"profile observability: scrape :9464, traces"| observability-stack
+    local-compose -->|"profile backup: nightly pg_dump"| backup
+    caddy-https -->|"routes domains to web containers"| web-images

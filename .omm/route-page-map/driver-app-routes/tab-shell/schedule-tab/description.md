@@ -1,0 +1,1 @@
+`/schedule` (screens/schedule_screen.dart, DR-02): availability for the coming days, one toggle per wave; waves already planned by dispatch are locked. Bus drivers only (hidden tab + redirect for taxi drivers).

@@ -1,0 +1,1 @@
+`/trips` (screens/trips_screen.dart, TripsScreen) with two tabs — rides and payments (`?tab=payments` opens the second, used from /subscription). Child route `/trips/ride/:id` opens RideDetailsScreen (screens/receipt.dart), receiving the RideHistoryItem via `extra` for instant render. Reached from /profile and /subscription.

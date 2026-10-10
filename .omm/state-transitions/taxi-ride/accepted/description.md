@@ -1,0 +1,1 @@
+A driver won the ride (driverId, acceptedAt). Student gets taxi.accepted with the driver's name; the driver now sees the exact point and student phone. Driver heartbeats forward 'taxi:position' with ETA to the student.

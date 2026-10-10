@@ -1,0 +1,9 @@
+created: 2026-10-10T17:36:48.562Z
+updated: 2026-10-10T17:36:48.562Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: job-queues
+children: []
+parentPath:
+  - handlers

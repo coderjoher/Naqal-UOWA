@@ -1,0 +1,1 @@
+`/taxi` (screens/taxi_screen.dart + taxi_ride_view.dart, taxi_widgets.dart; P10): request or follow a campus taxi ride. Query params: `ride` = an existing ride id to resume, `dir` = to|from (TaxiDirection.toCampus/fromCampus).

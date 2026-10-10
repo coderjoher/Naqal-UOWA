@@ -1,0 +1,1 @@
+`/choose-point` (onboarding/choose_point_screen.dart, ST-02): choose the default gathering point. Mandatory after sign-in while user.defaultPoint is null; once set, the redirect sends the user to /home. Also mounted as /profile/point with `changing: true`.

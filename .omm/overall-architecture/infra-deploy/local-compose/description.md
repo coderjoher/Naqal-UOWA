@@ -1,0 +1,1 @@
+docker-compose.yml: the full local stack started with `docker compose up -d --build --wait`. API env: DATABASE_URL, REDIS_URL, OSRM_URL, JWT_SECRET (dev default), API_WORKERS=2, DEMO_SEED/OTP_DEV_ECHO (DEMO=true by default), STORAGE_DIR volume for driver documents, optional SENTRY_DSN / OTEL endpoint. API healthcheck polls /health.

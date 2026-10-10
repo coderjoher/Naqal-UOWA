@@ -1,0 +1,10 @@
+graph LR
+    rate-limit["Rate Limit Guard\nsecurity/rate-limit.ts"]
+    jwt-auth["JWT Auth Guard\nauth/jwt-auth.guard.ts, auth/user-cache.ts"]
+    roles-guard["Roles Guard\nauth/roles.guard.ts, auth/decorators.ts"]
+
+    rate-limit -->|"under limit, continue"| jwt-auth
+    jwt-auth -->|"req.user set, tenant store filled"| roles-guard
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    class rate-limit entry

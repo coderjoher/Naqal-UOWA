@@ -1,0 +1,1 @@
+Public route `/login` (apps/dashboard/src/pages/LoginPage.tsx). The only page outside RequireAuth. After a successful sign-in via lib/auth.tsx it navigates back to `location.state.from` set by RequireAuth, defaulting to the Overview index.

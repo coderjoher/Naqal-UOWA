@@ -1,0 +1,1 @@
+Producers on the HTTP path: POST /dispatch/plan (office, 202, enqueuePlan), RidesService.request (enqueueRecheck if the wave is planned), DispatchEngine.cancel and move (enqueueRecheck after commit). The request path itself only writes the request row (NF-03); seating happens in the worker.

@@ -1,0 +1,1 @@
+UI screens of the student app (lib/screens/): onboarding/, home_screen, bus_booking_screen, track_screen and live_ride (map with the bus position from Socket.IO), taxi_screen/taxi_ride_view/taxi_widgets, trips_screen, subscription_screen/subscription_card/receipt, notifications_screen, profile_screen, feedback_sheets, ride_cards. Built from naql_ui components.

@@ -1,0 +1,1 @@
+This machine is separate from User.status (active | suspended), which blocks login and socket connections entirely. Review transitions send no notification today (no driver.* notification kind exists in notifications/rules.ts).

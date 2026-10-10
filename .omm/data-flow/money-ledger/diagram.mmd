@@ -1,0 +1,19 @@
+graph LR
+    subscription-sale["Subscription Sale\napps/api/src/subscriptions/subscriptions.service.ts"]
+    payments-record["PaymentsService.record\napps/api/src/payments/payments.service.ts"]
+    payment-providers["Payment Providers\napps/api/src/payments/payment-provider.ts"]
+    receipt-counter["Receipt Counter\nreceipt_counters (schema.prisma)"]
+    payment-rows["Immutable Payment Rows\npayments (schema.prisma)"]
+    reversals["Reversals\napps/api/src/payments/payments.service.ts"]
+    receipt-pdf["Receipt PDF\napps/api/src/payments/receipt-pdf.ts"]
+
+    subscription-sale -->|"record(type subscription, cash_office) in same tx"| payments-record
+    payments-record -->|"collect(amount, reference) -> externalRef"| payment-providers
+    payments-record -->|"INSERT .. ON CONFLICT last+1 RETURNING"| receipt-counter
+    payments-record -->|"INSERT Payment with receiptNo"| payment-rows
+    subscription-sale -->|"Subscription row linked by paymentId"| payment-rows
+    reversals -->|"negative row with reversesPaymentId + new receiptNo"| payment-rows
+    payment-rows -->|"payment + subscription + student data"| receipt-pdf
+
+    classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e
+    class receipt-counter,payment-rows store

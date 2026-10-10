@@ -1,0 +1,1 @@
+Stale entries are filtered on read but never removed (no TTL, no cleanup), so a driver who stops sending heartbeats without going offline stays in the hash indefinitely. Harmless for correctness, but the hash only shrinks on explicit goOffline.

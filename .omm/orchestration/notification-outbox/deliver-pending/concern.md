@@ -1,0 +1,1 @@
+Push text is always rendered in Arabic (messageFor(..., 'ar')) regardless of the user's language. Delivery has no retry: claimed rows whose send fails stay marked pushed. Batches cap at 200 rows per call, with no background sweeper to drain a backlog.

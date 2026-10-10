@@ -1,0 +1,1 @@
+GET /metrics on the main HTTP port is @Public and only checks METRICS_TOKEN when it is set; docker-compose defaults METRICS_TOKEN to empty, and nginx proxies all of /api/, so /api/metrics (queue depth, socket counts, route latencies) is publicly readable in the default stack.

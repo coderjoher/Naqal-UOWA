@@ -1,0 +1,15 @@
+created: 2026-10-10T17:32:23.625Z
+updated: 2026-10-10T17:32:24.310Z
+update_count: 4
+last_field: todo
+kind: nested-class
+title: money-ledger
+children:
+  - payment-providers
+  - payment-rows
+  - payments-record
+  - receipt-counter
+  - receipt-pdf
+  - reversals
+  - subscription-sale
+parentPath: []

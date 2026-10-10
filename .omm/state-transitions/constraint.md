@@ -1,0 +1,4 @@
+- Every ride-request and run change for one wave+date runs under pg_advisory_xact_lock(hashtext('dispatch:{waveId}:{date}')) (DispatchEngine.locked), so planning, rechecks, cancels, moves and driver run actions never interleave.
+- Taxi transitions use conditional updateMany (where status = seen status and driverId = seen driver); zero rows updated means a lost race and a 409.
+- Run actions are idempotent per (runId, clientId) via RunEvent rows (NF-09), so offline batches replay safely.
+- Payments and approved settlements are immutable (DB triggers); subscription cancellation happens only through a payment reversal.

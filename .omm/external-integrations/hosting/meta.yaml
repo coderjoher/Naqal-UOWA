@@ -1,0 +1,17 @@
+created: 2026-10-10T17:33:33.345Z
+updated: 2026-10-10T17:34:11.034Z
+update_count: 3
+last_field: concern
+kind: nested-class
+title: hosting
+children:
+  - api-service
+  - backup-job
+  - caddy-https
+  - observability-stack
+  - oracle-overlay
+  - osrm-stack
+  - postgres
+  - redis
+  - web-frontends
+parentPath: []

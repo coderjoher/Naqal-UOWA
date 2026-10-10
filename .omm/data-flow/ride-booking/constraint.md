@@ -1,0 +1,1 @@
+At most one live request per student, wave and date: a unique-violation (P2002) becomes 409 "You already have a request for this wave". The fare is frozen on the RideRequest so later subscription or tier changes never alter what the driver collects.

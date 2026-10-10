@@ -1,0 +1,1 @@
+Driver data layer (lib/data/): session.dart (OTP session), runs.dart, run_controller.dart (drives an active run: GPS via Geolocator every 5 s, run actions and fares written to the naql_core outbox and synced every 5 s), taxi.dart (online heartbeat and offers), earnings.dart, image_document_picker.dart (document uploads).

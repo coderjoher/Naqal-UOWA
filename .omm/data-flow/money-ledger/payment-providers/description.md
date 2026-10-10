@@ -1,0 +1,1 @@
+PaymentProvider interface (apps/api/src/payments/payment-provider.ts, PA-04): collect(amount, reference) confirms money was received and returns an external reference. Registered: OfficeCashProvider (cash_office) and DriverCashProvider (cash_driver), both returning externalRef null. Electronic methods (zaincash, qi) can be added without schema change.

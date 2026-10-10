@@ -1,0 +1,1 @@
+Firebase Cloud Messaging HTTP v1 (fcm.googleapis.com/v1/projects/{id}/messages:send, OAuth via oauth2.googleapis.com). External push channel to the Flutter student and driver apps; configured by FCM_SERVICE_ACCOUNT. Android messages are sent with high priority.

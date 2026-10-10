@@ -1,0 +1,22 @@
+graph LR
+    otp-sign-in["OTP Sign-in\napps/api/src/drivers/otp.service.ts"]
+    application["Application Form\napps/api/src/drivers/drivers.service.ts"]
+    requirements["Driver Requirements\napps/api/src/driver-requirements/"]
+    document-upload["Document Upload\napps/api/src/drivers/drivers.controller.ts"]
+    document-store["Private Document Store\napps/api/src/storage/storage.service.ts"]
+    office-review["Office Review\napps/api/src/drivers/drivers.service.ts"]
+    document-links["Signed Document Links\napps/api/src/storage/files.controller.ts"]
+
+    otp-sign-in -->|"first login creates User + draft DriverProfile"| application
+    requirements -->|"required fields and document keys"| application
+    requirements -->|"allowed document keys"| document-upload
+    document-upload -->|"buffer -> drivers/{uni}/{driver}/{uuid}"| document-store
+    document-upload -->|"DriverDocument upsert (storageKey, mime, size)"| application
+    application -->|"submit: status pending"| office-review
+    office-review -->|"request link: DocumentAccess row + HMAC token"| document-links
+    document-links -->|"verify token, read bytes"| document-store
+
+    classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    class document-store store
+    class otp-sign-in entry

@@ -1,0 +1,1 @@
+Image builds: apps/api/Dockerfile (NestJS API), apps/dashboard/Dockerfile + nginx.conf (SPA with CSP, proxies /api/ and Socket.IO upgrade to api:3000), infra/flutter-web/Dockerfile + nginx.conf (builds student_app or driver_app for web via the APP build arg; make_icons.py generates icons).

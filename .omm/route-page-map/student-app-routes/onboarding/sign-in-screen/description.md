@@ -1,0 +1,1 @@
+`/sign-in` (onboarding/sign_in_screen.dart): student number + password, verified by the API against the university's configured identity provider (manual roster, HTTP API or OIDC; apps/api/src/identity). Links to /activate for first-time roster activation and back to /university.

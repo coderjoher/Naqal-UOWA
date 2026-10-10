@@ -1,0 +1,9 @@
+created: 2026-10-10T17:38:15.023Z
+updated: 2026-10-10T17:38:15.023Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: socket-adapter
+children: []
+parentPath:
+  - redis

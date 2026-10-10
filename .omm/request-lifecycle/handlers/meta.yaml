@@ -1,0 +1,28 @@
+created: 2026-10-10T17:36:31.328Z
+updated: 2026-10-10T17:37:51.079Z
+update_count: 3
+last_field: diagram
+kind: nested-class
+title: handlers
+children:
+  - controllers
+  - job-queues
+  - read-caches
+  - realtime-emit
+  - services
+parentPath: []
+prev_diagram: >
+  graph LR
+      controllers["Controllers\nsrc/*/*.controller.ts"]
+      services["Services and Rules\nsrc/*/*.service.ts, *-rules.ts"]
+      read-caches["Read Caches\nconfig-cache/, common/swr-cache.ts"]
+      job-queues["BullMQ Queues\ndispatch/, taxi/, routing/"]
+      realtime-emit["Realtime Emit\nlive/live.hub.ts"]
+
+      controllers -->|"@CurrentUser + validated DTO"| services
+      services -->|"tiers/points/waves config, office board and ops views"| read-caches
+      services -->|"enqueue plan, recheck, matrix jobs"| job-queues
+      services -->|"bus, run, taxi, notification events"| realtime-emit
+
+      classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+      class controllers entry

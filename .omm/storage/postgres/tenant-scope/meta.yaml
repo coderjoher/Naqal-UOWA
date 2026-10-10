@@ -1,0 +1,9 @@
+created: 2026-10-10T17:37:23.339Z
+updated: 2026-10-10T17:37:23.339Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: tenant-scope
+children: []
+parentPath:
+  - postgres

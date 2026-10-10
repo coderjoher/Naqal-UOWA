@@ -1,0 +1,1 @@
+Initial state. Created on first OTP sign-in (DriversService.verifyOtp) or lazily by mine() for seeded/imported drivers. The driver fills name, vehicle, plate, seats, model year and uploads required documents.

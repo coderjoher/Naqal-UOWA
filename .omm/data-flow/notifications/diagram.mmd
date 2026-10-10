@@ -1,0 +1,17 @@
+graph LR
+    notification-rules["Notification Rules\napps/api/src/notifications/rules.ts"]
+    outbox-table["Notification Outbox\nNotification (schema.prisma)"]
+    deliver-pending["Deliver Pending\napps/api/src/notifications/notifications.service.ts"]
+    device-tokens["Device Tokens\nDeviceToken (schema.prisma)"]
+    push-sender["Push Sender\napps/api/src/notifications/push.ts"]
+
+    notification-rules -->|"drafts with dedupeKey, written in business tx"| outbox-table
+    outbox-table -->|"rows with pushedAt null (claimed atomically)"| deliver-pending
+    device-tokens -->|"FCM tokens of the recipients"| deliver-pending
+    deliver-pending -->|"Arabic title/body + data per token"| push-sender
+    push-sender -->|"invalid-token: delete row"| device-tokens
+
+    classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e
+    classDef external fill:#585b70,stroke:#585b70,color:#cdd6f4
+    class outbox-table,device-tokens store
+    class push-sender external

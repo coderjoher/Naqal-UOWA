@@ -1,0 +1,3 @@
+- Dashboard routes and the navigation menu share a single source: apps/dashboard/src/app/nav.ts (NAV groups with per-item roles). App.tsx enforces the same roles with RequireRole.
+- Both Flutter apps define a Riverpod `routerProvider` whose `redirect` callback re-runs (refreshListenable) whenever auth / application state changes, so navigation is state-driven rather than imperative.
+- Flutter web builds of both apps are served by nginx (infra/flutter-web) with history-mode routing; the same routes apply on Android/iOS.

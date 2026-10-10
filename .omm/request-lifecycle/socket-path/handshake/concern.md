@@ -1,0 +1,1 @@
+Authentication happens once per connection: expiry or suspension is not re-checked for live sockets. The gateway also sets cors origin: true and allows the polling transport, and has no per-socket message rate limit.

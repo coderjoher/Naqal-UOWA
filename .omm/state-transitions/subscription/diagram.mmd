@@ -1,0 +1,12 @@
+graph LR
+    active["Active\nSubscriptionStatus.active"]
+    cancelled["Cancelled\nSubscriptionStatus.cancelled"]
+    student-view["Student View Status\nsubscriptions.service.ts forStudent"]
+
+    active -->|"office reverses the payment (PaymentsService.reverse)"| cancelled
+    active -->|"derived per request: none / active / expiring / expired"| student-view
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e
+    class active entry
+    class cancelled store

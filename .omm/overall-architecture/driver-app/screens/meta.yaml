@@ -1,0 +1,9 @@
+created: 2026-10-10T17:28:39.898Z
+updated: 2026-10-10T17:28:39.899Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: screens
+children: []
+parentPath:
+  - driver-app

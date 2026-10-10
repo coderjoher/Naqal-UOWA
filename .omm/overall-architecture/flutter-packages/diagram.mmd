@@ -1,0 +1,7 @@
+graph LR
+    naql-app["naql_app\npackages/naql_app/"]
+    naql-core["naql_core\npackages/naql_core/"]
+    naql-ui["naql_ui\npackages/naql_ui/"]
+
+    naql-app -->|"builds ApiClient and LiveFeed providers"| naql-core
+    naql-app -->|"applies theme at bootstrap"| naql-ui

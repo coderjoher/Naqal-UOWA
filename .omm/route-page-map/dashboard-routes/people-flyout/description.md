@@ -1,0 +1,1 @@
+Flyout group `nav.group.people` (office only): `/drivers` -> pages/DriversPage.tsx (driver applications, documents, approval/suspension), `/students` -> pages/StudentsPage.tsx (student roster), `/users` -> pages/UsersPage.tsx (office staff accounts).

@@ -1,0 +1,1 @@
+Defaults are demo-oriented: JWT_SECRET falls back to a hard-coded dev secret, POSTGRES_PASSWORD is `naql`, and DEMO=true echoes OTP codes. Only the deploy/oracle overlay enforces DB_PASSWORD and JWT_SECRET, so running the base compose on a public host is unsafe.

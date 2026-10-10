@@ -1,0 +1,22 @@
+graph LR
+    oracle-overlay["Oracle Overlay\ndeploy/oracle/compose.server.yml + up.sh"]
+    caddy-https["Caddy HTTPS\nservice https (profile https)"]
+    web-frontends["Web Frontends\ndashboard, student-web, driver-web (nginx)"]
+    api-service["API Service\napps/api/Dockerfile"]
+    postgres["PostgreSQL\npostgres:16-bookworm"]
+    redis["Redis\nredis:7-alpine"]
+    osrm-stack["OSRM Stack\nosrm-download, osrm-prepare, osrm"]
+    backup-job["Backup Job\ninfra/backup (profile backup)"]
+    observability-stack["Observability Stack\nprometheus, grafana, jaeger (profile observability)"]
+    oracle-overlay -->|"enables https + backup profiles, hides other ports"| caddy-https
+    caddy-https -->|"reverse_proxy per domain :80"| web-frontends
+    web-frontends -->|"nginx /api/ proxy incl. Socket.IO upgrade"| api-service
+    api-service -->|"Prisma DATABASE_URL"| postgres
+    api-service -->|"BullMQ queues + Socket.IO redis-adapter"| redis
+    api-service -->|"OSRM_URL route / table queries"| osrm-stack
+    backup-job -->|"nightly pg_dump"| postgres
+    observability-stack -->|"scrape api:9464 metrics, OTLP traces :4318"| api-service
+    class oracle-overlay,caddy-https entry
+    class postgres,redis store
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e

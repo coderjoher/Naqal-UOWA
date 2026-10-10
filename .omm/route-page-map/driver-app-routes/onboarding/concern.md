@@ -1,0 +1,1 @@
+The OTP step depends on an SMS gateway, but the API only binds ConsoleSmsSender (apps/api/src/app.module.ts). Without DEMO/OTP_DEV_ECHO=true the code is only written to the API log, so real drivers cannot complete /code in production until a gateway is plugged in.

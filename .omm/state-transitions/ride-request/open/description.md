@@ -1,0 +1,1 @@
+Initial state set by RidesService.request (dispatch/rides.service.ts). The request carries point, tier, gender, subscriber flag and fare (0 or tier difference for subscribers, tier ridePrice otherwise). If the wave is already planned, a waitlist.recheck job is enqueued immediately; otherwise it waits for wave.plan.

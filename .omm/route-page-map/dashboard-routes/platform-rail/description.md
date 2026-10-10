@@ -1,0 +1,1 @@
+Rail group `nav.group.platform` with a single item: `/universities` -> pages/UniversitiesPage.tsx, guarded by RequireRole(['super_admin']). Multi-tenant administration (create universities, configure their integrations such as the identity provider).

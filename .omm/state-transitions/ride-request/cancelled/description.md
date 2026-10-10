@@ -1,0 +1,1 @@
+Terminal. Reached by student cancel (cancelReason=student, ST-08) or waitlist expiry (cancelReason=expired, ride.expired notification). runId and waitlistedUntil are cleared; cancelling an assigned ride frees the seat and enqueues a waitlist.recheck.

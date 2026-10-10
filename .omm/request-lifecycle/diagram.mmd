@@ -1,0 +1,37 @@
+graph LR
+    client["Client\napps/dashboard, apps/student_app, apps/driver_app"]
+    edge-proxy["Reverse Proxy\napps/dashboard/nginx.conf, infra/caddy/"]
+    bootstrap["Process Bootstrap\napps/api/src/main.ts, setup-app.ts"]
+    middleware["Middleware Chain\nhelmet, observability/metrics.ts, tenancy/tenant.middleware.ts"]
+    guards["Global Guards\nsecurity/rate-limit.ts, auth/*.guard.ts"]
+    audit-interceptor["Audit Interceptor\naudit/audit.interceptor.ts"]
+    validation-pipe["Validation Pipe\nsetup-app.ts, *.dto.ts"]
+    handlers["Controllers and Services\nsrc/*/*.controller.ts, *.service.ts"]
+    tenant-prisma["Tenant-scoped Prisma\ntenancy/tenant-scope.ts, prisma/prisma.service.ts"]
+    exception-filter["Exception Filter\nobservability/sentry.filter.ts"]
+    socket-path["Socket.IO Path\nlive/"]
+    postgres["PostgreSQL\napps/api/prisma/"]
+    redis["Redis\nredis/redis.module.ts"]
+
+    client -->|"HTTPS /api/* and WebSocket upgrade"| edge-proxy
+    edge-proxy -->|"proxy_pass to api:3000, X-Forwarded-For"| bootstrap
+    bootstrap -->|"Express app per cluster worker"| middleware
+    middleware -->|"opens empty tenant store, then routes"| guards
+    guards -->|"user + tenant store filled"| audit-interceptor
+    audit-interceptor -->|"wraps handler call"| validation-pipe
+    validation-pipe -->|"whitelisted, transformed DTOs"| handlers
+    handlers -->|"db.* queries inside tenant context"| tenant-prisma
+    tenant-prisma -->|"SQL with universityId filter"| postgres
+    guards -->|"rate-limit counters"| redis
+    handlers -->|"ConfigCache, BullMQ jobs, live GPS"| redis
+    guards -->|"401 / 403 / 429 thrown"| exception-filter
+    handlers -->|"HttpException or unexpected error"| exception-filter
+    edge-proxy -->|"/socket.io upgrade to namespace /live"| socket-path
+    socket-path -->|"pub/sub fan-out across workers"| redis
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e
+    classDef external fill:#585b70,stroke:#585b70,color:#cdd6f4
+    class bootstrap,socket-path entry
+    class postgres,redis store
+    class client,edge-proxy external

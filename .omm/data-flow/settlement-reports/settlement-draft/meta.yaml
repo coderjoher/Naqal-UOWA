@@ -1,0 +1,9 @@
+created: 2026-10-10T17:33:17.531Z
+updated: 2026-10-10T17:33:17.531Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: settlement-draft
+children: []
+parentPath:
+  - settlement-reports

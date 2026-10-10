@@ -1,0 +1,4 @@
+- wave.plan uses jobId plan-{waveId}-{date}: duplicate enqueues while the job exists collapse; plan() itself falls through to a recheck if a WavePlan row already exists (planned exactly once).
+- recheck() is a no-op before the wave is planned.
+- Job options: wave.plan 3 attempts / backoff 2 s; waitlist.recheck 3 attempts / backoff 1 s; waitlist.expire 3 attempts, delay = waitlistedUntil - now; removeOnComplete everywhere, failed jobs kept (100).
+- The wave-tick scheduler is skipped when DISPATCH_TICK=off.

@@ -1,0 +1,23 @@
+graph LR
+    core-platform["Core Platform\nmain.ts, setup-app.ts, auth/, tenancy/, prisma/"]
+    identity-drivers["Identity and Drivers\nidentity/, students/, drivers/, users/, storage/"]
+    university-config["University Config\nuniversities/, tiers/, gathering-points/, driver-requirements/"]
+    dispatch-operations["Dispatch and Runs\ndispatch/, waves/, runs/, routing/"]
+    taxi["On-demand Taxi\ntaxi/"]
+    payments-settlement["Payments and Settlement\nsubscriptions/, payments/, settlement/"]
+    live-notifications["Live and Notifications\nlive/, notifications/, geo/"]
+    admin-reports["Feedback, Announcements, Reports\nfeedback/, announcements/, reports/"]
+
+    core-platform -->|"guards, tenant context, Prisma client for every module"| identity-drivers
+    university-config -->|"tiers, points, waves define bookable service"| dispatch-operations
+    identity-drivers -->|"approved drivers and active students"| dispatch-operations
+    payments-settlement -->|"subscription status sets booking priority"| dispatch-operations
+    dispatch-operations -->|"run status, run changes, GPS ingest"| live-notifications
+    taxi -->|"offers, ride state to sockets and push"| live-notifications
+    dispatch-operations -->|"completed runs and fares feed payouts"| payments-settlement
+    taxi -->|"cash fares feed driver settlement"| payments-settlement
+    admin-reports -->|"aggregate runs, payments, ratings"| dispatch-operations
+    admin-reports -->|"announcements fan out as notifications"| live-notifications
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    class core-platform entry

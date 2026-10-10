@@ -1,0 +1,19 @@
+graph LR
+    planned["Planned\nRunStatus.planned"]
+    started["Started\nRunStatus.started"]
+    at-stop["At Stop\nRunStatus.at_stop"]
+    done["Done\nRunStatus.done"]
+    cancelled["Cancelled\nRunStatus.cancelled"]
+
+    planned -->|"driver 'start' (return: board on campus, no-show wait)"| started
+    started -->|"driver 'arrive' at next stop, stopsLeft > 0"| at-stop
+    at-stop -->|"driver 'depart': wait elapsed or all boarded, stop served"| started
+    started -->|"driver 'end' when stopsLeft = 0"| done
+    planned -.->|"enum only: no code path sets it"| cancelled
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e
+    classDef concern fill:#f38ba8,stroke:#f38ba8,color:#1e1e2e
+    class planned entry
+    class done store
+    class cancelled concern

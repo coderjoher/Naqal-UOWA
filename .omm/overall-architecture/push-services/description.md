@@ -1,0 +1,1 @@
+Outbound messaging providers. Push: Firebase Cloud Messaging HTTP v1 via FcmPushSender when FCM_SERVICE_ACCOUNT is set, otherwise LogPushSender (src/notifications/push.ts). SMS for driver OTP: currently ConsoleSmsSender is bound in app.module.ts (codes are logged / echoed in demo mode via OTP_DEV_ECHO).

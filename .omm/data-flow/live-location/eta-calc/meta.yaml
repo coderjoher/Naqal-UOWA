@@ -1,0 +1,9 @@
+created: 2026-10-10T17:31:26.356Z
+updated: 2026-10-10T17:31:26.356Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: eta-calc
+children: []
+parentPath:
+  - live-location

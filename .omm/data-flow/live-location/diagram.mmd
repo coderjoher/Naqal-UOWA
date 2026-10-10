@@ -1,0 +1,20 @@
+graph LR
+    live-gateway["Live Gateway\napps/api/src/live/live.gateway.ts"]
+    gps-ingest["GPS Ingest\napps/api/src/live/live.service.ts"]
+    redis-live-keys["Redis Live Keys\nlive:last / live:geo / live:pos / live:near"]
+    position-sampling["Position Sampling\nRunPosition (schema.prisma)"]
+    eta-calc["ETA Calculation\napps/api/src/live/eta.ts"]
+    live-hub["Live Hub\napps/api/src/live/live.hub.ts"]
+
+    live-gateway -->|"gps message (driver sockets only)"| gps-ingest
+    gps-ingest -->|"SET NX per run-minute and near-stop keys"| redis-live-keys
+    gps-ingest -->|"HSET last point, GEOADD"| redis-live-keys
+    redis-live-keys -->|"only points that won a slot"| position-sampling
+    gps-ingest -->|"latest point + cached route legs"| eta-calc
+    eta-calc -->|"seconds to each remaining stop"| live-hub
+    live-hub -->|"bus event to run and ops rooms"| live-gateway
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e
+    class live-gateway entry
+    class redis-live-keys,position-sampling store

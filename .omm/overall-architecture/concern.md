@@ -1,0 +1,2 @@
+- Redis is a hard runtime dependency for more than caching: sign-in rate limiting, BullMQ dispatch/taxi/routing jobs, the Socket.IO adapter and live GPS all depend on it. A Redis outage blocks sign-in (rate-limit guard throws) and stops dispatch planning.
+- The docker-compose header comment still says "PostgreSQL (PostGIS)" but the image is plain postgres:16-bookworm; geo math is done in application code (src/geo/geo.ts).

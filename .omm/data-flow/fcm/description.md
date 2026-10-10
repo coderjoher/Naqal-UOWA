@@ -1,0 +1,1 @@
+Firebase Cloud Messaging HTTP v1 (external). Receives push messages from FcmPushSender (apps/api/src/notifications/push.ts) for ride, run, taxi, announcement and problem-report events; configured with the FCM_SERVICE_ACCOUNT JSON. Without it the API logs pushes instead (LogPushSender) and only in-app delivery works.

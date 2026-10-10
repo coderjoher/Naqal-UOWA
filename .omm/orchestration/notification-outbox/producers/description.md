@@ -1,0 +1,1 @@
+Services that create notifications: DispatchEngine (ride.assigned/waitlisted/bumped/expired, ride.moved, run.changed), RunsService (ride.arrived at stop), LiveService (ride.approaching from GPS ETAs), TaxiService (taxi.offer/accepted/arrived/cancelled/expired), FeedbackService (problem.answered), AnnouncementsService (announcement to a wave, point or everyone).

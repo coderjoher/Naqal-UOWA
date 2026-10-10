@@ -1,0 +1,1 @@
+`/activate` (onboarding/activate_screen.dart): first-time activation for roster students — student number, the activation code issued by the office (NaqlOtpField) and a new password (min 8 chars); calls authProvider.activate, which signs the student in.

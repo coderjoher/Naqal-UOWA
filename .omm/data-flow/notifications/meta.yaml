@@ -1,0 +1,13 @@
+created: 2026-10-10T17:32:03.087Z
+updated: 2026-10-10T17:32:03.526Z
+update_count: 3
+last_field: concern
+kind: nested-class
+title: notifications
+children:
+  - deliver-pending
+  - device-tokens
+  - notification-rules
+  - outbox-table
+  - push-sender
+parentPath: []

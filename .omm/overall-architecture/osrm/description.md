@@ -1,0 +1,1 @@
+Self-hosted OSRM routing engine (osrm-backend v5.27.1, MLD algorithm) on the Geofabrik Iraq extract, prepared by infra/osrm/prepare.sh. The API calls it through src/routing/osrm.client.ts for travel-time tables between gathering points and campus; results are stored as TravelTime rows by the travel-matrix BullMQ processor.

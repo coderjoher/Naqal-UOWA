@@ -1,0 +1,4 @@
+- Race fix (commit b0a6ec9): DispatchEngine.save() re-assigns riders with updateMany where status IN (open, waitlisted, assigned). A ride that became done, no_show or cancelled after the plan snapshot was loaded is never flipped back to assigned; no_show riders stay counted on the bus they missed.
+- At most one live request per student, wave and date (unique index; P2002 -> 409 "You already have a request for this wave").
+- Requests only for today or tomorrow, before the wave time.
+- cancel() rejects closed requests (cancelled/done/no_show) and riders with boardedAt set.

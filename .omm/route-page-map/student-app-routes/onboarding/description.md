@@ -1,0 +1,1 @@
+Signed-out flow in apps/student_app/lib/screens/onboarding/: welcome -> university picker -> sign-in (student number + university identity) or activate (roster activation code) -> choose pickup point. Only these routes are reachable without a session (the `_onboarding` set in router.dart, plus /choose-point once signed in).

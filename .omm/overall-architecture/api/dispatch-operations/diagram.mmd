@@ -1,0 +1,17 @@
+graph LR
+    rides["Ride Requests and Board\ndispatch/rides.*"]
+    dispatch-engine["Dispatch Engine\ndispatch/dispatch.engine.ts, domain/"]
+    dispatch-queue["Dispatch Worker\ndispatch/dispatch.processor.ts"]
+    waves["Waves\nwaves/"]
+    runs["Runs\nruns/"]
+    routing["Routing\nrouting/"]
+
+    rides -->|"place or cancel a request in planned runs"| dispatch-engine
+    dispatch-queue -->|"wave.tick / wave.plan / waitlist jobs"| dispatch-engine
+    dispatch-engine -->|"enqueue plan and re-check jobs (BullMQ)"| dispatch-queue
+    dispatch-engine -->|"reads wave slots and lead time"| waves
+    dispatch-engine -->|"travel times between stops"| routing
+    dispatch-engine -->|"creates Runs and RunStops"| runs
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    class dispatch-queue entry

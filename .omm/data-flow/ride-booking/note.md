@@ -1,0 +1,1 @@
+The one-live-request rule is enforced by a partial unique index created in raw SQL (migration 20261004210000_p4_dispatch: `ride_requests_one_live` on (student_id, wave_id, date) WHERE status IN ('open','assigned','waitlisted')); it is not visible in schema.prisma. After writing, the SWR office-view cache (common/swr-cache.ts officeViews) is invalidated for the university.

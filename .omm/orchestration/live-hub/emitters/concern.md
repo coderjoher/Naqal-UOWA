@@ -1,0 +1,1 @@
+cancelByDriver emits taxiRide with status 'requested' but no taxiGone/offer reset event to the taxi room before re-offering; drivers outside the new offer set rely on 'taxi:offer' and polling (offersFor via heartbeat) to see it again.

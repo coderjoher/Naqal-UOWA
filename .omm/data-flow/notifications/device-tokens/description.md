@@ -1,0 +1,1 @@
+DeviceToken model (schema.prisma, table device_tokens): one FCM registration per app install (unique token, platform, userId). Registered via POST /devices (NotificationsService.registerDevice); a token signed in by a new user moves to that user. Deleted when FCM answers 400/404 (invalid token).

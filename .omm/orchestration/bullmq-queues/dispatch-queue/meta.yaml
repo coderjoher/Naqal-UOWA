@@ -1,0 +1,15 @@
+created: 2026-10-10T17:31:22.322Z
+updated: 2026-10-10T17:31:22.778Z
+update_count: 3
+last_field: constraint
+kind: nested-class
+title: dispatch-queue
+children:
+  - dispatch-engine
+  - request-producers
+  - waitlist-expire
+  - waitlist-recheck
+  - wave-plan
+  - wave-tick
+parentPath:
+  - bullmq-queues

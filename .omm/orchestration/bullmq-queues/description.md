@@ -1,0 +1,1 @@
+The three BullMQ queues and their @Processor workers (WorkerHost from @nestjs/bullmq): 'dispatch' (DispatchProcessor: wave.tick scheduler, wave.plan, waitlist.recheck, waitlist.expire), 'taxi' (TaxiProcessor: taxi.sweep scheduler every 20 s) and 'routing' (TravelMatrixProcessor: travel-matrix.rebuild). Workers run in every API process; Redis holds the jobs.

@@ -1,0 +1,3 @@
+- CORS defaults to `origin: true` (reflect any origin) when CORS_ORIGIN is unset; with bearer tokens this is not a CSRF risk but should be pinned in production.
+- A single flat AppModule wires ~30 providers by hand; module boundaries are by folder convention only, so any service can inject any other.
+- BullMQ processors run in every API worker process, so request handling and planning jobs share CPU.

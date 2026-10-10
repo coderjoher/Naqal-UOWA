@@ -1,0 +1,10 @@
+created: 2026-10-10T17:34:07.378Z
+updated: 2026-10-10T17:34:07.379Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: settlement
+children: []
+parentPath:
+  - api
+  - payments-settlement

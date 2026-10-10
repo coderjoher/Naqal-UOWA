@@ -1,0 +1,1 @@
+PostgreSQL reached only through the tenant-scoped Prisma client (DATABASE_URL). On the request path it serves the user status lookup in JwtAuthGuard (when not cached), all handler reads/writes (often in interactive transactions), and the AuditEvent insert after successful admin mutations.

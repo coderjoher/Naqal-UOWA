@@ -1,0 +1,7 @@
+graph LR
+    subscriptions["Subscriptions\nsubscriptions/"]
+    payments["Payments\npayments/"]
+    settlement["Driver Settlement\nsettlement/"]
+
+    subscriptions -->|"collect subscription fee, render receipt"| payments
+    settlement -->|"net driver-kept cash fares and reversals"| payments

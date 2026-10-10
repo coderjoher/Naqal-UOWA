@@ -1,0 +1,1 @@
+StorageService (apps/api/src/storage/storage.service.ts, NF-13): private disk storage under STORAGE_DIR (default ./storage; /data/storage on the `storage` Docker volume). put() writes `{prefix}/{uuid}` with mode 0600 in 0700 directories; read() refuses paths escaping the root. Designed so an S3/MinIO adapter can replace the disk backend without changing callers.

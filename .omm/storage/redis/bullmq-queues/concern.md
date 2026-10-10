@@ -1,0 +1,1 @@
+Redis has no persistence configured in docker-compose.yml, so delayed jobs (waitlist.expire) and pending plans vanish on a Redis restart. The wave tick re-queues unplanned waves within a minute, and later rechecks expire overdue waitlist entries, but expiry notifications can be late.

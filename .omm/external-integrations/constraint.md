@@ -1,0 +1,3 @@
+- No integration is mandatory for a pilot: empty SENTRY_DSN, FCM_SERVICE_ACCOUNT, MAP_TILES, BACKUP_REMOTE or identity config each fall back to a local behaviour (no reporting, log-only push, OSM tiles, local backups only, manual roster).
+- Client-side settings (VITE_MAP_TILES, VITE_SENTRY_DSN, MAP_TILES, SENTRY_DSN, API_URL) are baked in at build time; changing them requires rebuilding the dashboard image / Flutter apps.
+- Map attribution must match the tile provider (OpenStreetMap requires "© OpenStreetMap contributors").

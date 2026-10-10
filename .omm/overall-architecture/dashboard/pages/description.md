@@ -1,0 +1,1 @@
+One component per screen (src/pages/): Overview, Dispatch (wave board), LiveOps (live map of runs), Students, Drivers, Subscriptions, Settlement, Taxi, Reports, Inbox (feedback/problem reports), Announcements, Audit, Users, Universities (super admin), Login, and settings/ (Tiers, Points, Waves, driver Requirements).

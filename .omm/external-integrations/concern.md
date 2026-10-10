@@ -1,0 +1,3 @@
+- SMS: only ConsoleSmsSender is registered for SMS_SENDER (apps/api/src/app.module.ts). With DEMO=false driver OTP codes are not delivered anywhere except the API log.
+- Push: the API can send FCM, and naql_core exposes ApiClient.registerDevice (POST /devices), but no Flutter app depends on firebase_messaging or calls registerDevice, so no device tokens are ever stored and FCM delivery is effectively unused; notifications reach users only via Socket.IO + in-app list.
+- OpenStreetMap's tile usage policy forbids heavy use; a keyed provider is required before full launch (docs/OPERATIONS.md §8).

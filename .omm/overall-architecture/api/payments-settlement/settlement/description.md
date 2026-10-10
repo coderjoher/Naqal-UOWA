@@ -1,0 +1,1 @@
+settlement/: SettlementController/Service compute monthly driver settlements (Settlement + SettlementLine rows): verify.ts checks each run's stored GPS track against its stops, payout.ts computes payouts in basis points, taxi cash fares kept by drivers are netted (including reversals), settlement-export.ts produces PDF and XLSX. Writes audit rows through AuditService.

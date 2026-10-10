@@ -1,0 +1,9 @@
+created: 2026-10-10T17:32:44.392Z
+updated: 2026-10-10T17:32:44.392Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: receipt-counter
+children: []
+parentPath:
+  - money-ledger

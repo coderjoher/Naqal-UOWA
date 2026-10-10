@@ -1,0 +1,12 @@
+created: 2026-10-10T17:28:20.930Z
+updated: 2026-10-10T17:28:21.150Z
+update_count: 2
+last_field: diagram
+kind: nested-class
+title: student-app
+children:
+  - app-shell
+  - data
+  - l10n
+  - screens
+parentPath: []

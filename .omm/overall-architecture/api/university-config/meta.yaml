@@ -1,0 +1,9 @@
+created: 2026-10-10T17:33:07.232Z
+updated: 2026-10-10T17:33:07.232Z
+update_count: 1
+last_field: description
+kind: nested-class
+title: university-config
+children: []
+parentPath:
+  - api

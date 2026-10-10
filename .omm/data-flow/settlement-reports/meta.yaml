@@ -1,0 +1,15 @@
+created: 2026-10-10T17:33:16.469Z
+updated: 2026-10-10T17:33:16.901Z
+update_count: 3
+last_field: constraint
+kind: nested-class
+title: settlement-reports
+children:
+  - monthly-reports
+  - payout-formula
+  - run-review
+  - settlement-approval
+  - settlement-draft
+  - settlement-export
+  - settlement-inputs
+parentPath: []

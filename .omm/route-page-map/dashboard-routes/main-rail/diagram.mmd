@@ -1,0 +1,16 @@
+graph LR
+    overview-page["Overview\n/ pages/OverviewPage.tsx"]
+    live-ops-page["Live Ops\n/live pages/LiveOpsPage.tsx"]
+    dispatch-page["Dispatch\n/dispatch pages/DispatchPage.tsx"]
+    taxi-page["Taxi\n/taxi pages/TaxiPage.tsx"]
+    subscriptions-page["Subscriptions\n/subscriptions pages/SubscriptionsPage.tsx"]
+    settlement-page["Settlement\n/settlement pages/SettlementPage.tsx"]
+    reports-page["Reports\n/reports pages/ReportsPage.tsx"]
+    overview-page -->|"wave card Link to /dispatch"| dispatch-page
+    overview-page -->|"same live-runs feed, full map view"| live-ops-page
+    overview-page -->|"same MapLibre MapView, taxi markers"| taxi-page
+    dispatch-page -->|"planned runs become live runs"| live-ops-page
+    live-ops-page -->|"completed runs are verified in settlement"| settlement-page
+    subscriptions-page -->|"subscription revenue by tier"| reports-page
+    class overview-page entry
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e

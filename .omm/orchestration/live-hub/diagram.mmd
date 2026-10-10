@@ -1,0 +1,18 @@
+graph LR
+    live-gateway["Live Gateway\napps/api/src/live/live.gateway.ts"]
+    rooms["Socket Rooms\napps/api/src/live/live.hub.ts rooms"]
+    emitters["LiveHub Emitters\napps/api/src/live/live.hub.ts"]
+    live-service["GPS Ingest\napps/api/src/live/live.service.ts"]
+    redis-io-adapter["Redis IO Adapter\napps/api/src/live/redis-io.adapter.ts"]
+
+    live-gateway -->|"handleConnection joins user/ops/driver, 'join' joins run"| rooms
+    live-gateway -->|"afterInit: hub.attach(server)"| emitters
+    live-gateway -->|"'gps' message from driver socket"| live-service
+    live-service -->|"hub.bus to run + ops rooms"| emitters
+    emitters -->|"server.to(room).emit"| rooms
+    emitters -->|"emit published to every instance"| redis-io-adapter
+
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e
+    class live-gateway entry
+    class redis-io-adapter store

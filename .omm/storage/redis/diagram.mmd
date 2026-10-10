@@ -1,0 +1,21 @@
+graph LR
+    redis-client["Shared ioredis Client\napps/api/src/redis/redis.module.ts"]
+    config-cache["Config Cache cfg:*\napps/api/src/config-cache/config-cache.service.ts"]
+    rate-limits["Rate-limit Counters rl:*\napps/api/src/security/rate-limit.ts"]
+    live-keys["Live Tracking Keys live:*\napps/api/src/live/live.service.ts"]
+    taxi-online["Online Taxi Hash taxi:online:uni\napps/api/src/taxi/taxi.service.ts"]
+    bullmq-queues["BullMQ Queues naql:*\napps/api/src/app.module.ts"]
+    socket-adapter["Socket.IO Adapter naql:io\napps/api/src/live/redis-io.adapter.ts"]
+
+    redis-client -->|"GET/SET EX 3600, DEL on invalidate"| config-cache
+    redis-client -->|"MULTI INCR + EXPIRE per window"| rate-limits
+    redis-client -->|"pipeline SET NX, HSET, GEOADD"| live-keys
+    redis-client -->|"HSET / HGETALL / HDEL"| taxi-online
+    live-keys -->|"newest bus point emitted to run and ops rooms"| socket-adapter
+    taxi-online -->|"presence joins taxi room; offers emitted"| socket-adapter
+    bullmq-queues -->|"job handlers emit run:updated and taxi events"| socket-adapter
+
+    classDef store fill:#a6e3a1,stroke:#a6e3a1,color:#1e1e2e
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e
+    class config-cache,rate-limits,live-keys,taxi-online,bullmq-queues,socket-adapter store
+    class redis-client entry

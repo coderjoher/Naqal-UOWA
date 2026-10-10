@@ -1,0 +1,10 @@
+graph LR
+    today-tab["Today\n/today runs/today_screen.dart | taxi/taxi_home_screen.dart"]
+    schedule-tab["Schedule\n/schedule screens/schedule_screen.dart"]
+    earnings-tab["Earnings\n/earnings screens/earnings_screen.dart"]
+    profile-tab["Profile\n/profile screens/account_screen.dart"]
+    today-tab -->|"no runs yet: go /schedule"| schedule-tab
+    today-tab -->|"tab bar goBranch"| earnings-tab
+    today-tab -->|"tab bar goBranch"| profile-tab
+    class today-tab entry
+    classDef entry fill:#89b4fa,stroke:#89b4fa,color:#1e1e2e

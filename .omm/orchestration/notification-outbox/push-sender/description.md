@@ -1,0 +1,1 @@
+PushSender (notifications/push.ts), chosen by pushSenderFromEnv: FcmPushSender (FCM HTTP v1, service-account JWT exchanged for a cached OAuth token; 400/404 -> 'invalid-token') when FCM_SERVICE_ACCOUNT is set, otherwise LogPushSender which only logs (in-app socket delivery still works).
